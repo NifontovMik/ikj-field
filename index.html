@@ -1,0 +1,1004 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b3d63">
+<meta name="color-scheme" content="light">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>IKJ Field</title>
+<style>
+:root{
+  --ink:#14181d; --muted:#5b6672; --bg:#eef1f4; --card:#fff; --line:#d3d9e0;
+  --hdr:#0b3d63; --primary:#0b5cad; --primary-dark:#084a8c;
+  --ok:#1b7a35; --ok-bg:#e3f3e7; --red:#c00000; --red-bg:#fdecec; --blue:#0066cc; --blue-bg:#e7f0fb;
+  --warn:#8a5300; --warn-bg:#fff3dc;
+  --mono:ui-monospace,"Roboto Mono","Droid Sans Mono","SFMono-Regular",Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+  font:17px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;-webkit-text-size-adjust:100%}
+button,input,textarea{font:inherit;color:inherit}
+button{touch-action:manipulation;cursor:pointer}
+.hidden{display:none!important}
+
+/* header */
+header.top{position:sticky;top:0;z-index:20;background:var(--hdr);color:#fff;display:flex;align-items:center;gap:6px;
+  padding:8px 8px 8px 8px;padding-top:calc(8px + env(safe-area-inset-top));min-height:58px;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+header.top .title{flex:1;min-width:0;padding-left:4px}
+.t1{font-weight:700;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t2{font-size:13px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hbtn{background:transparent;border:0;color:#fff;min-width:46px;min-height:46px;border-radius:10px;font-size:24px;line-height:1;padding:0 8px}
+.hbtn:active{background:rgba(255,255,255,.18)}
+.hsend{background:#fff;color:var(--hdr);border:0;border-radius:10px;min-height:42px;padding:0 12px;font-weight:700;font-size:15px;position:relative}
+.badge{position:absolute;top:-6px;right:-6px;background:#e5484d;color:#fff;border-radius:999px;font-size:12px;min-width:20px;height:20px;line-height:20px;padding:0 5px;text-align:center}
+.offl{font-size:12px;background:#ffd166;color:#3a2a00;border-radius:999px;padding:3px 8px;font-weight:700;white-space:nowrap}
+
+main{padding:12px;padding-bottom:calc(110px + env(safe-area-inset-bottom));max-width:760px;margin:0 auto}
+.card{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin:0 0 10px}
+button.card:active{background:#f3f6f9}
+.muted{color:var(--muted)} .small{font-size:14px} .tiny{font-size:12px}
+.mono,.code{font-family:var(--mono)}
+.code{font-weight:700;font-size:18px;letter-spacing:.2px;word-break:break-all}
+.red{color:var(--red)} .blue{color:var(--blue)} .okc{color:var(--ok)}
+s{text-decoration-thickness:2px}
+h3{font-size:15px;margin:16px 2px 8px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+
+.btn{display:block;width:100%;min-height:50px;border-radius:12px;border:1px solid var(--line);background:#fff;font-weight:600;font-size:16px;margin:0 0 10px;padding:8px 12px}
+.btn:active{filter:brightness(.95)}
+.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.btn.danger{background:var(--red);border-color:var(--red);color:#fff}
+.btn.danger-outline{color:var(--red);border-color:var(--red)}
+.btn.add{border-style:dashed;border-color:var(--blue);color:var(--blue);background:var(--blue-bg)}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--muted)}
+.btn.big{min-height:58px;font-size:17px}
+.btn[disabled]{opacity:.5}
+.link{background:none;border:0;color:var(--primary);text-decoration:underline;padding:0 4px;font-size:inherit}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid2 .btn{margin:0}
+
+.chip{display:inline-block;font-size:12px;font-weight:700;border-radius:999px;padding:2px 8px;background:#e9edf1;color:var(--muted);white-space:nowrap}
+.chip.ok{background:var(--ok-bg);color:var(--ok)} .chip.prog{background:var(--warn-bg);color:var(--warn)}
+.chip.blue{background:var(--blue-bg);color:var(--blue)} .chip.red{background:var(--red-bg);color:var(--red)}
+.bar{height:6px;background:#e3e8ed;border-radius:99px;overflow:hidden;margin:8px 0 4px}
+.bar>i{display:block;height:100%;background:var(--ok)}
+.item-top{display:flex;align-items:center;justify-content:space-between;gap:4px 8px;flex-wrap:wrap}
+.mark{font-family:var(--mono);font-weight:700;font-size:18px;white-space:nowrap}
+.ft{margin-top:4px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.jid{font-family:var(--mono);font-weight:700;font-size:16px;word-break:break-all}
+.unsent{margin-top:6px;font-size:14px;font-weight:700;color:#b42318}
+.warnbox{background:var(--warn-bg);border:1px solid #f0c36d;color:#5c3900;border-radius:12px;padding:12px;margin:0 0 10px;font-size:15px}
+.errbox{background:var(--red-bg);border:1px solid #f1a9a9;color:#7a0b0b;border-radius:12px;padding:12px;margin:0 0 10px;font-size:15px;font-weight:600}
+
+.tabs{display:grid;grid-template-columns:1fr 1fr;background:#dfe5eb;border-radius:12px;padding:4px;margin:0 0 10px}
+.tabs button{border:0;background:transparent;min-height:44px;border-radius:9px;font-weight:700;color:var(--muted)}
+.tabs button.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.search,.inp{display:block;width:100%;min-height:50px;border:1px solid var(--line);border-radius:12px;background:#fff;padding:10px 12px;font-size:17px;margin:0 0 10px}
+.search:focus,.inp:focus{outline:2px solid var(--primary);border-color:var(--primary)}
+textarea.inp{min-height:84px;resize:vertical}
+.lbl{display:block;font-size:14px;font-weight:700;color:var(--muted);margin:6px 2px 6px}
+
+/* route */
+ol.route{list-style:none;margin:0 0 10px;padding:0}
+.rr{display:flex;align-items:stretch;gap:8px;background:#fff;border:1px solid var(--line);border-radius:12px;margin:0 0 8px;padding:6px}
+.rr .num{flex:0 0 30px;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--muted);font-size:14px}
+.rr .code-btn{flex:1;min-width:0;text-align:left;background:transparent;border:0;padding:6px 4px;display:flex;flex-direction:column;justify-content:center;gap:2px;min-height:52px}
+.rr .tick{flex:0 0 64px;border-radius:10px;border:2px solid var(--ok);background:#fff;color:var(--ok);font-size:28px;font-weight:800}
+.rr .tick.on{background:var(--ok);color:#fff}
+.rr.ok{background:var(--ok-bg);border-color:#b7dfc2}
+.rr.chg{background:var(--blue-bg);border-color:#b8d3f3}
+.rr.no{background:var(--red-bg);border-color:#f1b8b8}
+.rr.add{background:var(--blue-bg);border-color:#b8d3f3;border-style:dashed}
+.rr .more{flex:0 0 44px;border:0;background:transparent;font-size:24px;color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin:0 2px 10px}
+
+/* tray rows */
+.trow{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;margin:0 0 10px}
+.trow .tb{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px}
+.trow .tb button{min-height:50px;border-radius:10px;border:1px solid var(--line);background:#fff;font-weight:700;font-size:15px}
+.trow .tb .y{border:2px solid var(--ok);color:var(--ok)} .trow .tb .y.on{background:var(--ok);color:#fff}
+.trow .tb .n{border:2px solid var(--red);color:var(--red)} .trow .tb .n.on{background:var(--red);color:#fff}
+.trow .tb .o{border:2px solid var(--blue);color:var(--blue)} .trow .tb .o.on{background:var(--blue);color:#fff}
+.trow.ok{border-color:#b7dfc2} .trow.no{border-color:#f1b8b8} .trow.chg{border-color:#b8d3f3}
+
+/* photos */
+.photos{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px}
+.photos img{width:84px;height:84px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+
+/* sheet */
+#sheet{position:fixed;inset:0;z-index:50}
+.sheet-bd{position:absolute;inset:0;background:rgba(10,20,30,.45)}
+.sheet-pn{position:absolute;left:0;right:0;bottom:0;max-height:92vh;overflow:auto;background:var(--bg);border-radius:18px 18px 0 0;
+  padding:14px 12px calc(14px + env(safe-area-inset-bottom));max-width:760px;margin:0 auto;box-shadow:0 -4px 18px rgba(0,0,0,.25)}
+.sh-title{margin:2px 2px 12px}
+.sh-title .big{font-size:19px;font-weight:700}
+.shelves{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:0 0 12px}
+.sbtn{min-height:50px;border-radius:10px;border:1px solid var(--line);background:#fff;font-weight:800;font-size:18px;font-family:var(--mono)}
+.sbtn.cur{background:#dfe5eb;color:var(--muted)}
+.sbtn.wide{grid-column:span 2;font-size:14px;font-family:inherit}
+.clist{max-height:42vh;overflow:auto;margin:0 0 10px}
+.clist button{display:block;width:100%;text-align:left;min-height:48px;border:1px solid var(--line);border-radius:10px;background:#fff;margin:0 0 6px;padding:8px 12px;font-family:var(--mono);font-weight:700;font-size:17px}
+.clist button.pos{font-family:inherit;font-weight:600;font-size:16px}
+.hint{font-size:14px;margin:-4px 2px 10px}
+.chk{display:flex;align-items:center;gap:10px;font-size:16px;margin:0 2px 12px}
+.chk input{width:24px;height:24px}
+
+#toast{pointer-events:none;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom));z-index:60;background:#1d2733;color:#fff;
+  border-radius:12px;padding:12px 14px;font-size:15px;display:flex;gap:14px;align-items:center;max-width:92vw;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+#toast button{pointer-events:auto;background:transparent;border:0;color:#7cc4ff;font-weight:800;font-size:15px;padding:4px}
+#busy{position:fixed;inset:0;z-index:70;background:rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;font-weight:700}
+#upd{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:40;background:#1d2733;color:#fff;border-radius:12px;padding:12px;display:flex;align-items:center;gap:10px}
+#upd span{flex:1;font-size:15px}
+#upd button{background:#fff;color:#1d2733;border:0;border-radius:10px;min-height:42px;padding:0 14px;font-weight:800}
+.help p,.help li{font-size:16px}
+.help li{margin:0 0 8px}
+</style>
+</head>
+<body>
+<header class="top">
+  <button class="hbtn hidden" id="hBack" aria-label="Back">&#8592;</button>
+  <div class="title"><div class="t1" id="hT1">IKJ Field</div><div class="t2" id="hT2"></div></div>
+  <span class="offl hidden" id="hOff">Offline</span>
+  <div id="hAct"></div>
+</header>
+<main id="view"></main>
+<div id="sheet" class="hidden"></div>
+<div id="toast" class="hidden"></div>
+<div id="busy" class="hidden">Working…</div>
+<div id="upd" class="hidden"><span>A new version of the app is ready.</span><button id="updBtn">Update</button></div>
+<input type="file" id="fileJournal" class="hidden">
+<input type="file" id="fileBackup" class="hidden">
+<input type="file" id="filePhoto" accept="image/*" class="hidden">
+<script>
+'use strict';
+const APP_VERSION = '1.0.0';
+const EMBEDDED_JOURNAL = null; /*EMBED*/
+const ST = {U:'unchecked', OK:'ok', CHG:'changed', NO:'absent', ADD:'added'};
+const CODE_RE = /^\d{2}\.\d{2}[A-Z]{3}\d{2}\.\d{3}V?(\/\d{1,2})?$/;
+const SHELVES = Array.from({length: 17}, (_, i) => String(i));
+
+const $ = (s, el) => (el || document).querySelector(s);
+const view = $('#view'), sheet = $('#sheet');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const enc = encodeURIComponent, dec = decodeURIComponent;
+const nowIso = () => new Date().toISOString();
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const natCmp = (a, b) => String(a).localeCompare(String(b), 'en', {numeric: true, sensitivity: 'base'});
+const normCode = s => String(s || '').trim().toUpperCase().replace(/\s+/g, '').replace(/,/g, '.');
+const squash = s => String(s || '').toUpperCase().replace(/[^0-9A-Z]/g, '');
+function matchCodes(known, raw) {
+  const q = normCode(raw); if (!q) return known;
+  let list = known.filter(c => c.includes(q));
+  if (!list.length) { const qs = squash(raw); if (qs) list = known.filter(c => squash(c).includes(qs)); }
+  return list;
+}
+const shortId = id => { const p = String(id || '').split('.'); return p[p.length - 1] || id; };
+function splitCode(code) { const c = String(code || ''); const i = c.lastIndexOf('/'); return i < 0 ? {section: c, shelf: null} : {section: c.slice(0, i), shelf: c.slice(i + 1)}; }
+const withShelf = (section, shelf) => (shelf === null || shelf === '' ? section : section + '/' + shelf);
+function fmtTime(iso) {
+  if (!iso) return '';
+  const d = new Date(iso); const m = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()];
+  return `${String(d.getDate()).padStart(2, '0')} ${m} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+}
+function stamp() { const d = new Date(), p = n => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}`; }
+const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
+
+/* ---------------------------------------------------------------- storage */
+const Store = (() => {
+  let db = null, mode = 'idb';
+  const mem = new Map(), memPh = new Map();
+  function open() {
+    return new Promise(resolve => {
+      if (!('indexedDB' in window)) { mode = 'memory'; return resolve(); }
+      let done = false;
+      const fin = m => { if (done) return; done = true; if (m) mode = m; resolve(); };
+      const timer = setTimeout(() => fin('memory'), 5000);
+      try {
+        const req = indexedDB.open('ikj-field', 1);
+        req.onupgradeneeded = () => {
+          const d = req.result;
+          if (!d.objectStoreNames.contains('kv')) d.createObjectStore('kv');
+          if (!d.objectStoreNames.contains('photos')) d.createObjectStore('photos', {keyPath: 'id'});
+        };
+        req.onsuccess = () => { clearTimeout(timer); db = req.result; fin(); };
+        req.onerror = () => { clearTimeout(timer); fin('memory'); };
+      } catch (e) { clearTimeout(timer); fin('memory'); }
+    });
+  }
+  function tx(store, rw, fn) {
+    return new Promise((resolve, reject) => {
+      let out;
+      try {
+        const t = db.transaction(store, rw), s = t.objectStore(store), r = fn(s);
+        if (r) r.onsuccess = () => { out = r.result; };
+        t.oncomplete = () => resolve(out);
+        t.onerror = () => reject(t.error); t.onabort = () => reject(t.error || new Error('aborted'));
+      } catch (e) { reject(e); }
+    });
+  }
+  return {
+    open, get mode() { return mode; },
+    get: k => mode === 'memory' ? Promise.resolve(mem.get(k)) : tx('kv', 'readonly', s => s.get(k)),
+    set: (k, v) => mode === 'memory' ? (mem.set(k, JSON.parse(JSON.stringify(v))), Promise.resolve()) : tx('kv', 'readwrite', s => s.put(v, k)),
+    del: k => mode === 'memory' ? (mem.delete(k), Promise.resolve()) : tx('kv', 'readwrite', s => s.delete(k)),
+    keys: () => mode === 'memory' ? Promise.resolve([...mem.keys()]) : tx('kv', 'readonly', s => s.getAllKeys()),
+    putPhoto: p => mode === 'memory' ? (memPh.set(p.id, p), Promise.resolve()) : tx('photos', 'readwrite', s => s.put(p)),
+    getPhoto: id => mode === 'memory' ? Promise.resolve(memPh.get(id)) : tx('photos', 'readonly', s => s.get(id)),
+    delPhoto: id => mode === 'memory' ? (memPh.delete(id), Promise.resolve()) : tx('photos', 'readwrite', s => s.delete(id)),
+    allPhotos: () => mode === 'memory' ? Promise.resolve([...memPh.values()]) : tx('photos', 'readonly', s => s.getAll()),
+  };
+})();
+
+/* ---------------------------------------------------------------- state */
+const S = {settings: {inspector: ''}, journals: {}, results: {}, idx: {}, persisted: null, installEvt: null, storageError: false,
+           ui: {tab: {}, q: {}, scroll: {}, route: ''}};
+
+function buildIdx(jid) { const j = S.journals[jid]; S.idx[jid] = {byMark: new Map(j.cables.map(c => [c.mark, c]))}; }
+function newCableResult(c) { return {entries: (c.route || []).map(seg => ({k: uid(), seg, st: ST.U, t: null})), finished: false, factLength: null, note: '', photos: [], updated: null}; }
+function newResult(j) {
+  const r = {journalId: j.id, hash: j.hash, created: nowIso(), updated: null, lastSent: null, unsent: 0, cables: {}};
+  for (const c of j.cables) r.cables[c.mark] = newCableResult(c);
+  return r;
+}
+function mergeResult(old, j) {
+  const res = newResult(j); const changed = [];
+  Object.assign(res, {created: old.created, lastSent: old.lastSent, unsent: old.unsent || 0, updated: old.updated});
+  for (const c of j.cables) {
+    const oc = old.cables[c.mark]; if (!oc) continue;
+    const nc = res.cables[c.mark];
+    Object.assign(nc, {finished: oc.finished, factLength: oc.factLength, note: oc.note, photos: oc.photos || [], updated: oc.updated});
+    const oldDesign = oc.entries.filter(e => e.seg !== null).map(e => e.seg);
+    if (JSON.stringify(oldDesign) === JSON.stringify(c.route || [])) { nc.entries = oc.entries; continue; }
+    const pool = new Map(), addsAfter = new Map(); let anchor = '';
+    for (const e of oc.entries) {
+      if (e.seg === null) { if (!addsAfter.has(anchor)) addsAfter.set(anchor, []); addsAfter.get(anchor).push(e); }
+      else { if (!pool.has(e.seg)) pool.set(e.seg, []); pool.get(e.seg).push(e); anchor = e.seg; }
+    }
+    const out = []; (addsAfter.get('') || []).forEach(e => out.push(e)); addsAfter.delete('');
+    for (const seg of (c.route || [])) {
+      const lst = pool.get(seg); const prev = lst && lst.length ? lst.shift() : null;
+      out.push(prev || {k: uid(), seg, st: ST.U, t: null});
+      if (addsAfter.has(seg)) { addsAfter.get(seg).forEach(e => out.push(e)); addsAfter.delete(seg); }
+    }
+    for (const lst of addsAfter.values()) lst.forEach(e => out.push(e));
+    nc.entries = out; changed.push(c.mark);
+  }
+  const orphans = Object.assign({}, old.orphans || {});
+  for (const m in old.cables) if (!j.cables.some(c => c.mark === m)) orphans[m] = old.cables[m];
+  if (Object.keys(orphans).length) res.orphans = orphans;
+  return {res, changed};
+}
+
+let saveChain = Promise.resolve();
+function saveResult(jid) {
+  const snap = S.results[jid];
+  saveChain = saveChain.then(() => Store.set('result:' + jid, snap)).catch(err => { console.error(err); S.storageError = true; toast('Could not save to phone storage! Send results now.'); });
+  return saveChain;
+}
+async function saveSettings() { try { await Store.set('settings', S.settings); } catch (e) { console.error(e); } }
+
+let undo = null;
+function snapshotCable(jid, mark) { return {jid, mark, data: JSON.parse(JSON.stringify(S.results[jid].cables[mark]))}; }
+function commit(jid, mark, msg, snap) {
+  const r = S.results[jid]; r.unsent = (r.unsent || 0) + 1; r.updated = nowIso();
+  if (mark) r.cables[mark].updated = nowIso();
+  saveResult(jid);
+  if (snap) { undo = snap; toast(msg || 'Saved', 'Undo', doUndo); } else if (msg) toast(msg);
+}
+function doUndo() {
+  if (!undo) return; const {jid, mark, data} = undo; undo = null;
+  if (!S.results[jid]) return;
+  S.results[jid].cables[mark] = data; S.results[jid].unsent = (S.results[jid].unsent || 0) + 1; saveResult(jid); render(); toast('Undone');
+}
+
+/* ---------------------------------------------------------------- stats */
+function cableStats(rc) {
+  const s = {total: 0, checked: 0, ok: 0, chg: 0, no: 0, add: 0};
+  for (const e of rc.entries) {
+    if (e.seg === null) { s.add++; continue; }
+    s.total++; if (e.st !== ST.U) s.checked++;
+    if (e.st === ST.OK) s.ok++; else if (e.st === ST.CHG) s.chg++; else if (e.st === ST.NO) s.no++;
+  }
+  s.changes = s.chg + s.no + s.add; return s;
+}
+function journalStats(jid) {
+  const j = S.journals[jid], r = S.results[jid];
+  const t = {total: 0, checked: 0, changes: 0, cables: j.cables.length, done: 0, photos: 0};
+  for (const c of j.cables) {
+    const rc = r.cables[c.mark]; if (!rc) continue; const s = cableStats(rc);
+    t.total += s.total; t.checked += s.checked; t.changes += s.changes; if (rc.finished) t.done++; t.photos += (rc.photos || []).length;
+  }
+  return t;
+}
+const bar = (a, b) => `<div class="bar"><i style="width:${b ? Math.round(100 * a / b) : 0}%"></i></div>`;
+function knownCodes() {
+  const set = new Set();
+  for (const id in S.journals) for (const c of S.journals[id].cables) (c.route || []).forEach(x => set.add(x));
+  for (const id in S.results) for (const m in S.results[id].cables) for (const e of S.results[id].cables[m].entries) if (e.fact) set.add(e.fact);
+  return [...set].sort(natCmp);
+}
+
+/* ---------------------------------------------------------------- journals in/out */
+function validateJournal(o) {
+  if (!o || typeof o !== 'object') return 'The file is empty or damaged.';
+  if (o.format === 'ikj-field-results') return 'This is a RESULTS file (from “Send”), not a journal. Journals come from your supervisor.';
+  if (o.format === 'ikj-field-backup') return 'This is a BACKUP file. Use Settings → Restore from backup.';
+  if (o.format !== 'ikj-journal' || !o.id || !Array.isArray(o.cables)) return 'This is not an IKJ journal file.';
+  for (const c of o.cables) if (!c || !c.mark || !Array.isArray(c.route)) return 'The journal file is damaged (cable without mark or route).';
+  return null;
+}
+async function addJournal(j, opts = {}) {
+  const err = validateJournal(j); if (err) throw new Error(err);
+  const exist = S.journals[j.id];
+  if (exist && exist.hash === j.hash) { if (!opts.silent) toast('This journal is already on the phone.'); return j.id; }
+  if (exist) {
+    const ok = await confirmSheet(`<b>${esc(j.id)}</b> is already on this phone, but this file is a different version (the design was updated).<br><br>Update it? Your marks are kept where the trays are the same.`, 'Update journal', 'Cancel');
+    if (!ok) return null;
+  }
+  S.journals[j.id] = j; await Store.set('journal:' + j.id, j); buildIdx(j.id);
+  if (S.results[j.id]) {
+    const {res, changed} = mergeResult(S.results[j.id], j); S.results[j.id] = res;
+    if (changed.length) toast(`Journal updated. Routes changed for ${plural(changed.length, 'cable')}.`);
+  } else S.results[j.id] = newResult(j);
+  await saveResult(j.id);
+  if (!opts.silent && !exist) toast(`Loaded: ${shortId(j.id)} (${plural(j.cables.length, 'cable')})`);
+  return j.id;
+}
+function readFileText(file) { return new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = () => rej(fr.error); fr.readAsText(file); }); }
+function blobToDataURL(b) { return new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = () => rej(fr.error); fr.readAsDataURL(b); }); }
+async function dataURLToBlob(u) { const r = await fetch(u); return await r.blob(); }
+
+async function buildExport(jid, withPhotos) {
+  const j = S.journals[jid], r = S.results[jid], cables = [];
+  for (const c of j.cables) {
+    const rc = r.cables[c.mark];
+    const entries = rc.entries.map(e => { const o = {seg: e.seg, status: e.seg === null ? ST.ADD : e.st}; if (e.fact) o.fact = e.fact; if (e.t) o.t = e.t; return o; });
+    const photos = [];
+    for (const pid of (rc.photos || [])) {
+      const p = await Store.getPhoto(pid); if (!p) continue;
+      const o = {name: p.name, takenAt: p.takenAt}; if (withPhotos) o.data = await blobToDataURL(p.blob); photos.push(o);
+    }
+    cables.push({mark: c.mark, no: c.no, finished: !!rc.finished, factLength: rc.factLength, note: rc.note || '', updated: rc.updated, entries, photos});
+  }
+  const out = {format: 'ikj-field-results', version: 1, app: 'IKJ Field ' + APP_VERSION,
+    journal: {id: j.id, hash: j.hash, title: j.title || '', building: j.building || ''},
+    inspector: S.settings.inspector || '', exportedAt: nowIso(), summary: journalStats(jid), photosIncluded: !!withPhotos, cables};
+  if (r.orphans) out.orphans = r.orphans;
+  return JSON.stringify(out, null, 1);
+}
+function downloadBlob(blob, name) {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 5000);
+}
+async function shareOrSave(file, mode) {
+  if (mode === 'share' && navigator.canShare && navigator.share) {
+    let can = false; try { can = navigator.canShare({files: [file]}); } catch (e) {}
+    if (can) {
+      try { await navigator.share({files: [file], title: file.name}); return 'shared'; }
+      catch (e) { if (e && e.name === 'AbortError') return 'cancelled'; console.warn(e); }
+    }
+  }
+  downloadBlob(file, file.name); return 'saved';
+}
+
+/* ---------------------------------------------------------------- mutations */
+function getEntry(jid, mark, k) { const rc = S.results[jid].cables[mark]; const i = rc.entries.findIndex(e => e.k === k); return {rc, i, e: rc.entries[i]}; }
+function setDesign(jid, mark, k, st, fact) {
+  const snap = snapshotCable(jid, mark); const {rc, e} = getEntry(jid, mark, k); if (!e || e.seg === null) return;
+  if (st === ST.CHG && fact === e.seg) st = ST.OK;
+  e.st = st; if (st === ST.CHG) e.fact = fact; else delete e.fact; e.t = nowIso();
+  const msg = {[ST.OK]: '✓ ' + e.seg, [ST.NO]: '✗ Not here: ' + e.seg, [ST.CHG]: e.seg + ' → ' + fact, [ST.U]: 'Mark cleared'}[st];
+  commit(jid, mark, msg, snap);
+}
+function setAdded(jid, mark, k, fact) { const snap = snapshotCable(jid, mark); const {e} = getEntry(jid, mark, k); if (!e) return; e.fact = fact; e.t = nowIso(); commit(jid, mark, '+ ' + fact, snap); }
+function deleteAdded(jid, mark, k) { const snap = snapshotCable(jid, mark); const rc = S.results[jid].cables[mark]; rc.entries = rc.entries.filter(x => x.k !== k); commit(jid, mark, 'Added tray deleted', snap); }
+function insertAt(jid, mark, afterK, code) {
+  const snap = snapshotCable(jid, mark); const rc = S.results[jid].cables[mark];
+  const ne = {k: uid(), seg: null, st: ST.ADD, fact: code, t: nowIso()};
+  if (afterK === null) rc.entries.unshift(ne);
+  else if (afterK === 'END') rc.entries.push(ne);
+  else { const i = rc.entries.findIndex(e => e.k === afterK); rc.entries.splice(i < 0 ? rc.entries.length : i + 1, 0, ne); }
+  commit(jid, mark, '+ ' + code, snap); return ne.k;
+}
+
+/* ---------------------------------------------------------------- UI basics */
+let toastTimer = null;
+function toast(msg, actLabel, actFn) {
+  const t = $('#toast'); t.innerHTML = `<span>${esc(msg)}</span>` + (actLabel ? `<button id="toastAct">${esc(actLabel)}</button>` : '');
+  t.classList.remove('hidden'); clearTimeout(toastTimer);
+  if (actLabel) $('#toastAct').onclick = () => { t.classList.add('hidden'); actFn && actFn(); };
+  toastTimer = setTimeout(() => t.classList.add('hidden'), actLabel ? 5000 : 2600);
+}
+const busy = on => $('#busy').classList.toggle('hidden', !on);
+
+let sheetHandler = null, sheetInput = null, sheetPushed = false;
+function openSheet(html, onAct, onInput) {
+  sheet.innerHTML = `<div class="sheet-bd" data-sact="close"></div><div class="sheet-pn">${html}</div>`;
+  sheet.classList.remove('hidden'); sheetHandler = onAct || null; sheetInput = onInput || null;
+  if (!sheetPushed) { try { history.pushState({ikjSheet: 1}, ''); sheetPushed = true; } catch (e) {} }
+}
+function closeSheet(fromPop) {
+  if (sheet.classList.contains('hidden')) return;
+  const h = sheetHandler; sheetHandler = null; sheetInput = null;
+  sheet.classList.add('hidden'); sheet.innerHTML = '';
+  if (h && h.onClose) h.onClose();
+  if (sheetPushed) { sheetPushed = false; if (!fromPop) { try { history.back(); } catch (e) {} } }
+}
+window.addEventListener('popstate', () => { if (!sheet.classList.contains('hidden')) closeSheet(true); });
+sheet.addEventListener('click', e => {
+  const el = e.target.closest('[data-sact]'); if (!el) return;
+  if (el.dataset.sact === 'close') { closeSheet(); return; }
+  if (sheetHandler) sheetHandler(el.dataset.sact, el.dataset, el);
+});
+sheet.addEventListener('input', e => { if (sheetInput) sheetInput(e); });
+
+function confirmSheet(html, yes, no, danger) {
+  return new Promise(resolve => {
+    let done = false; const fin = v => { if (done) return; done = true; resolve(v); };
+    const handler = act => { if (act === 'yes') { fin(true); closeSheet(); } else if (act === 'no') { fin(false); closeSheet(); } };
+    handler.onClose = () => fin(false);
+    openSheet(`<div class="sh-title"><div style="font-size:17px">${html}</div></div>
+      <button class="btn ${danger ? 'danger' : 'primary'} big" data-sact="yes">${esc(yes)}</button>
+      <button class="btn" data-sact="no">${esc(no || 'Cancel')}</button>`, handler);
+  });
+}
+function promptSheet(title, value, placeholder, okLabel) {
+  return new Promise(resolve => {
+    let done = false; const fin = v => { if (done) return; done = true; resolve(v); };
+    const handler = act => {
+      if (act === 'ok') { const v = $('#pIn').value.trim(); if (!v) { $('#pIn').focus(); return; } fin(v); closeSheet(); }
+      else if (act === 'cancel') { fin(null); closeSheet(); }
+    };
+    handler.onClose = () => fin(null);
+    openSheet(`<div class="sh-title"><div class="big">${esc(title)}</div></div>
+      <input class="inp" id="pIn" value="${esc(value || '')}" placeholder="${esc(placeholder || '')}" autocomplete="name">
+      <button class="btn primary big" data-sact="ok">${esc(okLabel || 'OK')}</button><button class="btn ghost" data-sact="cancel">Cancel</button>`, handler);
+    setTimeout(() => { const i = $('#pIn'); i && i.focus(); }, 60);
+  });
+}
+
+/* code picker: resolves to a code or null */
+function pickCode({title, base, sub}) {
+  return new Promise(resolve => {
+    let done = false; const fin = v => { if (done) return; done = true; resolve(v); };
+    const known = knownCodes();
+    const startQ = base ? splitCode(base).section : '';
+    const html = `<div class="sh-title"><div class="big">${esc(title)}</div>${sub ? `<div class="small muted">${sub}</div>` : ''}</div>
+      <input class="inp mono" id="cQ" value="${esc(startQ)}" placeholder="Type tray code or part of it, e.g. 109" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false">
+      <div class="hint" id="cHint"></div><div class="clist" id="cList"></div>
+      <button class="btn ghost" data-sact="cancel">Cancel</button>`;
+    const handler = (act, ds) => {
+      if (act === 'pick') { fin(ds.code); closeSheet(); }
+      else if (act === 'use') { const v = normCode($('#cQ').value); if (v) { fin(v); closeSheet(); } }
+      else if (act === 'cancel') { fin(null); closeSheet(); }
+    };
+    handler.onClose = () => fin(null);
+    openSheet(html, handler, () => upd());
+    function upd() {
+      const raw = $('#cQ').value, q = normCode(raw);
+      const list = matchCodes(known, raw).slice(0, 60);
+      let h = list.map(c => `<button data-sact="pick" data-code="${esc(c)}">${esc(c)}</button>`).join('');
+      if (!list.length) h = `<div class="small muted" style="padding:6px 2px">No known tray matches.</div>`;
+      let hint = '';
+      if (q && !known.includes(q)) {
+        if (CODE_RE.test(q)) hint = `<button class="btn primary" data-sact="use">Use new code: <span class="mono">${esc(q)}</span></button>`;
+        else if (!list.length) h += `<button class="btn danger-outline" data-sact="use" style="margin-top:6px">Use anyway: <span class="mono">${esc(q)}</span></button>
+          <div class="red small" style="margin:-4px 2px 8px">Unusual format. A full code looks like 12.12URF10.109/3 — check before using.</div>`;
+        else hint = `<div class="small muted" style="margin:0 2px 8px">Pick from the list — or type the full code (like 12.12URF10.109/3) to add a new one.</div>`;
+      }
+      $('#cHint').innerHTML = hint; $('#cList').innerHTML = h;
+    }
+    upd();
+  });
+}
+
+/* ---------------------------------------------------------------- header */
+function setHeader({title, sub, back, send}) {
+  $('#hT1').textContent = title || 'IKJ Field'; $('#hT2').textContent = sub || '';
+  const b = $('#hBack'); b.classList.toggle('hidden', !back); b.onclick = back ? () => { location.hash = back; } : null;
+  let a = '';
+  if (send) { const n = (S.results[send] || {}).unsent || 0; a = `<button class="hsend" id="hSend">Send${n ? `<span class="badge">${n > 99 ? '99+' : n}</span>` : ''}</button>`; }
+  else if (!back) a = `<button class="hbtn" id="hSet" aria-label="Settings">&#9881;</button>`;
+  $('#hAct').innerHTML = a;
+  if (send) $('#hSend').onclick = () => openSend(send);
+  if ($('#hSet')) $('#hSet').onclick = () => { location.hash = '#/settings'; };
+  $('#hOff').classList.toggle('hidden', navigator.onLine !== false);
+}
+window.addEventListener('online', () => $('#hOff').classList.add('hidden'));
+window.addEventListener('offline', () => $('#hOff').classList.remove('hidden'));
+
+/* ---------------------------------------------------------------- router */
+function parseRoute() {
+  const h = location.hash.replace(/^#/, '');
+  const p = h.split('/').filter(Boolean).map(dec);
+  if (p[0] === 'j' && p[1]) {
+    if (p[2] === 'c' && p.length >= 4) return {v: 'cable', jid: p[1], mark: p.slice(3).join('/')};
+    if (p[2] === 't' && p.length >= 4) return {v: 'tray', jid: p[1], code: p.slice(3).join('/')};
+    return {v: 'journal', jid: p[1]};
+  }
+  if (p[0] === 'settings') return {v: 'settings'};
+  if (p[0] === 'help') return {v: 'help'};
+  return {v: 'home'};
+}
+const rJ = jid => '#/j/' + enc(jid);
+const rC = (jid, mark) => `#/j/${enc(jid)}/c/${enc(mark)}`;
+const rT = (jid, code) => `#/j/${enc(jid)}/t/${enc(code)}`;
+
+function render() {
+  const key = location.hash || '#/';
+  if (S.ui.route && S.ui.route !== key) S.ui.scroll[S.ui.route] = window.scrollY;
+  const isNew = S.ui.route !== key; S.ui.route = key;
+  if (!sheet.classList.contains('hidden') && isNew) closeSheet(true);
+  const r = parseRoute();
+  try {
+    if (r.v === 'journal' && S.journals[r.jid]) viewJournal(r.jid);
+    else if (r.v === 'cable' && S.journals[r.jid] && S.idx[r.jid].byMark.has(r.mark)) viewCable(r.jid, r.mark);
+    else if (r.v === 'tray' && S.journals[r.jid]) viewTray(r.jid, r.code);
+    else if (r.v === 'settings') viewSettings();
+    else if (r.v === 'help') viewHelp();
+    else viewHome();
+  } catch (e) { console.error(e); view.innerHTML = `<div class="errbox">Something went wrong: ${esc(e.message)}</div><button class="btn" onclick="location.hash='#/'">Home</button>`; }
+  if (isNew) window.scrollTo(0, S.ui.scroll[key] || 0);
+}
+window.addEventListener('hashchange', render);
+
+/* ---------------------------------------------------------------- views */
+function viewHome() {
+  setHeader({title: 'IKJ Field', sub: 'Cable route check — as-built journal'});
+  const ids = Object.keys(S.journals).sort(natCmp);
+  let h = '';
+  if (Store.mode === 'memory') h += `<div class="errbox">Phone storage is not available in this browser. Your marks will be LOST when the app is closed. Send results often.</div>`;
+  if (S.installEvt && !isStandalone()) h += `<button class="btn primary big" data-act="install">Install app on this phone</button>`;
+  if (!ids.length) h += `<div class="card"><p style="margin-top:0"><b>No journal on this phone yet.</b></p>
+     <p class="small">1. Your supervisor sends you a journal file (name ends with <b>.ikj.json</b>).<br>
+     2. In Telegram tap <b>⋮</b> on the file → <b>Save to Downloads</b>.<br>
+     3. Tap <b>Load journal file</b> below and pick it from Downloads.</p></div>`;
+  for (const id of ids) {
+    const j = S.journals[id], r = S.results[id], s = journalStats(id);
+    h += `<button class="card" data-act="openJ" data-j="${esc(id)}">
+      <div class="item-top"><span class="jid">${esc(j.id)}</span>${s.done === s.cables && s.cables ? '<span class="chip ok">All done</span>' : ''}</div>
+      <div class="small muted">${esc(j.building || '')}${j.building ? ' · ' : ''}${plural(j.cables.length, 'cable')}${j.title ? ' · ' + esc(j.title) : ''}</div>
+      ${bar(s.checked, s.total)}
+      <div class="small">${s.checked}/${s.total} trays checked · ${s.done}/${s.cables} cables done${s.changes ? ` · <span class="blue"><b>${s.changes}</b> changes</span>` : ''}</div>
+      ${r.unsent ? `<div class="unsent">Not sent yet: ${plural(r.unsent, 'edit')}</div>` : (r.lastSent ? `<div class="tiny muted" style="margin-top:6px">Last sent ${fmtTime(r.lastSent)}</div>` : '')}
+    </button>`;
+  }
+  h += `<button class="btn primary big" data-act="loadJ">Load journal file</button>`;
+  h += `<button class="btn" data-act="help">How to use</button>`;
+  view.innerHTML = h;
+}
+function isStandalone() { return (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true; }
+
+function viewJournal(jid) {
+  const j = S.journals[jid], tab = S.ui.tab[jid] || 'cable', q = S.ui.q[jid + ':' + tab] || '';
+  setHeader({title: shortId(j.id), sub: j.id, back: '#/', send: jid});
+  const s = journalStats(jid);
+  view.innerHTML = `
+    <div class="small muted" style="margin:0 2px 2px">${s.checked}/${s.total} trays checked · ${s.done}/${s.cables} cables done${s.changes ? ` · <span class="blue">${s.changes} changes</span>` : ''}</div>${bar(s.checked, s.total)}
+    <div class="tabs" style="margin-top:10px"><button data-act="tab" data-tab="cable" class="${tab === 'cable' ? 'on' : ''}">By cable</button><button data-act="tab" data-tab="tray" class="${tab === 'tray' ? 'on' : ''}">By tray</button></div>
+    <input class="search mono" type="search" id="jq" value="${esc(q)}" placeholder="${tab === 'cable' ? 'Find cable, e.g. 4204' : 'Find tray, e.g. 109'}" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false">
+    <div id="jlist"></div>
+    <button class="btn danger-outline" data-act="delJ" style="margin-top:24px">Remove this journal from the phone</button>`;
+  $('#jq').oninput = e => { S.ui.q[jid + ':' + tab] = e.target.value; renderJList(jid, tab, e.target.value); };
+  renderJList(jid, tab, q);
+}
+function renderJList(jid, tab, q) {
+  const j = S.journals[jid], r = S.results[jid], qs = squash(q);
+  let h = '';
+  if (tab === 'cable') {
+    const list = j.cables.filter(c => !qs || squash(c.mark).includes(qs) || squash(c.from + ' ' + c.to).includes(qs));
+    for (const c of list) {
+      const rc = r.cables[c.mark], s = cableStats(rc);
+      let chip = rc.finished ? '<span class="chip ok">Done</span>' : (s.checked || s.add ? '<span class="chip prog">In progress</span>' : '<span class="chip">Not started</span>');
+      h += `<button class="card" data-act="openC" data-m="${esc(c.mark)}">
+        <div class="item-top"><span class="mark">${esc(c.mark)}</span>${chip}</div>
+        <div class="small muted">No. ${esc(c.no)} · ${esc(c.type || '')} ${esc(c.size || '')} · ${esc(c.len)} m</div>
+        <div class="small ft"><span class="muted">From</span> ${esc(c.from)}<br><span class="muted">To</span> ${esc(c.to)}</div>
+        ${s.total ? bar(s.checked, s.total) : ''}
+        <div class="small muted">${s.total ? `${s.checked}/${s.total} trays checked` : 'No trays in design route'}${s.changes ? ` · <span class="blue">${plural(s.changes, 'change')}</span>` : ''}</div>
+      </button>`;
+    }
+    if (!list.length) h = `<div class="card muted">No cable matches “${esc(q)}”.</div>`;
+  } else {
+    const tAll = trayIndex(jid), keep = new Set(matchCodes(tAll.map(t => t.code), q)), trays = tAll.filter(t => keep.has(t.code));
+    for (const t of trays) {
+      const chk = t.design.filter(d => d.st !== ST.U).length;
+      const moved = t.design.filter(d => d.st === ST.CHG || d.st === ST.NO).length;
+      h += `<button class="card" data-act="openT" data-code="${esc(t.code)}">
+        <div class="item-top"><span class="code">${esc(t.code)}</span>${t.design.length && chk === t.design.length ? '<span class="chip ok">Checked</span>' : ''}</div>
+        <div class="small muted">${t.design.length ? `${plural(t.design.length, 'cable')} by design · ${chk} checked` : 'Not in design'}${moved ? ` · <span class="red">${moved} not here/moved</span>` : ''}${t.field.length ? ` · <span class="blue">${t.field.length} found here</span>` : ''}</div>
+      </button>`;
+    }
+    if (!trays.length) h = `<div class="card muted">No tray matches “${esc(q)}”.</div>`;
+  }
+  $('#jlist').innerHTML = h;
+}
+function trayIndex(jid) {
+  const j = S.journals[jid], r = S.results[jid], m = new Map();
+  const get = code => { if (!m.has(code)) m.set(code, {code, design: [], field: []}); return m.get(code); };
+  for (const c of j.cables) {
+    const rc = r.cables[c.mark]; if (!rc) continue;
+    for (const e of rc.entries) {
+      if (e.seg !== null) get(e.seg).design.push({mark: c.mark, k: e.k, st: e.st});
+      if (e.fact && (e.seg === null || e.st === ST.CHG)) get(e.fact).field.push({mark: c.mark, k: e.k, st: e.seg === null ? ST.ADD : e.st, from: e.seg});
+    }
+  }
+  return [...m.values()].sort((a, b) => natCmp(a.code, b.code));
+}
+
+function viewCable(jid, mark) {
+  const j = S.journals[jid], c = S.idx[jid].byMark.get(mark), rc = S.results[jid].cables[mark], s = cableStats(rc);
+  setHeader({title: mark, sub: `${shortId(j.id)} · cable No. ${c.no}`, back: rJ(jid), send: jid});
+  let n = 0, rows = '';
+  for (const e of rc.entries) rows += routeRow(e, e.seg !== null ? ++n : null);
+  view.innerHTML = `
+    <div class="card small">
+      <div><span class="muted">Type</span> <b>${esc(c.type || '')} ${esc(c.size || '')}</b> · <span class="muted">Design length</span> <b>${esc(c.len)} m</b></div>
+      <div style="margin-top:4px"><span class="muted">From</span> ${esc(c.from)}${c.fromRoom ? ` <span class="muted">(${esc(c.fromRoom)})</span>` : ''}</div>
+      <div style="margin-top:2px"><span class="muted">To</span> ${esc(c.to)}${c.toRoom ? ` <span class="muted">(${esc(c.toRoom)})</span>` : ''}</div>
+      ${s.total ? bar(s.checked, s.total) + `<div class="muted">${s.checked}/${s.total} trays checked${s.changes ? ` · <span class="blue">${plural(s.changes, 'change')}</span>` : ''}</div>` : ''}
+    </div>
+    <div class="legend tiny"><span><b>black</b> = as designed</span><span class="red"><s><b>red</b></s> = design tray not used</span><span class="blue"><b>blue</b> = actual tray</span></div>
+    <div class="small muted" style="margin:0 2px 8px">Walk along the route. Tap <b class="okc">✓</b> if the cable is on that tray. Tap the tray code for other options.</div>
+    <button class="btn add" data-act="addStart">＋ Add a tray at the start</button>
+    ${rc.entries.length ? `<ol class="route">${rows}</ol>` : `<div class="card small muted">The design gives no tray route for this cable. If it runs on trays, add them.</div>`}
+    <button class="btn add" data-act="addEnd">＋ Add a tray at the end (route continues)</button>
+    <div class="card">
+      <label class="lbl" for="fLen">Actual length, m (if known)</label>
+      <input class="inp" id="fLen" type="number" inputmode="decimal" min="0" step="1" value="${rc.factLength ?? ''}" placeholder="design ${esc(c.len)} m">
+      <label class="lbl" for="fNote">Note</label>
+      <textarea class="inp" id="fNote" rows="3" placeholder="Anything unusual on this cable">${esc(rc.note || '')}</textarea>
+      <div class="lbl">Photos</div><div class="photos" id="photos"></div>
+      <button class="btn" data-act="addPhoto">📷 Add photo</button>
+    </div>
+    ${rc.finished ? `<button class="btn ok big" data-act="finish">✓ Cable done (tap to reopen)</button>` : `<button class="btn primary big" data-act="finish">Mark cable as done</button>`}`;
+  const fLen = $('#fLen'), fNote = $('#fNote'); let noteTimer = null;
+  fLen.onchange = () => {
+    const v = fLen.value.trim(); const num = v === '' ? null : Number(v.replace(',', '.'));
+    if (v !== '' && !isFinite(num)) { toast('Length must be a number'); return; }
+    if (num === rc.factLength) return;
+    const snap = snapshotCable(jid, mark); rc.factLength = num; commit(jid, mark, num === null ? 'Length cleared' : `Actual length ${num} m`, snap);
+  };
+  fNote.oninput = () => { rc.note = fNote.value; clearTimeout(noteTimer); noteTimer = setTimeout(() => saveResult(jid), 500); };
+  fNote.onchange = () => { rc.note = fNote.value; commit(jid, mark, 'Note saved'); };
+  renderPhotos(jid, mark);
+}
+function routeRow(e, n) {
+  if (e.seg === null) return `<li class="rr add"><span class="num blue">+</span>
+      <button class="code-btn" data-act="entry" data-k="${e.k}"><span class="code blue">${esc(e.fact)}</span><span class="small blue">added in the field · tap to edit</span></button></li>`;
+  let cls = '', code = `<span class="code">${esc(e.seg)}</span>`, st = '<span class="small muted">not checked</span>';
+  if (e.st === ST.OK) { cls = 'ok'; st = '<span class="small okc"><b>✓ cable is here</b></span>'; }
+  else if (e.st === ST.CHG) { cls = 'chg'; code = `<span class="code red"><s>${esc(e.seg)}</s></span><span class="code blue">→ ${esc(e.fact)}</span>`; st = '<span class="small blue">actual tray differs</span>'; }
+  else if (e.st === ST.NO) { cls = 'no'; code = `<span class="code red"><s>${esc(e.seg)}</s></span>`; st = '<span class="small red"><b>✗ cable is not here</b></span>'; }
+  return `<li class="rr ${cls}"><span class="num">${n}</span>
+    <button class="code-btn" data-act="entry" data-k="${e.k}">${code}${st}</button>
+    <button class="tick ${e.st === ST.OK ? 'on' : ''}" data-act="tick" data-k="${e.k}" aria-label="Cable is here">✓</button></li>`;
+}
+const photoURLs = [];
+async function renderPhotos(jid, mark) {
+  while (photoURLs.length) URL.revokeObjectURL(photoURLs.pop());
+  const box = $('#photos'); if (!box) return; const rc = S.results[jid].cables[mark]; let h = '';
+  for (const pid of (rc.photos || [])) {
+    const p = await Store.getPhoto(pid); if (!p) continue;
+    const u = URL.createObjectURL(p.blob); photoURLs.push(u);
+    h += `<img src="${u}" alt="photo" data-act="photo" data-p="${esc(pid)}">`;
+  }
+  if ($('#photos') === box) box.innerHTML = h || '<span class="small muted">No photos</span>';
+}
+
+function viewTray(jid, code) {
+  const j = S.journals[jid];
+  setHeader({title: code, sub: `${shortId(j.id)} · tray`, back: rJ(jid), send: jid});
+  const t = trayIndex(jid).find(x => x.code === code) || {code, design: [], field: []};
+  let h = `<div class="small muted" style="margin:0 2px 10px">Stand at this tray. For each cable: is it here?</div>`;
+  if (!t.design.length) h += `<div class="card small muted">No cable runs on this tray by design.</div>`;
+  for (const d of t.design.sort((a, b) => natCmp(a.mark, b.mark))) {
+    const c = S.idx[jid].byMark.get(d.mark), {e} = getEntry(jid, d.mark, d.k);
+    let st = '<span class="small muted">not checked</span>', cls = '';
+    if (e.st === ST.OK) { st = '<span class="small okc"><b>✓ here</b></span>'; cls = 'ok'; }
+    else if (e.st === ST.NO) { st = '<span class="small red"><b>✗ not here</b></span>'; cls = 'no'; }
+    else if (e.st === ST.CHG) { st = `<span class="small blue"><b>actually on ${esc(e.fact)}</b></span>`; cls = 'chg'; }
+    h += `<div class="trow ${cls}">
+      <div class="item-top"><button class="link mark" style="padding:0;text-decoration:none;color:var(--ink)" data-act="openC" data-m="${esc(d.mark)}">${esc(d.mark)}</button>${st}</div>
+      <div class="tiny muted ft">${esc(c.from)} → ${esc(c.to)}</div>
+      <div class="tb"><button class="y ${e.st === ST.OK ? 'on' : ''}" data-act="tYes" data-m="${esc(d.mark)}" data-k="${d.k}">✓ Here</button>
+        <button class="n ${e.st === ST.NO ? 'on' : ''}" data-act="tNo" data-m="${esc(d.mark)}" data-k="${d.k}">✗ Not here</button>
+        <button class="o ${e.st === ST.CHG ? 'on' : ''}" data-act="tOther" data-m="${esc(d.mark)}" data-k="${d.k}">Other…</button></div>
+    </div>`;
+  }
+  if (t.field.length) {
+    h += `<h3>Found here in the field</h3>`;
+    for (const f of t.field) {
+      h += `<div class="trow chg"><div class="item-top"><button class="link mark" style="padding:0;text-decoration:none;color:var(--ink)" data-act="openC" data-m="${esc(f.mark)}">${esc(f.mark)}</button>
+        <span class="small blue">${f.st === ST.ADD ? 'added here' : 'moved here from <s class="red">' + esc(f.from) + '</s>'}</span></div>
+        <div class="tb" style="grid-template-columns:1fr"><button class="o" data-act="tOther" data-m="${esc(f.mark)}" data-k="${f.k}">Edit…</button></div></div>`;
+    }
+  }
+  h += `<button class="btn add" data-act="tAdd" data-code="${esc(code)}" style="margin-top:14px">＋ A cable is here that is not listed</button>`;
+  view.innerHTML = h;
+}
+
+function viewSettings() {
+  setHeader({title: 'Settings', back: '#/'});
+  const st = Store.mode === 'memory' ? '<span class="red"><b>NOT available</b> — marks are lost when the app closes</span>'
+    : (S.persisted ? '<span class="okc"><b>protected</b> on this phone</span>' : 'on this phone (install the app so the phone does not clean it up)');
+  view.innerHTML = `
+    <div class="card"><label class="lbl" for="sName">Your name (goes into the results file)</label>
+      <input class="inp" id="sName" value="${esc(S.settings.inspector || '')}" placeholder="Name and surname" autocomplete="name"></div>
+    <div class="card small">Storage: ${st}</div>
+    <button class="btn" data-act="backup">Backup all data to a file</button>
+    <button class="btn" data-act="restore">Restore from a backup file</button>
+    <button class="btn" data-act="help">How to use</button>
+    <div class="card tiny muted">IKJ Field ${APP_VERSION}. Works without internet. Your marks stay only on this phone until you send them.</div>`;
+  $('#sName').onchange = e => { S.settings.inspector = e.target.value.trim(); saveSettings(); toast('Saved'); };
+}
+function viewHelp() {
+  setHeader({title: 'How to use', back: '#/'});
+  view.innerHTML = `<div class="card help">
+  <p><b>1. Get the journal.</b> Your supervisor sends a file ending with <b>.ikj.json</b>. In Telegram tap ⋮ on it → <b>Save to Downloads</b>. In this app: <b>Load journal file</b>.</p>
+  <p><b>2. Check by cable.</b> Open a cable and walk along its route. At each tray:</p>
+  <ul>
+    <li><b class="okc">✓</b> — the cable is on this tray (as designed).</li>
+    <li>Tap the tray code → <b>other shelf</b> (number buttons) or <b>another tray</b> — the cable is somewhere else.</li>
+    <li>Tap the tray code → <b>✗ Not here</b> — the cable does not pass this tray.</li>
+    <li><b>＋ Add a tray</b> — the cable passes a tray that is not in the design, or the route continues further.</li>
+  </ul>
+  <p><b>3. Check by tray.</b> Standing at one tray? Open <b>By tray</b>, find it, and mark all cables there at once.</p>
+  <p><b>4. Colours</b> are the same as in the journal: black = as designed, <span class="red"><s>red crossed</s></span> = design tray not used, <span class="blue">blue</span> = actual tray.</p>
+  <p><b>5. Mistake?</b> Tap <b>Undo</b> in the message at the bottom, or tap the tray code → <b>Clear mark</b>.</p>
+  <p><b>6. Send.</b> Tap <b>Send</b> (top right) → Telegram/WhatsApp → your supervisor. No signal? Telegram sends it automatically when the signal is back. Each file contains <b>all</b> your work so far — always send the newest one.</p>
+  <p><b>Important:</b> the app works without internet. Your marks are kept only on this phone until you send them — do not uninstall the app or clear Chrome data. Send at least once a day.</p>
+  </div>`;
+}
+
+/* ---------------------------------------------------------------- sheets: entry actions */
+function openEntrySheet(jid, mark, k) {
+  const {e} = getEntry(jid, mark, k); if (!e) return;
+  const isAdd = e.seg === null, cur = isAdd ? e.fact : (e.st === ST.CHG ? e.fact : e.seg), sp = splitCode(cur);
+  const head = isAdd ? `<span class="blue">+ ${esc(e.fact)}</span>` : (e.st === ST.CHG ? `<span class="red"><s>${esc(e.seg)}</s></span> <span class="blue">→ ${esc(e.fact)}</span>` : (e.st === ST.NO ? `<span class="red"><s>${esc(e.seg)}</s></span>` : esc(e.seg)));
+  let h = `<div class="sh-title"><div class="small muted">${esc(mark)}${isAdd ? ' · tray added in the field' : ' · design tray'}</div><div class="code" style="font-size:20px">${head}</div></div>`;
+  if (!isAdd) h += `<div class="grid2" style="margin-bottom:12px"><button class="btn ok big" data-sact="ok">✓ Cable is here</button><button class="btn danger big" data-sact="no">✗ Not here</button></div>`;
+  h += `<div class="lbl">Same tray, ${isAdd ? 'other' : 'cable is on'} shelf: <span class="mono">${esc(sp.section)}/…</span></div>
+    <div class="shelves">${SHELVES.map(s => `<button class="sbtn ${s === sp.shelf ? 'cur' : ''}" data-sact="shelf" data-s="${s}">${s}</button>`).join('')}<button class="sbtn wide ${sp.shelf === null ? 'cur' : ''}" data-sact="shelf" data-s="">no shelf</button></div>
+    <button class="btn" data-sact="other">${isAdd ? 'Change to another tray…' : 'Cable is on another tray…'}</button>
+    <button class="btn add" data-sact="after">＋ Add a tray after this one…</button>`;
+  if (isAdd) h += `<button class="btn danger-outline" data-sact="del">Delete this added tray</button>`;
+  else if (e.st !== ST.U) h += `<button class="btn" data-sact="clear">↺ Clear mark (not checked)</button>`;
+  h += `<button class="btn ghost" data-sact="close">Cancel</button>`;
+  const apply = code => { if (isAdd) setAdded(jid, mark, k, code); else setDesign(jid, mark, k, ST.CHG, code); };
+  openSheet(h, async (act, ds) => {
+    if (act === 'ok') setDesign(jid, mark, k, ST.OK);
+    else if (act === 'no') setDesign(jid, mark, k, ST.NO);
+    else if (act === 'clear') setDesign(jid, mark, k, ST.U);
+    else if (act === 'shelf') { const code = withShelf(sp.section, ds.s === '' ? null : ds.s); if (code === cur) { closeSheet(); return; } apply(code); }
+    else if (act === 'other') { const code = await pickCode({title: isAdd ? 'Change tray' : 'Where is the cable actually?', base: cur, sub: `${esc(mark)} · instead of <span class="mono">${esc(cur)}</span>`}); if (!code) return; apply(code); render(); return; }
+    else if (act === 'after') { const code = await pickCode({title: 'Add a tray after ' + cur, sub: esc(mark)}); if (!code) return; insertAt(jid, mark, k, code); render(); return; }
+    else if (act === 'del') deleteAdded(jid, mark, k);
+    closeSheet(); render();
+  });
+}
+async function addAtEdge(jid, mark, where) {
+  const code = await pickCode({title: where === 'start' ? 'Add a tray at the start' : 'Add a tray at the end', sub: esc(mark)});
+  if (!code) return; insertAt(jid, mark, where === 'start' ? null : 'END', code); render();
+}
+async function trayAddCable(jid, code) {
+  const j = S.journals[jid], t = trayIndex(jid).find(x => x.code === code);
+  const listed = new Set([...(t ? t.design : []), ...(t ? t.field : [])].map(d => d.mark));
+  const mark = await new Promise(resolve => {
+    let done = false; const fin = v => { if (done) return; done = true; resolve(v); };
+    const handler = (act, ds) => { if (act === 'pick') { fin(ds.m); } else if (act === 'cancel') { fin(null); closeSheet(); } };
+    handler.onClose = () => fin(null);
+    openSheet(`<div class="sh-title"><div class="big">Which cable is here?</div><div class="small muted">Tray <span class="mono">${esc(code)}</span></div></div>
+      <input class="inp mono" id="mQ" placeholder="Find cable, e.g. 4204" autocomplete="off" autocapitalize="characters" spellcheck="false"><div class="clist" id="mList"></div>
+      <button class="btn ghost" data-sact="cancel">Cancel</button>`, handler, () => upd());
+    function upd() {
+      const qs = squash($('#mQ').value);
+      $('#mList').innerHTML = j.cables.filter(c => !listed.has(c.mark) && (!qs || squash(c.mark).includes(qs)))
+        .map(c => `<button data-sact="pick" data-m="${esc(c.mark)}">${esc(c.mark)}</button>`).join('') || '<div class="small muted">No cable matches.</div>';
+    }
+    upd();
+  });
+  if (!mark) return;
+  const rc = S.results[jid].cables[mark];
+  const after = await new Promise(resolve => {
+    let done = false; const fin = v => { if (done) return; done = true; resolve(v); };
+    const handler = (act, ds) => { if (act === 'pos') { fin(ds.k === '' ? null : ds.k); closeSheet(); } else if (act === 'cancel') { fin(undefined); closeSheet(); } };
+    handler.onClose = () => fin(undefined);
+    let h = `<div class="sh-title"><div class="big">Where in the route of ${esc(mark)}?</div><div class="small muted">Tray <span class="mono">${esc(code)}</span> goes after…</div></div><div class="clist" style="max-height:56vh">
+      <button class="pos" data-sact="pos" data-k="">At the very start</button>`;
+    for (const e of rc.entries) {
+      const lbl = e.seg === null ? `<span class="blue">+ ${esc(e.fact)}</span>` : (e.st === ST.CHG ? `<s class="red">${esc(e.seg)}</s> <span class="blue">${esc(e.fact)}</span>` : (e.st === ST.NO ? `<s class="red">${esc(e.seg)}</s>` : esc(e.seg)));
+      h += `<button class="pos" data-sact="pos" data-k="${e.k}">after <span class="mono"><b>${lbl}</b></span></button>`;
+    }
+    h += `</div><button class="btn ghost" data-sact="cancel">Cancel</button>`;
+    openSheet(h, handler);
+  });
+  if (after === undefined) return;
+  insertAt(jid, mark, after, code); render();
+}
+
+/* ---------------------------------------------------------------- send / backup */
+async function openSend(jid) {
+  if (!S.settings.inspector) {
+    const name = await promptSheet('Your name', '', 'Name and surname', 'Continue'); if (!name) return;
+    S.settings.inspector = name; await saveSettings();
+  }
+  const j = S.journals[jid], r = S.results[jid], s = journalStats(jid);
+  const html = `<div class="sh-title"><div class="big">Send results</div><div class="small muted mono">${esc(j.id)}</div></div>
+    <div class="card small">Trays checked: <b>${s.checked}/${s.total}</b><br>Cables done: <b>${s.done}/${s.cables}</b><br>Changes: <b>${s.changes}</b><br>Photos: <b>${s.photos}</b><br>
+      Inspector: <b>${esc(S.settings.inspector)}</b> <button class="link" data-sact="rename">change</button>
+      ${r.lastSent ? `<br><span class="muted">Last sent ${fmtTime(r.lastSent)}</span>` : ''}</div>
+    <p class="small muted" style="margin:0 2px 12px">The file contains <b>all</b> your work on this journal so far. Send it to your supervisor. No signal? Telegram will send it when the signal is back.</p>
+    ${s.photos ? `<label class="chk"><input type="checkbox" id="incPh" checked> Include photos</label>` : ''}
+    <button class="btn primary big" data-sact="share">Send…</button>
+    <button class="btn" data-sact="save">Save the file on this phone</button>
+    <button class="btn ghost" data-sact="close">Cancel</button>`;
+  openSheet(html, async act => {
+    if (act === 'rename') { closeSheet(); const n = await promptSheet('Your name', S.settings.inspector, 'Name and surname', 'Save'); if (n) { S.settings.inspector = n; await saveSettings(); } openSend(jid); return; }
+    if (act !== 'share' && act !== 'save') return;
+    const inc = $('#incPh') ? $('#incPh').checked : false;
+    busy(true); let text;
+    try { text = await buildExport(jid, inc); } catch (e) { busy(false); toast('Could not build the file: ' + e.message); return; }
+    busy(false);
+    const name = `IKJ_${shortId(j.id)}_${stamp()}.txt`;
+    const file = new File([text], name, {type: 'text/plain'});
+    const res = await shareOrSave(file, act);
+    if (res === 'cancelled') { toast('Not sent'); return; }
+    r.lastSent = nowIso(); r.unsent = 0; await saveResult(jid);
+    closeSheet(); render();
+    toast(res === 'shared' ? 'Sent ✓' : `Saved to Downloads: ${name}`);
+  });
+}
+async function doBackup() {
+  busy(true);
+  try {
+    const photos = [];
+    for (const p of await Store.allPhotos()) photos.push({id: p.id, jid: p.jid, mark: p.mark, name: p.name, takenAt: p.takenAt, data: await blobToDataURL(p.blob)});
+    const out = {format: 'ikj-field-backup', version: 1, app: 'IKJ Field ' + APP_VERSION, exportedAt: nowIso(), settings: S.settings,
+      journals: Object.values(S.journals), results: Object.values(S.results), photos};
+    const file = new File([JSON.stringify(out)], `IKJ_backup_${stamp()}.txt`, {type: 'text/plain'});
+    busy(false); const res = await shareOrSave(file, 'share');
+    toast(res === 'cancelled' ? 'Backup not sent' : (res === 'shared' ? 'Backup sent ✓' : 'Backup saved to Downloads'));
+  } catch (e) { busy(false); toast('Backup failed: ' + e.message); }
+}
+async function doRestore(file) {
+  let o; try { o = JSON.parse(await readFileText(file)); } catch (e) { toast('Cannot read this file.'); return; }
+  if (!o || o.format !== 'ikj-field-backup') { toast('This is not an IKJ backup file.'); return; }
+  const ok = await confirmSheet(`Restore <b>${plural((o.journals || []).length, 'journal')}</b> from the backup of ${fmtTime(o.exportedAt)}?<br><br>Data of the same journals on this phone will be <b>replaced</b>.`, 'Restore', 'Cancel', true);
+  if (!ok) return;
+  busy(true);
+  try {
+    for (const j of o.journals || []) { if (validateJournal(j)) continue; S.journals[j.id] = j; await Store.set('journal:' + j.id, j); buildIdx(j.id); }
+    for (const r of o.results || []) { if (!r.journalId || !S.journals[r.journalId]) continue; S.results[r.journalId] = r; await Store.set('result:' + r.journalId, r); }
+    for (const p of o.photos || []) { await Store.putPhoto({id: p.id, jid: p.jid, mark: p.mark, name: p.name, takenAt: p.takenAt, blob: await dataURLToBlob(p.data)}); }
+    if (o.settings && o.settings.inspector && !S.settings.inspector) { S.settings.inspector = o.settings.inspector; await saveSettings(); }
+    busy(false); toast('Restored ✓'); location.hash = '#/'; render();
+  } catch (e) { busy(false); toast('Restore failed: ' + e.message); }
+}
+
+/* ---------------------------------------------------------------- photos */
+let photoTarget = null;
+async function downscale(file, max = 1600, q = 0.72) {
+  let src;
+  try { src = await createImageBitmap(file); }
+  catch (e) { src = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = URL.createObjectURL(file); }); }
+  const w0 = src.width, h0 = src.height, sc = Math.min(1, max / Math.max(w0, h0));
+  const cv = document.createElement('canvas'); cv.width = Math.round(w0 * sc); cv.height = Math.round(h0 * sc);
+  cv.getContext('2d').drawImage(src, 0, 0, cv.width, cv.height);
+  return await new Promise(res => cv.toBlob(b => res(b || file), 'image/jpeg', q));
+}
+$('#filePhoto').addEventListener('change', async ev => {
+  const f = ev.target.files && ev.target.files[0]; ev.target.value = ''; if (!f || !photoTarget) return;
+  const {jid, mark} = photoTarget; busy(true);
+  try {
+    const blob = await downscale(f); const rc = S.results[jid].cables[mark];
+    const n = (rc.photos || []).length + 1, safe = mark.replace(/[^A-Za-z0-9-]/g, '_');
+    const p = {id: uid(), jid, mark, name: `${safe}_${stamp()}_${n}.jpg`, takenAt: nowIso(), blob};
+    await Store.putPhoto(p); rc.photos = [...(rc.photos || []), p.id];
+    busy(false); commit(jid, mark, 'Photo added'); render();
+  } catch (e) { busy(false); toast('Photo failed: ' + e.message); }
+});
+async function openPhoto(jid, mark, pid) {
+  const p = await Store.getPhoto(pid); if (!p) return; const u = URL.createObjectURL(p.blob);
+  const handler = async act => {
+    if (act === 'delp') {
+      const rc = S.results[jid].cables[mark]; rc.photos = rc.photos.filter(x => x !== pid); await Store.delPhoto(pid);
+      commit(jid, mark, 'Photo deleted'); closeSheet(); render();
+    }
+  };
+  handler.onClose = () => URL.revokeObjectURL(u);
+  openSheet(`<img src="${u}" alt="photo" style="width:100%;border-radius:12px;margin-bottom:10px"><div class="tiny muted" style="margin:0 2px 10px">${esc(p.name)} · ${fmtTime(p.takenAt)}</div>
+    <button class="btn danger-outline" data-sact="delp">Delete photo</button><button class="btn ghost" data-sact="close">Close</button>`, handler);
+}
+
+/* ---------------------------------------------------------------- events */
+async function toggleFinish(jid, mark) {
+  const rc = S.results[jid].cables[mark], snap = snapshotCable(jid, mark);
+  if (rc.finished) { rc.finished = false; commit(jid, mark, 'Cable reopened', snap); render(); return; }
+  const s = cableStats(rc), left = s.total - s.checked;
+  if (left > 0) { const ok = await confirmSheet(`<b>${plural(left, 'tray')}</b> of this cable not checked yet.<br>Mark the cable as done anyway?`, 'Mark done anyway', 'Go back'); if (!ok) return; }
+  rc.finished = true; commit(jid, mark, 'Cable marked as done', snap); render();
+}
+view.addEventListener('click', async ev => {
+  const el = ev.target.closest('[data-act]'); if (!el) return;
+  const a = el.dataset.act, r = parseRoute(), jid = r.jid;
+  switch (a) {
+    case 'openJ': location.hash = rJ(el.dataset.j); break;
+    case 'loadJ': $('#fileJournal').click(); break;
+    case 'help': location.hash = '#/help'; break;
+    case 'install': if (S.installEvt) { S.installEvt.prompt(); try { await S.installEvt.userChoice; } catch (e) {} S.installEvt = null; render(); } break;
+    case 'tab': S.ui.tab[jid] = el.dataset.tab; render(); break;
+    case 'openC': location.hash = rC(jid, el.dataset.m); break;
+    case 'openT': location.hash = rT(jid, el.dataset.code); break;
+    case 'delJ': {
+      const res = S.results[jid];
+      const ok = await confirmSheet(`Remove <b>${esc(jid)}</b> and all your marks for it from this phone?${res && res.unsent ? `<br><br><span class="red"><b>${plural(res.unsent, 'edit')} not sent yet!</b></span>` : ''}`, 'Remove', 'Cancel', true);
+      if (!ok) break;
+      const rc = S.results[jid]; for (const m in (rc ? rc.cables : {})) for (const pid of (rc.cables[m].photos || [])) await Store.delPhoto(pid);
+      delete S.journals[jid]; delete S.results[jid]; delete S.idx[jid];
+      await Store.del('journal:' + jid); await Store.del('result:' + jid);
+      location.hash = '#/'; toast('Journal removed'); break;
+    }
+    case 'tick': { const {e} = getEntry(jid, r.mark, el.dataset.k); if (e) setDesign(jid, r.mark, e.k, e.st === ST.OK ? ST.U : ST.OK); render(); break; }
+    case 'entry': openEntrySheet(jid, r.mark, el.dataset.k); break;
+    case 'addStart': addAtEdge(jid, r.mark, 'start'); break;
+    case 'addEnd': addAtEdge(jid, r.mark, 'end'); break;
+    case 'addPhoto': photoTarget = {jid, mark: r.mark}; $('#filePhoto').click(); break;
+    case 'photo': openPhoto(jid, r.mark, el.dataset.p); break;
+    case 'finish': toggleFinish(jid, r.mark); break;
+    case 'tYes': { const {e} = getEntry(jid, el.dataset.m, el.dataset.k); setDesign(jid, el.dataset.m, el.dataset.k, e.st === ST.OK ? ST.U : ST.OK); render(); break; }
+    case 'tNo': { const {e} = getEntry(jid, el.dataset.m, el.dataset.k); setDesign(jid, el.dataset.m, el.dataset.k, e.st === ST.NO ? ST.U : ST.NO); render(); break; }
+    case 'tOther': openEntrySheet(jid, el.dataset.m, el.dataset.k); break;
+    case 'tAdd': trayAddCable(jid, el.dataset.code); break;
+    case 'backup': doBackup(); break;
+    case 'restore': $('#fileBackup').click(); break;
+  }
+});
+$('#fileJournal').addEventListener('change', async ev => {
+  const f = ev.target.files && ev.target.files[0]; ev.target.value = ''; if (!f) return;
+  let o; try { o = JSON.parse(await readFileText(f)); } catch (e) { toast('Cannot read this file — is it the .ikj.json journal?'); return; }
+  try { const id = await addJournal(o); if (id) location.hash = rJ(id); render(); } catch (e) { toast(e.message); }
+});
+$('#fileBackup').addEventListener('change', async ev => { const f = ev.target.files && ev.target.files[0]; ev.target.value = ''; if (f) doRestore(f); });
+
+/* ---------------------------------------------------------------- install / service worker */
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); S.installEvt = e; if (parseRoute().v === 'home') render(); });
+window.addEventListener('appinstalled', () => { S.installEvt = null; toast('App installed ✓'); });
+function registerSW() {
+  if (!('serviceWorker' in navigator) || !/^https?:$/.test(location.protocol)) return;
+  let reloading = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => { if (window.__ikjUpdating && !reloading) { reloading = true; location.reload(); } });
+  navigator.serviceWorker.register('sw.js').then(reg => {
+    const show = w => { $('#upd').classList.remove('hidden'); $('#updBtn').onclick = () => { window.__ikjUpdating = true; w.postMessage('skipWaiting'); }; };
+    if (reg.waiting && navigator.serviceWorker.controller) show(reg.waiting);
+    reg.addEventListener('updatefound', () => { const w = reg.installing; if (!w) return; w.addEventListener('statechange', () => { if (w.state === 'installed' && navigator.serviceWorker.controller) show(w); }); });
+  }).catch(e => console.warn('SW', e));
+}
+
+/* ---------------------------------------------------------------- boot */
+(async function boot() {
+  await Store.open();
+  try {
+    for (const k of await Store.keys()) {
+      const v = await Store.get(k);
+      if (k === 'settings' && v) S.settings = Object.assign(S.settings, v);
+      else if (k.startsWith('journal:') && v && v.id) S.journals[v.id] = v;
+      else if (k.startsWith('result:') && v && v.journalId) S.results[v.journalId] = v;
+    }
+  } catch (e) { console.error(e); }
+  for (const id in S.journals) {
+    buildIdx(id);
+    if (!S.results[id]) S.results[id] = newResult(S.journals[id]);
+    for (const c of S.journals[id].cables) if (!S.results[id].cables[c.mark]) S.results[id].cables[c.mark] = newCableResult(c);
+  }
+  if (EMBEDDED_JOURNAL && !S.journals[EMBEDDED_JOURNAL.id]) { try { await addJournal(EMBEDDED_JOURNAL, {silent: true}); } catch (e) { console.error(e); } }
+  try { if (navigator.storage && navigator.storage.persist) { S.persisted = await navigator.storage.persisted(); if (!S.persisted) S.persisted = await navigator.storage.persist(); } } catch (e) {}
+  registerSW();
+  render();
+})();
+</script>
+</body>
+</html>
