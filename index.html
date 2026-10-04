@@ -27,7 +27,10 @@ button{touch-action:manipulation;cursor:pointer}
 /* header */
 header.top{position:sticky;top:0;z-index:20;background:var(--hdr);color:#fff;display:flex;align-items:center;gap:6px;
   padding:8px 8px 8px 8px;padding-top:calc(8px + env(safe-area-inset-top));min-height:58px;box-shadow:0 1px 4px rgba(0,0,0,.25)}
-header.top .title{flex:1;min-width:0;padding-left:4px}
+header.top .title{flex:1;min-width:0;padding:2px 4px;border-radius:10px}
+header.top .title.tap{cursor:pointer}
+header.top .title.tap:active{background:rgba(255,255,255,.14)}
+header.top .title.tap .t1::after{content:" \25BE";font-size:14px;opacity:.85}
 .t1{font-weight:700;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .t2{font-size:13px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hbtn{background:transparent;border:0;color:#fff;min-width:46px;min-height:46px;border-radius:10px;font-size:24px;line-height:1;padding:0 8px}
@@ -55,7 +58,7 @@ h3{font-size:15px;margin:16px 2px 8px;color:var(--muted);text-transform:uppercas
 .btn.add{border-style:dashed;border-color:var(--blue);color:var(--blue);background:var(--blue-bg)}
 .btn.ghost{background:transparent;border-color:transparent;color:var(--muted)}
 .btn.big{min-height:58px;font-size:17px}
-.btn[disabled]{opacity:.5}
+.btn[disabled]{opacity:.45}
 .link{background:none;border:0;color:var(--primary);text-decoration:underline;padding:0 4px;font-size:inherit}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .grid2 .btn{margin:0}
@@ -66,12 +69,19 @@ h3{font-size:15px;margin:16px 2px 8px;color:var(--muted);text-transform:uppercas
 .bar{height:6px;background:#e3e8ed;border-radius:99px;overflow:hidden;margin:8px 0 4px}
 .bar>i{display:block;height:100%;background:var(--ok)}
 .item-top{display:flex;align-items:center;justify-content:space-between;gap:4px 8px;flex-wrap:wrap}
-.mark{font-family:var(--mono);font-weight:700;font-size:18px;white-space:nowrap}
+.mark{font-family:var(--mono);font-weight:700;font-size:17px;white-space:nowrap}
+.cno{display:inline-block;font-family:var(--mono);font-weight:800;font-size:15px;background:var(--hdr);color:#fff;border-radius:7px;padding:1px 7px;margin-right:8px;white-space:nowrap;vertical-align:1px}
 .ft{margin-top:4px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .jid{font-family:var(--mono);font-weight:700;font-size:16px;word-break:break-all}
 .unsent{margin-top:6px;font-size:14px;font-weight:700;color:#b42318}
 .warnbox{background:var(--warn-bg);border:1px solid #f0c36d;color:#5c3900;border-radius:12px;padding:12px;margin:0 0 10px;font-size:15px}
 .errbox{background:var(--red-bg);border:1px solid #f1a9a9;color:#7a0b0b;border-radius:12px;padding:12px;margin:0 0 10px;font-size:15px;font-weight:600}
+.info{background:#eef4fb;border:1px dashed var(--blue);color:#0b3a66;border-radius:12px;padding:10px 12px;margin:0 0 10px;font-size:15px}
+.sec-h{font-size:13px;font-weight:800;color:var(--hdr);margin:14px 0 8px;padding:6px 10px;background:#dfe7ef;border-radius:10px}
+.jchip{display:inline-block;font-size:12px;font-weight:800;border-radius:6px;padding:1px 6px;background:#e9edf1;color:var(--muted);white-space:nowrap}
+.navrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 10px}
+.navrow .btn{margin:0;min-height:48px;padding:4px 8px;line-height:1.2}
+.navrow .btn .mono{font-weight:800}
 
 .tabs{display:grid;grid-template-columns:1fr 1fr;background:#dfe5eb;border-radius:12px;padding:4px;margin:0 0 10px}
 .tabs button{border:0;background:transparent;min-height:44px;border-radius:9px;font-weight:700;color:var(--muted)}
@@ -92,7 +102,6 @@ ol.route{list-style:none;margin:0 0 10px;padding:0}
 .rr.chg{background:var(--blue-bg);border-color:#b8d3f3}
 .rr.no{background:var(--red-bg);border-color:#f1b8b8}
 .rr.add{background:var(--blue-bg);border-color:#b8d3f3;border-style:dashed}
-.rr .more{flex:0 0 44px;border:0;background:transparent;font-size:24px;color:var(--muted)}
 .legend{display:flex;flex-wrap:wrap;gap:10px;margin:0 2px 10px}
 
 /* tray rows */
@@ -103,6 +112,7 @@ ol.route{list-style:none;margin:0 0 10px;padding:0}
 .trow .tb .n{border:2px solid var(--red);color:var(--red)} .trow .tb .n.on{background:var(--red);color:#fff}
 .trow .tb .o{border:2px solid var(--blue);color:var(--blue)} .trow .tb .o.on{background:var(--blue);color:#fff}
 .trow.ok{border-color:#b7dfc2} .trow.no{border-color:#f1b8b8} .trow.chg{border-color:#b8d3f3}
+.trow .cbtn{background:none;border:0;padding:0;text-align:left;color:var(--ink)}
 
 /* photos */
 .photos{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px}
@@ -116,12 +126,13 @@ ol.route{list-style:none;margin:0 0 10px;padding:0}
 .sh-title{margin:2px 2px 12px}
 .sh-title .big{font-size:19px;font-weight:700}
 .shelves{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:0 0 12px}
-.sbtn{min-height:50px;border-radius:10px;border:1px solid var(--line);background:#fff;font-weight:800;font-size:18px;font-family:var(--mono)}
+.sbtn{min-height:48px;border-radius:10px;border:1px solid var(--line);background:#fff;font-weight:800;font-size:18px;font-family:var(--mono)}
 .sbtn.cur{background:#dfe5eb;color:var(--muted)}
 .sbtn.wide{grid-column:span 2;font-size:14px;font-family:inherit}
 .clist{max-height:42vh;overflow:auto;margin:0 0 10px}
 .clist button{display:block;width:100%;text-align:left;min-height:48px;border:1px solid var(--line);border-radius:10px;background:#fff;margin:0 0 6px;padding:8px 12px;font-family:var(--mono);font-weight:700;font-size:17px}
 .clist button.pos{font-family:inherit;font-weight:600;font-size:16px}
+.clist button.cur{border:2px solid var(--primary)}
 .hint{font-size:14px;margin:-4px 2px 10px}
 .chk{display:flex;align-items:center;gap:10px;font-size:16px;margin:0 2px 12px}
 .chk input{width:24px;height:24px}
@@ -140,7 +151,7 @@ ol.route{list-style:none;margin:0 0 10px;padding:0}
 <body>
 <header class="top">
   <button class="hbtn hidden" id="hBack" aria-label="Back">&#8592;</button>
-  <div class="title"><div class="t1" id="hT1">IKJ Field</div><div class="t2" id="hT2"></div></div>
+  <div class="title" id="hTitle"><div class="t1" id="hT1">IKJ Field</div><div class="t2" id="hT2"></div></div>
   <span class="offl hidden" id="hOff">Offline</span>
   <div id="hAct"></div>
 </header>
@@ -149,16 +160,15 @@ ol.route{list-style:none;margin:0 0 10px;padding:0}
 <div id="toast" class="hidden"></div>
 <div id="busy" class="hidden">Working…</div>
 <div id="upd" class="hidden"><span>A new version of the app is ready.</span><button id="updBtn">Update</button></div>
-<input type="file" id="fileJournal" class="hidden">
+<input type="file" id="fileJournal" class="hidden" multiple>
 <input type="file" id="fileBackup" class="hidden">
 <input type="file" id="filePhoto" accept="image/*" class="hidden">
 <script>
 'use strict';
-const APP_VERSION = '1.0.0';
+const APP_VERSION = '1.1.0';
 const EMBEDDED_JOURNAL = null; /*EMBED*/
 const ST = {U:'unchecked', OK:'ok', CHG:'changed', NO:'absent', ADD:'added'};
 const CODE_RE = /^\d{2}\.\d{2}[A-Z]{3}\d{2}\.\d{3}V?(\/\d{1,2})?$/;
-const SHELVES = Array.from({length: 17}, (_, i) => String(i));
 
 const $ = (s, el) => (el || document).querySelector(s);
 const view = $('#view'), sheet = $('#sheet');
@@ -234,9 +244,12 @@ const Store = (() => {
 
 /* ---------------------------------------------------------------- state */
 const S = {settings: {inspector: ''}, journals: {}, results: {}, idx: {}, persisted: null, installEvt: null, storageError: false,
-           ui: {tab: {}, q: {}, scroll: {}, route: ''}};
+           ui: {tab: {}, q: {}, gq: '', scroll: {}, route: '', lastJid: null}};
 
-function buildIdx(jid) { const j = S.journals[jid]; S.idx[jid] = {byMark: new Map(j.cables.map(c => [c.mark, c]))}; }
+function buildIdx(jid) {
+  const j = S.journals[jid];
+  S.idx[jid] = {byMark: new Map(j.cables.map(c => [c.mark, c])), pos: new Map(j.cables.map((c, i) => [c.mark, i]))};
+}
 function newCableResult(c) { return {entries: (c.route || []).map(seg => ({k: uid(), seg, st: ST.U, t: null})), finished: false, factLength: null, note: '', photos: [], updated: null}; }
 function newResult(j) {
   const r = {journalId: j.id, hash: j.hash, created: nowIso(), updated: null, lastSent: null, unsent: 0, cables: {}};
@@ -294,7 +307,7 @@ function doUndo() {
   S.results[jid].cables[mark] = data; S.results[jid].unsent = (S.results[jid].unsent || 0) + 1; saveResult(jid); render(); toast('Undone');
 }
 
-/* ---------------------------------------------------------------- stats */
+/* ---------------------------------------------------------------- stats & indexes */
 function cableStats(rc) {
   const s = {total: 0, checked: 0, ok: 0, chg: 0, no: 0, add: 0};
   for (const e of rc.entries) {
@@ -314,12 +327,48 @@ function journalStats(jid) {
   return t;
 }
 const bar = (a, b) => `<div class="bar"><i style="width:${b ? Math.round(100 * a / b) : 0}%"></i></div>`;
+function journalIds() {
+  return Object.keys(S.journals).sort((a, b) => natCmp((S.journals[a].building || '') + ' ' + a, (S.journals[b].building || '') + ' ' + b));
+}
+const totalUnsent = () => Object.values(S.results).reduce((n, r) => n + (r.unsent || 0), 0);
 function knownCodes() {
   const set = new Set();
   for (const id in S.journals) for (const c of S.journals[id].cables) (c.route || []).forEach(x => set.add(x));
   for (const id in S.results) for (const m in S.results[id].cables) for (const e of S.results[id].cables[m].entries) if (e.fact) set.add(e.fact);
   return [...set].sort(natCmp);
 }
+function shelvesList() {
+  let max = 16;
+  for (const c of knownCodes()) { const s = splitCode(c).shelf; if (s !== null && /^\d{1,2}$/.test(s)) max = Math.max(max, +s); }
+  max = Math.min(max, 40);
+  return Array.from({length: max + 1}, (_, i) => String(i));
+}
+function actualRoute(rc) {
+  const out = [];
+  for (const e of rc.entries) {
+    if (e.seg === null) { if (e.fact) out.push(e.fact); }
+    else if (e.st === ST.OK) out.push(e.seg);
+    else if (e.st === ST.CHG && e.fact) out.push(e.fact);
+  }
+  return out;
+}
+/* all trays of all loaded journals: code -> {design:[{jid,mark,k,st}], field:[{jid,mark,k,st,from}]} */
+function trayMapAll() {
+  const m = new Map();
+  const get = code => { if (!m.has(code)) m.set(code, {code, design: [], field: []}); return m.get(code); };
+  for (const jid of Object.keys(S.journals)) {
+    const j = S.journals[jid], r = S.results[jid];
+    for (const c of j.cables) {
+      const rc = r.cables[c.mark]; if (!rc) continue;
+      for (const e of rc.entries) {
+        if (e.seg !== null) get(e.seg).design.push({jid, mark: c.mark, k: e.k, st: e.st});
+        if (e.fact && (e.seg === null || e.st === ST.CHG)) get(e.fact).field.push({jid, mark: c.mark, k: e.k, st: e.seg === null ? ST.ADD : e.st, from: e.seg});
+      }
+    }
+  }
+  return m;
+}
+const byPos = jid => (a, b) => (S.idx[jid].pos.get(a.mark) ?? 0) - (S.idx[jid].pos.get(b.mark) ?? 0);
 
 /* ---------------------------------------------------------------- journals in/out */
 function validateJournal(o) {
@@ -333,7 +382,13 @@ function validateJournal(o) {
 async function addJournal(j, opts = {}) {
   const err = validateJournal(j); if (err) throw new Error(err);
   const exist = S.journals[j.id];
-  if (exist && exist.hash === j.hash) { if (!opts.silent) toast('This journal is already on the phone.'); return j.id; }
+  if (exist && exist.hash === j.hash) {
+    if (JSON.stringify(exist) === JSON.stringify(j)) { if (!opts.silent) toast('This journal is already on the phone.'); return j.id; }
+    /* same cables and routes, only descriptions changed: replace, marks stay as they are */
+    S.journals[j.id] = j; await Store.set('journal:' + j.id, j); buildIdx(j.id);
+    if (!opts.silent) toast(`Journal info updated: ${shortId(j.id)}. Your marks are kept.`);
+    return j.id;
+  }
   if (exist) {
     const ok = await confirmSheet(`<b>${esc(j.id)}</b> is already on this phone, but this file is a different version (the design was updated).<br><br>Update it? Your marks are kept where the trays are the same.`, 'Update journal', 'Cancel');
     if (!ok) return null;
@@ -387,7 +442,7 @@ async function shareOrSave(file, mode) {
 /* ---------------------------------------------------------------- mutations */
 function getEntry(jid, mark, k) { const rc = S.results[jid].cables[mark]; const i = rc.entries.findIndex(e => e.k === k); return {rc, i, e: rc.entries[i]}; }
 function setDesign(jid, mark, k, st, fact) {
-  const snap = snapshotCable(jid, mark); const {rc, e} = getEntry(jid, mark, k); if (!e || e.seg === null) return;
+  const snap = snapshotCable(jid, mark); const {e} = getEntry(jid, mark, k); if (!e || e.seg === null) return;
   if (st === ST.CHG && fact === e.seg) st = ST.OK;
   e.st = st; if (st === ST.CHG) e.fact = fact; else delete e.fact; e.t = nowIso();
   const msg = {[ST.OK]: '✓ ' + e.seg, [ST.NO]: '✗ Not here: ' + e.seg, [ST.CHG]: e.seg + ' → ' + fact, [ST.U]: 'Mark cleared'}[st];
@@ -403,6 +458,21 @@ function insertAt(jid, mark, afterK, code) {
   else { const i = rc.entries.findIndex(e => e.k === afterK); rc.entries.splice(i < 0 ? rc.entries.length : i + 1, 0, ne); }
   commit(jid, mark, '+ ' + code, snap); return ne.k;
 }
+function planCopy(jid, mark, sj, sm) {
+  const rc = S.results[jid].cables[mark], src = actualRoute(S.results[sj].cables[sm]);
+  const srcSet = new Set(src), have = new Set(actualRoute(rc)), confirm = [], add = [];
+  for (const e of rc.entries) if (e.seg !== null && e.st === ST.U && srcSet.has(e.seg)) { confirm.push(e.seg); have.add(e.seg); }
+  for (const code of src) if (!have.has(code)) { add.push(code); have.add(code); }
+  return {src, confirm, add};
+}
+function copyRoute(jid, mark, sj, sm) {
+  const snap = snapshotCable(jid, mark), rc = S.results[jid].cables[mark], p = planCopy(jid, mark, sj, sm), now = nowIso();
+  const conf = new Set(p.confirm);
+  for (const e of rc.entries) if (e.seg !== null && e.st === ST.U && conf.has(e.seg)) { e.st = ST.OK; e.t = now; }
+  for (const code of p.add) rc.entries.push({k: uid(), seg: null, st: ST.ADD, fact: code, t: now});
+  const sc = S.idx[sj].byMark.get(sm);
+  commit(jid, mark, `Copied from ${sc ? sc.no : sm}: +${p.add.length}, ✓${p.confirm.length}. Check them!`, snap);
+}
 
 /* ---------------------------------------------------------------- UI basics */
 let toastTimer = null;
@@ -414,20 +484,58 @@ function toast(msg, actLabel, actFn) {
 }
 const busy = on => $('#busy').classList.toggle('hidden', !on);
 
-let sheetHandler = null, sheetInput = null, sheetPushed = false;
+/* bottom sheet with Android back-button support.
+   Opening a sheet pushes a history entry, so the phone's Back closes the sheet.
+   Closing it from code goes back over that entry; until that back step has finished, further history
+   changes (a new sheet, navigation) wait for it — otherwise they could be undone by it. */
+let sheetHandler = null, sheetInput = null, sheetPushed = false, backPending = false, backTimer = null;
+const afterBack = [];
+const sheetOpen = () => !sheet.classList.contains('hidden');
+function whenHistoryIdle(fn) { if (backPending) afterBack.push(fn); else fn(); }
+function backDone() {
+  clearTimeout(backTimer); backPending = false;
+  for (const f of afterBack.splice(0)) { try { f(); } catch (e) { console.error(e); } }
+}
+function pushSheetEntry() { if (sheetOpen() && !sheetPushed) { try { history.pushState({ikjSheet: 1}, ''); sheetPushed = true; } catch (e) {} } }
 function openSheet(html, onAct, onInput) {
   sheet.innerHTML = `<div class="sheet-bd" data-sact="close"></div><div class="sheet-pn">${html}</div>`;
   sheet.classList.remove('hidden'); sheetHandler = onAct || null; sheetInput = onInput || null;
-  if (!sheetPushed) { try { history.pushState({ikjSheet: 1}, ''); sheetPushed = true; } catch (e) {} }
+  whenHistoryIdle(pushSheetEntry);
 }
-function closeSheet(fromPop) {
-  if (sheet.classList.contains('hidden')) return;
+function hideSheet() {
+  if (!sheetOpen()) return false;
   const h = sheetHandler; sheetHandler = null; sheetInput = null;
   sheet.classList.add('hidden'); sheet.innerHTML = '';
   if (h && h.onClose) h.onClose();
-  if (sheetPushed) { sheetPushed = false; if (!fromPop) { try { history.back(); } catch (e) {} } }
+  return true;
 }
-window.addEventListener('popstate', () => { if (!sheet.classList.contains('hidden')) closeSheet(true); });
+function closeSheet(fromPop) {
+  if (!hideSheet()) return;
+  if (fromPop || !sheetPushed) { sheetPushed = false; return; }
+  sheetPushed = false; backPending = true;
+  backTimer = setTimeout(backDone, 800);           /* safety: never wait forever */
+  try { history.back(); } catch (e) { backDone(); }
+}
+window.addEventListener('popstate', () => {
+  if (backPending) { backDone(); return; }          /* our own back step finished */
+  sheetPushed = false;
+  if (sheetOpen()) closeSheet(true);                /* phone Back pressed while a sheet is open */
+});
+/* navigate (waits for a pending back step) */
+function nav(hash) { whenHistoryIdle(() => { if (location.hash === hash) render(); else location.hash = hash; }); }
+/* navigate from inside a sheet: the sheet's history entry is replaced (no dead Back press);
+   opts.replace: replace the current page in history (prev/next cable) */
+function go(hash, opts = {}) {
+  if (hash === location.hash && !opts.replace) { closeSheet(); render(); return; }
+  const wasOpen = hideSheet();
+  whenHistoryIdle(() => {
+    if ((wasOpen && sheetPushed) || opts.replace) {
+      sheetPushed = false;
+      try { history.replaceState(null, '', hash); } catch (e) { location.hash = hash; return; }
+      render();
+    } else location.hash = hash;
+  });
+}
 sheet.addEventListener('click', e => {
   const el = e.target.closest('[data-sact]'); if (!el) return;
   if (el.dataset.sact === 'close') { closeSheet(); return; }
@@ -494,17 +602,31 @@ function pickCode({title, base, sub}) {
     upd();
   });
 }
+function pickJournal(title, pref) {
+  return new Promise(resolve => {
+    let done = false; const fin = v => { if (done) return; done = true; resolve(v); };
+    const ids = journalIds().sort((a, b) => (a === pref ? -1 : b === pref ? 1 : 0));
+    const handler = (act, ds) => { if (act === 'pickJ') fin(ds.j); else if (act === 'cancel') { fin(null); closeSheet(); } };
+    handler.onClose = () => fin(null);
+    openSheet(`<div class="sh-title"><div class="big">${esc(title)}</div></div><div class="clist" style="max-height:60vh">` +
+      ids.map(id => `<button class="pos" data-sact="pickJ" data-j="${esc(id)}"><b class="mono">${esc(shortId(id))}</b> <span class="jchip">${esc(S.journals[id].building || '')}</span><br><span class="tiny muted">${esc(id)}</span></button>`).join('') +
+      `</div><button class="btn ghost" data-sact="cancel">Cancel</button>`, handler);
+  });
+}
 
 /* ---------------------------------------------------------------- header */
-function setHeader({title, sub, back, send}) {
+function setHeader({title, sub, back, send, onTitle}) {
   $('#hT1').textContent = title || 'IKJ Field'; $('#hT2').textContent = sub || '';
-  const b = $('#hBack'); b.classList.toggle('hidden', !back); b.onclick = back ? () => { location.hash = back; } : null;
+  const b = $('#hBack'); b.classList.toggle('hidden', !back); b.onclick = back ? () => nav(back) : null;
   let a = '';
-  if (send) { const n = (S.results[send] || {}).unsent || 0; a = `<button class="hsend" id="hSend">Send${n ? `<span class="badge">${n > 99 ? '99+' : n}</span>` : ''}</button>`; }
-  else if (!back) a = `<button class="hbtn" id="hSet" aria-label="Settings">&#9881;</button>`;
+  if (send) {
+    const n = send === '*' ? totalUnsent() : ((S.results[send] || {}).unsent || 0);
+    a = `<button class="hsend" id="hSend">Send${n ? `<span class="badge">${n > 99 ? '99+' : n}</span>` : ''}</button>`;
+  } else if (!back) a = `<button class="hbtn" id="hSet" aria-label="Settings">&#9881;</button>`;
   $('#hAct').innerHTML = a;
-  if (send) $('#hSend').onclick = () => openSend(send);
-  if ($('#hSet')) $('#hSet').onclick = () => { location.hash = '#/settings'; };
+  if (send) $('#hSend').onclick = () => (send === '*' ? openSendHub() : openSend(send));
+  if ($('#hSet')) $('#hSet').onclick = () => nav('#/settings');
+  const tt = $('#hTitle'); tt.classList.toggle('tap', !!onTitle); tt.onclick = onTitle || null;
   $('#hOff').classList.toggle('hidden', navigator.onLine !== false);
 }
 window.addEventListener('online', () => $('#hOff').classList.add('hidden'));
@@ -512,140 +634,191 @@ window.addEventListener('offline', () => $('#hOff').classList.remove('hidden'));
 
 /* ---------------------------------------------------------------- router */
 function parseRoute() {
-  const h = location.hash.replace(/^#/, '');
-  const p = h.split('/').filter(Boolean).map(dec);
+  const p = location.hash.replace(/^#/, '').split('/').filter(Boolean).map(dec);
   if (p[0] === 'j' && p[1]) {
     if (p[2] === 'c' && p.length >= 4) return {v: 'cable', jid: p[1], mark: p.slice(3).join('/')};
     if (p[2] === 't' && p.length >= 4) return {v: 'tray', jid: p[1], code: p.slice(3).join('/')};
     return {v: 'journal', jid: p[1]};
   }
+  if (p[0] === 't' && p.length >= 2) return {v: 'tray', jid: null, code: p.slice(1).join('/')};
   if (p[0] === 'settings') return {v: 'settings'};
   if (p[0] === 'help') return {v: 'help'};
   return {v: 'home'};
 }
 const rJ = jid => '#/j/' + enc(jid);
 const rC = (jid, mark) => `#/j/${enc(jid)}/c/${enc(mark)}`;
-const rT = (jid, code) => `#/j/${enc(jid)}/t/${enc(code)}`;
+const rT = code => '#/t/' + enc(code);
 
 function render() {
   const key = location.hash || '#/';
   if (S.ui.route && S.ui.route !== key) S.ui.scroll[S.ui.route] = window.scrollY;
   const isNew = S.ui.route !== key; S.ui.route = key;
-  if (!sheet.classList.contains('hidden') && isNew) closeSheet(true);
+  if (sheetOpen() && isNew) closeSheet(true);
   const r = parseRoute();
   try {
-    if (r.v === 'journal' && S.journals[r.jid]) viewJournal(r.jid);
-    else if (r.v === 'cable' && S.journals[r.jid] && S.idx[r.jid].byMark.has(r.mark)) viewCable(r.jid, r.mark);
-    else if (r.v === 'tray' && S.journals[r.jid]) viewTray(r.jid, r.code);
+    if (r.v === 'journal' && S.journals[r.jid]) { S.ui.lastJid = r.jid; viewJournal(r.jid); }
+    else if (r.v === 'cable' && S.journals[r.jid] && S.idx[r.jid].byMark.has(r.mark)) { S.ui.lastJid = r.jid; viewCable(r.jid, r.mark); }
+    else if (r.v === 'tray') { if (r.jid && S.journals[r.jid]) S.ui.lastJid = r.jid; viewTray(r.code); }
     else if (r.v === 'settings') viewSettings();
     else if (r.v === 'help') viewHelp();
-    else viewHome();
+    else { S.ui.lastJid = null; viewHome(); }
   } catch (e) { console.error(e); view.innerHTML = `<div class="errbox">Something went wrong: ${esc(e.message)}</div><button class="btn" onclick="location.hash='#/'">Home</button>`; }
   if (isNew) window.scrollTo(0, S.ui.scroll[key] || 0);
 }
 window.addEventListener('hashchange', render);
 
 /* ---------------------------------------------------------------- views */
+function journalCard(id) {
+  const j = S.journals[id], r = S.results[id], s = journalStats(id);
+  const secs = (j.sections || []).map(x => x.id).join(' + ');
+  return `<button class="card" data-act="openJ" data-j="${esc(id)}">
+    <div class="item-top"><span class="jid">${esc(j.id)}</span>${s.done === s.cables && s.cables ? '<span class="chip ok">All done</span>' : ''}</div>
+    <div class="small muted">${plural(j.cables.length, 'cable')}${secs ? ' · ' + esc(secs) : ''}${j.title ? ' · ' + esc(j.title) : ''}</div>
+    ${bar(s.checked, s.total)}
+    <div class="small">${s.checked}/${s.total} trays checked · ${s.done}/${s.cables} cables done${s.changes ? ` · <span class="blue"><b>${s.changes}</b> changes</span>` : ''}</div>
+    ${r.unsent ? `<div class="unsent">Not sent yet: ${plural(r.unsent, 'edit')}</div>` : (r.lastSent ? `<div class="tiny muted" style="margin-top:6px">Last sent ${fmtTime(r.lastSent)}</div>` : '')}
+  </button>`;
+}
 function viewHome() {
   setHeader({title: 'IKJ Field', sub: 'Cable route check — as-built journal'});
-  const ids = Object.keys(S.journals).sort(natCmp);
+  const ids = journalIds();
   let h = '';
   if (Store.mode === 'memory') h += `<div class="errbox">Phone storage is not available in this browser. Your marks will be LOST when the app is closed. Send results often.</div>`;
   if (S.installEvt && !isStandalone()) h += `<button class="btn primary big" data-act="install">Install app on this phone</button>`;
   if (!ids.length) h += `<div class="card"><p style="margin-top:0"><b>No journal on this phone yet.</b></p>
      <p class="small">1. Your supervisor sends you a journal file (name ends with <b>.ikj.json</b>).<br>
      2. In Telegram tap <b>⋮</b> on the file → <b>Save to Downloads</b>.<br>
-     3. Tap <b>Load journal file</b> below and pick it from Downloads.</p></div>`;
+     3. Tap <b>Load journal files</b> below and pick them in Downloads (you can select several at once).</p></div>`;
+  else h += `<input class="search mono" type="search" id="gq" value="${esc(S.ui.gq)}" placeholder="Find cable No., mark or tray" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false"><div id="glist"></div>`;
+  let lastB = null;
   for (const id of ids) {
-    const j = S.journals[id], r = S.results[id], s = journalStats(id);
-    h += `<button class="card" data-act="openJ" data-j="${esc(id)}">
-      <div class="item-top"><span class="jid">${esc(j.id)}</span>${s.done === s.cables && s.cables ? '<span class="chip ok">All done</span>' : ''}</div>
-      <div class="small muted">${esc(j.building || '')}${j.building ? ' · ' : ''}${plural(j.cables.length, 'cable')}${j.title ? ' · ' + esc(j.title) : ''}</div>
-      ${bar(s.checked, s.total)}
-      <div class="small">${s.checked}/${s.total} trays checked · ${s.done}/${s.cables} cables done${s.changes ? ` · <span class="blue"><b>${s.changes}</b> changes</span>` : ''}</div>
-      ${r.unsent ? `<div class="unsent">Not sent yet: ${plural(r.unsent, 'edit')}</div>` : (r.lastSent ? `<div class="tiny muted" style="margin-top:6px">Last sent ${fmtTime(r.lastSent)}</div>` : '')}
-    </button>`;
+    const b = S.journals[id].building || '';
+    if (ids.length > 1 && b !== lastB) { lastB = b; h += `<h3>${esc(b || 'Other')}</h3>`; }
+    h += journalCard(id);
   }
-  h += `<button class="btn primary big" data-act="loadJ">Load journal file</button>`;
+  h += `<button class="btn primary big" data-act="loadJ">Load journal files</button>`;
   h += `<button class="btn" data-act="help">How to use</button>`;
   view.innerHTML = h;
+  const gq = $('#gq');
+  if (gq) { gq.oninput = e => { S.ui.gq = e.target.value; renderGlobal(e.target.value); }; renderGlobal(S.ui.gq); }
+}
+function renderGlobal(q) {
+  const box = $('#glist'); if (!box) return;
+  const qs = squash(q); if (!qs) { box.innerHTML = ''; return; }
+  const ids = journalIds(), multi = ids.length > 1;
+  let h = '', n = 0;
+  for (const id of ids) for (const c of S.journals[id].cables) {
+    if (!(squash(c.no).includes(qs) || squash(c.mark).includes(qs))) continue;
+    if (n++ >= 40) continue;
+    const rc = S.results[id].cables[c.mark];
+    h += `<button class="card" data-act="openGC" data-j="${esc(id)}" data-m="${esc(c.mark)}">
+      <div class="item-top"><span><span class="cno">${esc(c.no)}</span><span class="mark">${esc(c.mark)}</span></span>
+      <span>${multi ? `<span class="jchip">${esc(shortId(id))}</span> ` : ''}${c.section ? `<span class="jchip">${esc(c.section)}</span> ` : ''}${rc && rc.finished ? '<span class="chip ok">Done</span>' : ''}</span></div>
+      <div class="tiny muted ft">${esc(c.from)} → ${esc(c.to)}</div></button>`;
+  }
+  const all = trayMapAll(), codes = matchCodes([...all.keys()].sort(natCmp), q).slice(0, 20);
+  for (const code of codes) {
+    const t = all.get(code), js = [...new Set(t.design.map(d => d.jid))];
+    h += `<button class="card" data-act="openGT" data-code="${esc(code)}"><div class="item-top"><span class="code">${esc(code)}</span>
+      <span class="small muted">tray · ${plural(t.design.length, 'cable')}${multi && js.length ? ' · ' + js.map(shortId).join(', ') : ''}</span></div></button>`;
+  }
+  if (!h) h = `<div class="card small muted">Nothing found for “${esc(q)}”.</div>`;
+  else if (n > 40) h += `<div class="small muted" style="margin:0 2px 10px">${n - 40} more cables — type more digits.</div>`;
+  box.innerHTML = h + '<div style="height:6px"></div>';
 }
 function isStandalone() { return (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true; }
 
 function viewJournal(jid) {
   const j = S.journals[jid], tab = S.ui.tab[jid] || 'cable', q = S.ui.q[jid + ':' + tab] || '';
-  setHeader({title: shortId(j.id), sub: j.id, back: '#/', send: jid});
+  setHeader({title: shortId(j.id), sub: j.id, back: '#/', send: jid, onTitle: openJournalSwitcher});
   const s = journalStats(jid);
   view.innerHTML = `
     <div class="small muted" style="margin:0 2px 2px">${s.checked}/${s.total} trays checked · ${s.done}/${s.cables} cables done${s.changes ? ` · <span class="blue">${s.changes} changes</span>` : ''}</div>${bar(s.checked, s.total)}
     <div class="tabs" style="margin-top:10px"><button data-act="tab" data-tab="cable" class="${tab === 'cable' ? 'on' : ''}">By cable</button><button data-act="tab" data-tab="tray" class="${tab === 'tray' ? 'on' : ''}">By tray</button></div>
-    <input class="search mono" type="search" id="jq" value="${esc(q)}" placeholder="${tab === 'cable' ? 'Find cable, e.g. 4204' : 'Find tray, e.g. 109'}" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false">
+    <input class="search mono" type="search" id="jq" value="${esc(q)}" placeholder="${tab === 'cable' ? 'Cable No. or mark, e.g. 4.0012' : 'Find tray, e.g. 109'}" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false">
     <div id="jlist"></div>
     <button class="btn danger-outline" data-act="delJ" style="margin-top:24px">Remove this journal from the phone</button>`;
   $('#jq').oninput = e => { S.ui.q[jid + ':' + tab] = e.target.value; renderJList(jid, tab, e.target.value); };
   renderJList(jid, tab, q);
 }
+function cableCard(jid, c) {
+  const rc = S.results[jid].cables[c.mark], s = cableStats(rc);
+  const chip = rc.finished ? '<span class="chip ok">Done</span>' : (s.checked || s.add ? '<span class="chip prog">In progress</span>' : '<span class="chip">Not started</span>');
+  return `<button class="card" data-act="openC" data-j="${esc(jid)}" data-m="${esc(c.mark)}">
+    <div class="item-top"><span><span class="cno">${esc(c.no)}</span><span class="mark">${esc(c.mark)}</span></span>${chip}</div>
+    <div class="small muted">${esc(c.type || '')} ${esc(c.size || '')} · ${esc(c.len)} m${c.sheet ? ' · sheet ' + esc(c.sheet) : ''}</div>
+    <div class="small ft"><span class="muted">From</span> ${esc(c.from)}<br><span class="muted">To</span> ${esc(c.to)}</div>
+    ${s.total ? bar(s.checked, s.total) : ''}
+    <div class="small muted">${s.total ? `${s.checked}/${s.total} trays checked` : (c.routeNote ? 'Route in-situ' : 'No trays in design route')}${s.add ? ` · <span class="blue">+${s.add} added</span>` : ''}${s.chg + s.no ? ` · <span class="blue">${s.chg + s.no} changed</span>` : ''}</div>
+  </button>`;
+}
 function renderJList(jid, tab, q) {
-  const j = S.journals[jid], r = S.results[jid], qs = squash(q);
+  const j = S.journals[jid], qs = squash(q);
   let h = '';
   if (tab === 'cable') {
-    const list = j.cables.filter(c => !qs || squash(c.mark).includes(qs) || squash(c.from + ' ' + c.to).includes(qs));
+    const list = j.cables.filter(c => !qs || squash(c.no).includes(qs) || squash(c.mark).includes(qs) || squash(c.from + ' ' + c.to).includes(qs));
+    const secs = (j.sections || []).length > 1 ? j.sections : null;
+    let last = null;
     for (const c of list) {
-      const rc = r.cables[c.mark], s = cableStats(rc);
-      let chip = rc.finished ? '<span class="chip ok">Done</span>' : (s.checked || s.add ? '<span class="chip prog">In progress</span>' : '<span class="chip">Not started</span>');
-      h += `<button class="card" data-act="openC" data-m="${esc(c.mark)}">
-        <div class="item-top"><span class="mark">${esc(c.mark)}</span>${chip}</div>
-        <div class="small muted">No. ${esc(c.no)} · ${esc(c.type || '')} ${esc(c.size || '')} · ${esc(c.len)} m</div>
-        <div class="small ft"><span class="muted">From</span> ${esc(c.from)}<br><span class="muted">To</span> ${esc(c.to)}</div>
-        ${s.total ? bar(s.checked, s.total) : ''}
-        <div class="small muted">${s.total ? `${s.checked}/${s.total} trays checked` : 'No trays in design route'}${s.changes ? ` · <span class="blue">${plural(s.changes, 'change')}</span>` : ''}</div>
-      </button>`;
+      if (secs && c.section !== last) {
+        last = c.section; const s = secs.find(x => x.id === c.section);
+        h += `<div class="sec-h">${esc(c.section || '')}${s && s.title ? ' · ' + esc(s.title) : ''}${s && s.sheets ? ` <span class="muted">(sheets ${esc(s.sheets)})</span>` : ''}</div>`;
+      }
+      h += cableCard(jid, c);
     }
     if (!list.length) h = `<div class="card muted">No cable matches “${esc(q)}”.</div>`;
   } else {
-    const tAll = trayIndex(jid), keep = new Set(matchCodes(tAll.map(t => t.code), q)), trays = tAll.filter(t => keep.has(t.code));
+    const all = trayMapAll();
+    const mine = [...all.values()].filter(t => t.design.some(d => d.jid === jid) || t.field.some(d => d.jid === jid));
+    const keep = new Set(matchCodes(mine.map(t => t.code), q));
+    const trays = mine.filter(t => keep.has(t.code)).sort((a, b) => natCmp(a.code, b.code));
     for (const t of trays) {
-      const chk = t.design.filter(d => d.st !== ST.U).length;
-      const moved = t.design.filter(d => d.st === ST.CHG || d.st === ST.NO).length;
+      const dm = t.design.filter(d => d.jid === jid), fm = t.field.filter(d => d.jid === jid);
+      const chk = dm.filter(d => d.st !== ST.U).length, moved = dm.filter(d => d.st === ST.CHG || d.st === ST.NO).length;
+      const others = t.design.filter(d => d.jid !== jid), oj = [...new Set(others.map(d => d.jid))];
       h += `<button class="card" data-act="openT" data-code="${esc(t.code)}">
-        <div class="item-top"><span class="code">${esc(t.code)}</span>${t.design.length && chk === t.design.length ? '<span class="chip ok">Checked</span>' : ''}</div>
-        <div class="small muted">${t.design.length ? `${plural(t.design.length, 'cable')} by design · ${chk} checked` : 'Not in design'}${moved ? ` · <span class="red">${moved} not here/moved</span>` : ''}${t.field.length ? ` · <span class="blue">${t.field.length} found here</span>` : ''}</div>
+        <div class="item-top"><span class="code">${esc(t.code)}</span>${dm.length && chk === dm.length ? '<span class="chip ok">Checked</span>' : ''}</div>
+        <div class="small muted">${dm.length ? `${plural(dm.length, 'cable')} by design · ${chk} checked` : 'Not in design'}${moved ? ` · <span class="red">${moved} not here/moved</span>` : ''}${fm.length ? ` · <span class="blue">${fm.length} found here</span>` : ''}${others.length ? ` · <span class="jchip">+${others.length} in ${esc(oj.map(shortId).join(', '))}</span>` : ''}</div>
       </button>`;
     }
     if (!trays.length) h = `<div class="card muted">No tray matches “${esc(q)}”.</div>`;
   }
   $('#jlist').innerHTML = h;
 }
-function trayIndex(jid) {
-  const j = S.journals[jid], r = S.results[jid], m = new Map();
-  const get = code => { if (!m.has(code)) m.set(code, {code, design: [], field: []}); return m.get(code); };
-  for (const c of j.cables) {
-    const rc = r.cables[c.mark]; if (!rc) continue;
-    for (const e of rc.entries) {
-      if (e.seg !== null) get(e.seg).design.push({mark: c.mark, k: e.k, st: e.st});
-      if (e.fact && (e.seg === null || e.st === ST.CHG)) get(e.fact).field.push({mark: c.mark, k: e.k, st: e.seg === null ? ST.ADD : e.st, from: e.seg});
-    }
-  }
-  return [...m.values()].sort((a, b) => natCmp(a.code, b.code));
-}
 
+function navRow(jid, mark) {
+  const cs = S.journals[jid].cables, i = S.idx[jid].pos.get(mark), p = cs[i - 1], n = cs[i + 1];
+  const b = (c, dir) => c
+    ? `<button class="btn" data-act="navC" data-m="${esc(c.mark)}"><span class="mono">${dir < 0 ? '‹ ' : ''}${esc(c.no)}${dir > 0 ? ' ›' : ''}</span><br><span class="tiny muted">${esc(c.mark)}</span></button>`
+    : `<button class="btn" disabled>${dir < 0 ? '‹ first' : 'last ›'}</button>`;
+  return `<div class="navrow">${b(p, -1)}${b(n, 1)}</div>`;
+}
 function viewCable(jid, mark) {
   const j = S.journals[jid], c = S.idx[jid].byMark.get(mark), rc = S.results[jid].cables[mark], s = cableStats(rc);
-  setHeader({title: mark, sub: `${shortId(j.id)} · cable No. ${c.no}`, back: rJ(jid), send: jid});
+  setHeader({title: mark, sub: `No. ${c.no} · ${shortId(j.id)}${c.section ? ' · ' + c.section : ''}${c.sheet ? ' · sh. ' + c.sheet : ''}`,
+             back: rJ(jid), send: jid, onTitle: () => openCableSwitcher(jid, mark)});
   let n = 0, rows = '';
   for (const e of rc.entries) rows += routeRow(e, e.seg !== null ? ++n : null);
+  const noDesign = !(c.route && c.route.length);
+  const note = c.routeNote ? `<div class="info"><b>Design:</b> ${esc(c.routeNote)}</div>` : '';
+  const empty = !rc.entries.length;
   view.innerHTML = `
+    ${navRow(jid, mark)}
     <div class="card small">
-      <div><span class="muted">Type</span> <b>${esc(c.type || '')} ${esc(c.size || '')}</b> · <span class="muted">Design length</span> <b>${esc(c.len)} m</b></div>
+      <div><span class="cno">${esc(c.no)}</span><b class="mono">${esc(c.mark)}</b></div>
+      <div style="margin-top:6px"><span class="muted">Type</span> <b>${esc(c.type || '')} ${esc(c.size || '')}</b> · <span class="muted">Design length</span> <b>${esc(c.len)} m</b></div>
       <div style="margin-top:4px"><span class="muted">From</span> ${esc(c.from)}${c.fromRoom ? ` <span class="muted">(${esc(c.fromRoom)})</span>` : ''}</div>
       <div style="margin-top:2px"><span class="muted">To</span> ${esc(c.to)}${c.toRoom ? ` <span class="muted">(${esc(c.toRoom)})</span>` : ''}</div>
+      ${c.protection ? `<div style="margin-top:2px"><span class="muted">Protection</span> ${esc(c.protection)}</div>` : ''}
       ${s.total ? bar(s.checked, s.total) + `<div class="muted">${s.checked}/${s.total} trays checked${s.changes ? ` · <span class="blue">${plural(s.changes, 'change')}</span>` : ''}</div>` : ''}
     </div>
     <div class="legend tiny"><span><b>black</b> = as designed</span><span class="red"><s><b>red</b></s> = design tray not used</span><span class="blue"><b>blue</b> = actual tray</span></div>
-    <div class="small muted" style="margin:0 2px 8px">Walk along the route. Tap <b class="okc">✓</b> if the cable is on that tray. Tap the tray code for other options.</div>
-    <button class="btn add" data-act="addStart">＋ Add a tray at the start</button>
-    ${rc.entries.length ? `<ol class="route">${rows}</ol>` : `<div class="card small muted">The design gives no tray route for this cable. If it runs on trays, add them.</div>`}
-    <button class="btn add" data-act="addEnd">＋ Add a tray at the end (route continues)</button>
+    ${noDesign ? note : `<div class="small muted" style="margin:0 2px 8px">Walk along the route. Tap <b class="okc">✓</b> if the cable is on that tray. Tap the tray code for other options.</div>`}
+    ${empty ? '' : `<button class="btn add" data-act="addStart">＋ Add a tray at the start</button>`}
+    ${empty ? (noDesign && c.routeNote ? '' : `<div class="card small muted">The design gives no tray route for this cable. If it runs on trays, add them.</div>`) : `<ol class="route">${rows}</ol>`}
+    ${noDesign ? '' : note}
+    <button class="btn add" data-act="addEnd">${empty ? '＋ Add a tray (actual route)' : '＋ Add a tray at the end (route continues)'}</button>
+    <button class="btn" data-act="copyRoute">⧉ Copy route from another cable…</button>
     <div class="card">
       <label class="lbl" for="fLen">Actual length, m (if known)</label>
       <input class="inp" id="fLen" type="number" inputmode="decimal" min="0" step="1" value="${rc.factLength ?? ''}" placeholder="design ${esc(c.len)} m">
@@ -654,7 +827,8 @@ function viewCable(jid, mark) {
       <div class="lbl">Photos</div><div class="photos" id="photos"></div>
       <button class="btn" data-act="addPhoto">📷 Add photo</button>
     </div>
-    ${rc.finished ? `<button class="btn ok big" data-act="finish">✓ Cable done (tap to reopen)</button>` : `<button class="btn primary big" data-act="finish">Mark cable as done</button>`}`;
+    ${rc.finished ? `<button class="btn ok big" data-act="finish">✓ Cable done (tap to reopen)</button>` : `<button class="btn primary big" data-act="finish">Mark cable as done</button>`}
+    ${navRow(jid, mark)}`;
   const fLen = $('#fLen'), fNote = $('#fNote'); let noteTimer = null;
   fLen.onchange = () => {
     const v = fLen.value.trim(); const num = v === '' ? null : Number(v.replace(',', '.'));
@@ -689,33 +863,44 @@ async function renderPhotos(jid, mark) {
   if ($('#photos') === box) box.innerHTML = h || '<span class="small muted">No photos</span>';
 }
 
-function viewTray(jid, code) {
-  const j = S.journals[jid];
-  setHeader({title: code, sub: `${shortId(j.id)} · tray`, back: rJ(jid), send: jid});
-  const t = trayIndex(jid).find(x => x.code === code) || {code, design: [], field: []};
-  let h = `<div class="small muted" style="margin:0 2px 10px">Stand at this tray. For each cable: is it here?</div>`;
+/* tray view — cables of ALL loaded journals that run on this tray */
+const secName = (jid, c) => ((S.journals[jid].sections || []).length > 1 && c.section ? c.section : '');
+const secTag = (jid, c) => (secName(jid, c) ? `<b>${esc(secName(jid, c))}</b> · ` : '');
+function trayRow(jid, d) {
+  const c = S.idx[jid].byMark.get(d.mark), {e} = getEntry(jid, d.mark, d.k);
+  let st = '<span class="small muted">not checked</span>', cls = '';
+  if (e.st === ST.OK) { st = '<span class="small okc"><b>✓ here</b></span>'; cls = 'ok'; }
+  else if (e.st === ST.NO) { st = '<span class="small red"><b>✗ not here</b></span>'; cls = 'no'; }
+  else if (e.st === ST.CHG) { st = `<span class="small blue"><b>actually on ${esc(e.fact)}</b></span>`; cls = 'chg'; }
+  const a = `data-j="${esc(jid)}" data-m="${esc(d.mark)}" data-k="${d.k}"`;
+  return `<div class="trow ${cls}">
+    <div class="item-top"><button class="cbtn" data-act="openC" data-j="${esc(jid)}" data-m="${esc(d.mark)}"><span class="cno">${esc(c.no)}</span><span class="mark">${esc(d.mark)}</span></button>${st}</div>
+    <div class="tiny muted ft">${secTag(jid, c)}${esc(c.from)} → ${esc(c.to)}</div>
+    <div class="tb"><button class="y ${e.st === ST.OK ? 'on' : ''}" data-act="tYes" ${a}>✓ Here</button>
+      <button class="n ${e.st === ST.NO ? 'on' : ''}" data-act="tNo" ${a}>✗ Not here</button>
+      <button class="o ${e.st === ST.CHG ? 'on' : ''}" data-act="tOther" ${a}>Other…</button></div>
+  </div>`;
+}
+function fieldRow(jid, f) {
+  const c = S.idx[jid].byMark.get(f.mark);
+  return `<div class="trow chg"><div class="item-top"><button class="cbtn" data-act="openC" data-j="${esc(jid)}" data-m="${esc(f.mark)}"><span class="cno">${esc(c.no)}</span><span class="mark">${esc(f.mark)}</span></button>
+    <span class="small blue">${f.st === ST.ADD ? 'added here' : 'moved here from <s class="red">' + esc(f.from) + '</s>'}</span></div>
+    ${secName(jid, c) ? `<div class="tiny muted"><b>${esc(secName(jid, c))}</b></div>` : ''}
+    <div class="tb" style="grid-template-columns:1fr"><button class="o" data-act="tOther" data-j="${esc(jid)}" data-m="${esc(f.mark)}" data-k="${f.k}">Edit…</button></div></div>`;
+}
+function viewTray(code) {
+  const pref = S.ui.lastJid && S.journals[S.ui.lastJid] ? S.ui.lastJid : null;
+  const t = trayMapAll().get(code) || {code, design: [], field: []};
+  const jids = [...new Set([...t.design, ...t.field].map(x => x.jid))].sort((a, b) => (a === pref ? -1 : b === pref ? 1 : natCmp(a, b)));
+  setHeader({title: code, sub: 'tray · ' + (jids.length ? jids.map(shortId).join(', ') : 'not in design'), back: pref ? rJ(pref) : '#/', send: '*'});
+  let h = `<div class="small muted" style="margin:0 2px 10px">Stand at this tray. For each cable: is it here?${jids.length > 1 ? ' Cables of all loaded journals are shown.' : ''}</div>`;
   if (!t.design.length) h += `<div class="card small muted">No cable runs on this tray by design.</div>`;
-  for (const d of t.design.sort((a, b) => natCmp(a.mark, b.mark))) {
-    const c = S.idx[jid].byMark.get(d.mark), {e} = getEntry(jid, d.mark, d.k);
-    let st = '<span class="small muted">not checked</span>', cls = '';
-    if (e.st === ST.OK) { st = '<span class="small okc"><b>✓ here</b></span>'; cls = 'ok'; }
-    else if (e.st === ST.NO) { st = '<span class="small red"><b>✗ not here</b></span>'; cls = 'no'; }
-    else if (e.st === ST.CHG) { st = `<span class="small blue"><b>actually on ${esc(e.fact)}</b></span>`; cls = 'chg'; }
-    h += `<div class="trow ${cls}">
-      <div class="item-top"><button class="link mark" style="padding:0;text-decoration:none;color:var(--ink)" data-act="openC" data-m="${esc(d.mark)}">${esc(d.mark)}</button>${st}</div>
-      <div class="tiny muted ft">${esc(c.from)} → ${esc(c.to)}</div>
-      <div class="tb"><button class="y ${e.st === ST.OK ? 'on' : ''}" data-act="tYes" data-m="${esc(d.mark)}" data-k="${d.k}">✓ Here</button>
-        <button class="n ${e.st === ST.NO ? 'on' : ''}" data-act="tNo" data-m="${esc(d.mark)}" data-k="${d.k}">✗ Not here</button>
-        <button class="o ${e.st === ST.CHG ? 'on' : ''}" data-act="tOther" data-m="${esc(d.mark)}" data-k="${d.k}">Other…</button></div>
-    </div>`;
-  }
-  if (t.field.length) {
-    h += `<h3>Found here in the field</h3>`;
-    for (const f of t.field) {
-      h += `<div class="trow chg"><div class="item-top"><button class="link mark" style="padding:0;text-decoration:none;color:var(--ink)" data-act="openC" data-m="${esc(f.mark)}">${esc(f.mark)}</button>
-        <span class="small blue">${f.st === ST.ADD ? 'added here' : 'moved here from <s class="red">' + esc(f.from) + '</s>'}</span></div>
-        <div class="tb" style="grid-template-columns:1fr"><button class="o" data-act="tOther" data-m="${esc(f.mark)}" data-k="${f.k}">Edit…</button></div></div>`;
-    }
+  for (const jid of jids) {
+    const ds = t.design.filter(d => d.jid === jid).sort(byPos(jid)), fs = t.field.filter(d => d.jid === jid).sort(byPos(jid));
+    const j = S.journals[jid];
+    h += `<div class="sec-h">${esc(shortId(jid))}${j.building ? ' · ' + esc(j.building) : ''} <span class="muted">· ${plural(ds.length, 'cable')} by design</span></div>`;
+    for (const d of ds) h += trayRow(jid, d);
+    if (fs.length) h += `<div class="small blue" style="margin:2px 2px 8px"><b>Found here in the field</b></div>` + fs.map(f => fieldRow(jid, f)).join('');
   }
   h += `<button class="btn add" data-act="tAdd" data-code="${esc(code)}" style="margin-top:14px">＋ A cable is here that is not listed</button>`;
   view.innerHTML = h;
@@ -738,31 +923,69 @@ function viewSettings() {
 function viewHelp() {
   setHeader({title: 'How to use', back: '#/'});
   view.innerHTML = `<div class="card help">
-  <p><b>1. Get the journal.</b> Your supervisor sends a file ending with <b>.ikj.json</b>. In Telegram tap ⋮ on it → <b>Save to Downloads</b>. In this app: <b>Load journal file</b>.</p>
-  <p><b>2. Check by cable.</b> Open a cable and walk along its route. At each tray:</p>
+  <p><b>1. Get the journals.</b> Your supervisor sends files ending with <b>.ikj.json</b> (one per working document). In Telegram tap ⋮ on each → <b>Save to Downloads</b>. In this app: <b>Load journal files</b> — you can select several files at once. A newer file of the same journal updates it; your marks are kept.</p>
+  <p><b>2. Find a cable.</b> On the first screen type the cable number (e.g. <b>4.0012</b>) or part of the mark — all journals are searched. Inside a cable use <b>‹ ›</b> for the previous / next cable, or tap the title on top to jump to any cable or another journal.</p>
+  <p><b>3. Check by cable.</b> Walk along the route. At each tray:</p>
   <ul>
     <li><b class="okc">✓</b> — the cable is on this tray (as designed).</li>
     <li>Tap the tray code → <b>other shelf</b> (number buttons) or <b>another tray</b> — the cable is somewhere else.</li>
     <li>Tap the tray code → <b>✗ Not here</b> — the cable does not pass this tray.</li>
-    <li><b>＋ Add a tray</b> — the cable passes a tray that is not in the design, or the route continues further.</li>
+    <li><b>＋ Add a tray</b> — the cable passes a tray that is not in the design, or the route continues (“in-situ”).</li>
+    <li><b>⧉ Copy route</b> — neighbour cables often run together: enter the trays for one cable, then copy them to the next and correct.</li>
   </ul>
-  <p><b>3. Check by tray.</b> Standing at one tray? Open <b>By tray</b>, find it, and mark all cables there at once.</p>
-  <p><b>4. Colours</b> are the same as in the journal: black = as designed, <span class="red"><s>red crossed</s></span> = design tray not used, <span class="blue">blue</span> = actual tray.</p>
-  <p><b>5. Mistake?</b> Tap <b>Undo</b> in the message at the bottom, or tap the tray code → <b>Clear mark</b>.</p>
-  <p><b>6. Send.</b> Tap <b>Send</b> (top right) → Telegram/WhatsApp → your supervisor. No signal? Telegram sends it automatically when the signal is back. Each file contains <b>all</b> your work so far — always send the newest one.</p>
+  <p><b>4. Check by tray.</b> Standing at one tray? Open <b>By tray</b> (or search the tray code on the first screen) — you see the cables of <b>all</b> loaded journals on this tray and mark them at once.</p>
+  <p><b>5. Colours</b> are the same as in the journal: black = as designed, <span class="red"><s>red crossed</s></span> = design tray not used, <span class="blue">blue</span> = actual tray.</p>
+  <p><b>6. Mistake?</b> Tap <b>Undo</b> in the message at the bottom, or tap the tray code → <b>Clear mark</b>.</p>
+  <p><b>7. Send.</b> Tap <b>Send</b> (top right) → Telegram/WhatsApp → your supervisor. Each journal is a separate file. No signal? Telegram sends it automatically when the signal is back. Each file contains <b>all</b> your work so far — always send the newest one.</p>
   <p><b>Important:</b> the app works without internet. Your marks are kept only on this phone until you send them — do not uninstall the app or clear Chrome data. Send at least once a day.</p>
   </div>`;
+}
+
+/* ---------------------------------------------------------------- switchers */
+function openJournalSwitcher() {
+  const ids = journalIds();
+  let h = `<div class="sh-title"><div class="big">Journals</div></div>`;
+  for (const id of ids) {
+    const s = journalStats(id), r = S.results[id];
+    h += `<button class="card" data-sact="pickJ" data-j="${esc(id)}"><div class="item-top"><span class="jid">${esc(shortId(id))}</span><span class="jchip">${esc(S.journals[id].building || '')}</span></div>
+      <div class="tiny muted">${esc(id)}</div>${bar(s.checked, s.total)}<div class="tiny">${s.checked}/${s.total} trays · ${s.done}/${s.cables} cables done${r.unsent ? ` · <span class="red">${r.unsent} not sent</span>` : ''}</div></button>`;
+  }
+  h += `<button class="btn" data-sact="home">First screen (search all)</button><button class="btn ghost" data-sact="close">Cancel</button>`;
+  openSheet(h, (act, ds) => { if (act === 'pickJ') go(rJ(ds.j)); else if (act === 'home') go('#/'); });
+}
+function openCableSwitcher(jid, mark) {
+  const j = S.journals[jid];
+  const handler = (act, ds) => { if (act === 'pickC') go(rC(jid, ds.m)); else if (act === 'otherJ') openJournalSwitcher(); };
+  openSheet(`<div class="sh-title"><div class="big">${esc(shortId(jid))} — cables</div><div class="small muted">${esc(j.id)}</div></div>
+    <input class="inp mono" id="swq" placeholder="Cable No. or mark" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false">
+    <div class="clist" id="swl" style="max-height:55vh"></div>
+    <button class="btn" data-sact="otherJ">Other journal…</button><button class="btn ghost" data-sact="close">Cancel</button>`, handler, () => upd());
+  function upd() {
+    const qs = squash($('#swq').value), secs = (j.sections || []).length > 1;
+    let h = '', last = null;
+    for (const c of j.cables) {
+      if (qs && !(squash(c.no).includes(qs) || squash(c.mark).includes(qs))) continue;
+      if (secs && c.section !== last) { last = c.section; h += `<div class="sec-h">${esc(c.section || '')}</div>`; }
+      const rc = S.results[jid].cables[c.mark], s = cableStats(rc);
+      const chip = rc.finished ? ' <span class="chip ok">Done</span>' : (s.checked || s.add ? ' <span class="chip prog">…</span>' : '');
+      h += `<button class="pos ${c.mark === mark ? 'cur' : ''}" data-sact="pickC" data-m="${esc(c.mark)}"><span class="cno">${esc(c.no)}</span><b class="mono">${esc(c.mark)}</b>${chip}</button>`;
+    }
+    $('#swl').innerHTML = h || '<div class="small muted" style="padding:6px 2px">No match.</div>';
+  }
+  upd();
+  const cur = sheet.querySelector('#swl .cur'); if (cur) cur.scrollIntoView({block: 'center'});
 }
 
 /* ---------------------------------------------------------------- sheets: entry actions */
 function openEntrySheet(jid, mark, k) {
   const {e} = getEntry(jid, mark, k); if (!e) return;
   const isAdd = e.seg === null, cur = isAdd ? e.fact : (e.st === ST.CHG ? e.fact : e.seg), sp = splitCode(cur);
+  const c = S.idx[jid].byMark.get(mark);
   const head = isAdd ? `<span class="blue">+ ${esc(e.fact)}</span>` : (e.st === ST.CHG ? `<span class="red"><s>${esc(e.seg)}</s></span> <span class="blue">→ ${esc(e.fact)}</span>` : (e.st === ST.NO ? `<span class="red"><s>${esc(e.seg)}</s></span>` : esc(e.seg)));
-  let h = `<div class="sh-title"><div class="small muted">${esc(mark)}${isAdd ? ' · tray added in the field' : ' · design tray'}</div><div class="code" style="font-size:20px">${head}</div></div>`;
+  let h = `<div class="sh-title"><div class="small muted">${esc(c.no)} · ${esc(mark)}${isAdd ? ' · tray added in the field' : ' · design tray'}</div><div class="code" style="font-size:20px">${head}</div></div>`;
   if (!isAdd) h += `<div class="grid2" style="margin-bottom:12px"><button class="btn ok big" data-sact="ok">✓ Cable is here</button><button class="btn danger big" data-sact="no">✗ Not here</button></div>`;
   h += `<div class="lbl">Same tray, ${isAdd ? 'other' : 'cable is on'} shelf: <span class="mono">${esc(sp.section)}/…</span></div>
-    <div class="shelves">${SHELVES.map(s => `<button class="sbtn ${s === sp.shelf ? 'cur' : ''}" data-sact="shelf" data-s="${s}">${s}</button>`).join('')}<button class="sbtn wide ${sp.shelf === null ? 'cur' : ''}" data-sact="shelf" data-s="">no shelf</button></div>
+    <div class="shelves">${shelvesList().map(s => `<button class="sbtn ${s === sp.shelf ? 'cur' : ''}" data-sact="shelf" data-s="${s}">${s}</button>`).join('')}<button class="sbtn wide ${sp.shelf === null ? 'cur' : ''}" data-sact="shelf" data-s="">no shelf</button></div>
     <button class="btn" data-sact="other">${isAdd ? 'Change to another tray…' : 'Cable is on another tray…'}</button>
     <button class="btn add" data-sact="after">＋ Add a tray after this one…</button>`;
   if (isAdd) h += `<button class="btn danger-outline" data-sact="del">Delete this added tray</button>`;
@@ -777,6 +1000,7 @@ function openEntrySheet(jid, mark, k) {
     else if (act === 'other') { const code = await pickCode({title: isAdd ? 'Change tray' : 'Where is the cable actually?', base: cur, sub: `${esc(mark)} · instead of <span class="mono">${esc(cur)}</span>`}); if (!code) return; apply(code); render(); return; }
     else if (act === 'after') { const code = await pickCode({title: 'Add a tray after ' + cur, sub: esc(mark)}); if (!code) return; insertAt(jid, mark, k, code); render(); return; }
     else if (act === 'del') deleteAdded(jid, mark, k);
+    else return;
     closeSheet(); render();
   });
 }
@@ -784,20 +1008,23 @@ async function addAtEdge(jid, mark, where) {
   const code = await pickCode({title: where === 'start' ? 'Add a tray at the start' : 'Add a tray at the end', sub: esc(mark)});
   if (!code) return; insertAt(jid, mark, where === 'start' ? null : 'END', code); render();
 }
-async function trayAddCable(jid, code) {
-  const j = S.journals[jid], t = trayIndex(jid).find(x => x.code === code);
-  const listed = new Set([...(t ? t.design : []), ...(t ? t.field : [])].map(d => d.mark));
+async function trayAddCable(code) {
+  const ids = journalIds();
+  const jid = ids.length === 1 ? ids[0] : await pickJournal('Which journal is the cable from?', S.ui.lastJid);
+  if (!jid) return;
+  const j = S.journals[jid], t = trayMapAll().get(code);
+  const listed = new Set([...(t ? t.design : []), ...(t ? t.field : [])].filter(d => d.jid === jid).map(d => d.mark));
   const mark = await new Promise(resolve => {
     let done = false; const fin = v => { if (done) return; done = true; resolve(v); };
     const handler = (act, ds) => { if (act === 'pick') { fin(ds.m); } else if (act === 'cancel') { fin(null); closeSheet(); } };
     handler.onClose = () => fin(null);
-    openSheet(`<div class="sh-title"><div class="big">Which cable is here?</div><div class="small muted">Tray <span class="mono">${esc(code)}</span></div></div>
-      <input class="inp mono" id="mQ" placeholder="Find cable, e.g. 4204" autocomplete="off" autocapitalize="characters" spellcheck="false"><div class="clist" id="mList"></div>
+    openSheet(`<div class="sh-title"><div class="big">Which cable is here?</div><div class="small muted">${esc(shortId(jid))} · tray <span class="mono">${esc(code)}</span></div></div>
+      <input class="inp mono" id="mQ" placeholder="Cable No. or mark, e.g. 4.0012" autocomplete="off" autocapitalize="characters" spellcheck="false"><div class="clist" id="mList"></div>
       <button class="btn ghost" data-sact="cancel">Cancel</button>`, handler, () => upd());
     function upd() {
       const qs = squash($('#mQ').value);
-      $('#mList').innerHTML = j.cables.filter(c => !listed.has(c.mark) && (!qs || squash(c.mark).includes(qs)))
-        .map(c => `<button data-sact="pick" data-m="${esc(c.mark)}">${esc(c.mark)}</button>`).join('') || '<div class="small muted">No cable matches.</div>';
+      $('#mList').innerHTML = j.cables.filter(c => !listed.has(c.mark) && (!qs || squash(c.no).includes(qs) || squash(c.mark).includes(qs)))
+        .map(c => `<button data-sact="pick" data-m="${esc(c.mark)}"><span class="cno">${esc(c.no)}</span>${esc(c.mark)}</button>`).join('') || '<div class="small muted">No cable matches.</div>';
     }
     upd();
   });
@@ -819,8 +1046,55 @@ async function trayAddCable(jid, code) {
   if (after === undefined) return;
   insertAt(jid, mark, after, code); render();
 }
+function openCopy(jid, mark) {
+  const c = S.idx[jid].byMark.get(mark);
+  const handler = (act, ds) => {
+    if (act === 'src') showConfirm(ds.j, ds.m);
+    else if (act === 'do') { copyRoute(jid, mark, ds.j, ds.m); closeSheet(); render(); }
+    else if (act === 'back') showList();
+  };
+  function showList() {
+    const ids = [jid, ...journalIds().filter(x => x !== jid)];
+    let h = `<div class="sh-title"><div class="big">Copy route from another cable</div><div class="small muted">to <span class="cno">${esc(c.no)}</span><span class="mono">${esc(mark)}</span>. Only trays already marked on the other cable are copied.</div></div><div class="clist" style="max-height:60vh">`;
+    let n = 0;
+    for (const id of ids) {
+      const rows = [];
+      for (const c2 of S.journals[id].cables) {
+        if (id === jid && c2.mark === mark) continue;
+        const ar = actualRoute(S.results[id].cables[c2.mark]); if (!ar.length) continue;
+        rows.push(`<button class="pos" data-sact="src" data-j="${esc(id)}" data-m="${esc(c2.mark)}"><span class="cno">${esc(c2.no)}</span><b class="mono">${esc(c2.mark)}</b><br><span class="small muted">${plural(ar.length, 'tray')}: ${esc(ar.slice(0, 3).join(', '))}${ar.length > 3 ? ' …' : ''}</span></button>`);
+      }
+      if (rows.length) { if (ids.length > 1) h += `<div class="sec-h">${esc(shortId(id))}</div>`; h += rows.join(''); n += rows.length; }
+    }
+    if (!n) h += `<div class="small muted" style="padding:6px 2px">No cable has marked trays yet. Mark the route of one cable first, then copy it to its neighbours.</div>`;
+    h += `</div><button class="btn ghost" data-sact="close">Cancel</button>`;
+    openSheet(h, handler);
+  }
+  function showConfirm(sj, sm) {
+    const sc = S.idx[sj].byMark.get(sm), p = planCopy(jid, mark, sj, sm);
+    let h = `<div class="sh-title"><div class="big">Copy from <span style="white-space:nowrap"><span class="cno">${esc(sc.no)}</span>${esc(sm)}</span>?</div><div class="small muted">Route of that cable (${plural(p.src.length, 'tray')}):</div></div>
+      <div class="card small mono" style="max-height:32vh;overflow:auto">${p.src.map(esc).join('<br>')}</div>
+      <div class="card small">To <b>${esc(c.no)} ${esc(mark)}</b>:${p.confirm.length ? `<br>✓ confirm design trays: <b>${p.confirm.length}</b>` : ''}${p.add.length ? `<br><span class="blue">＋ add at the end: <b>${p.add.length}</b></span>` : ''}${!p.confirm.length && !p.add.length ? '<br>nothing new — the route already contains these trays' : ''}<br><span class="muted">Check the result and correct what differs.</span></div>
+      <button class="btn primary big" data-sact="do" data-j="${esc(sj)}" data-m="${esc(sm)}" ${p.confirm.length || p.add.length ? '' : 'disabled'}>Copy</button>
+      <button class="btn" data-sact="back">‹ Choose another cable</button><button class="btn ghost" data-sact="close">Cancel</button>`;
+    openSheet(h, handler);
+  }
+  showList();
+}
 
 /* ---------------------------------------------------------------- send / backup */
+function openSendHub() {
+  const ids = journalIds();
+  if (!ids.length) return;
+  if (ids.length === 1) return openSend(ids[0]);
+  let h = `<div class="sh-title"><div class="big">Send results</div><div class="small muted">Each journal is a separate file.</div></div>`;
+  for (const id of ids) {
+    const r = S.results[id];
+    h += `<button class="card" data-sact="pick" data-j="${esc(id)}"><div class="item-top"><span class="jid">${esc(shortId(id))}</span>${r.unsent ? `<span class="chip red">${r.unsent} not sent</span>` : `<span class="chip ok">${r.lastSent ? 'sent ' + fmtTime(r.lastSent) : 'nothing new'}</span>`}</div><div class="tiny muted">${esc(id)}</div></button>`;
+  }
+  h += `<button class="btn ghost" data-sact="close">Cancel</button>`;
+  openSheet(h, (act, ds) => { if (act === 'pick') openSend(ds.j); });
+}
 async function openSend(jid) {
   if (!S.settings.inspector) {
     const name = await promptSheet('Your name', '', 'Name and surname', 'Continue'); if (!name) return;
@@ -837,7 +1111,7 @@ async function openSend(jid) {
     <button class="btn" data-sact="save">Save the file on this phone</button>
     <button class="btn ghost" data-sact="close">Cancel</button>`;
   openSheet(html, async act => {
-    if (act === 'rename') { closeSheet(); const n = await promptSheet('Your name', S.settings.inspector, 'Name and surname', 'Save'); if (n) { S.settings.inspector = n; await saveSettings(); } openSend(jid); return; }
+    if (act === 'rename') { const n = await promptSheet('Your name', S.settings.inspector, 'Name and surname', 'Save'); if (n) { S.settings.inspector = n; await saveSettings(); } openSend(jid); return; }
     if (act !== 'share' && act !== 'save') return;
     const inc = $('#incPh') ? $('#incPh').checked : false;
     busy(true); let text;
@@ -875,7 +1149,7 @@ async function doRestore(file) {
     for (const r of o.results || []) { if (!r.journalId || !S.journals[r.journalId]) continue; S.results[r.journalId] = r; await Store.set('result:' + r.journalId, r); }
     for (const p of o.photos || []) { await Store.putPhoto({id: p.id, jid: p.jid, mark: p.mark, name: p.name, takenAt: p.takenAt, blob: await dataURLToBlob(p.data)}); }
     if (o.settings && o.settings.inspector && !S.settings.inspector) { S.settings.inspector = o.settings.inspector; await saveSettings(); }
-    busy(false); toast('Restored ✓'); location.hash = '#/'; render();
+    busy(false); toast('Restored ✓'); nav('#/');
   } catch (e) { busy(false); toast('Restore failed: ' + e.message); }
 }
 
@@ -923,16 +1197,18 @@ async function toggleFinish(jid, mark) {
   rc.finished = true; commit(jid, mark, 'Cable marked as done', snap); render();
 }
 view.addEventListener('click', async ev => {
-  const el = ev.target.closest('[data-act]'); if (!el) return;
-  const a = el.dataset.act, r = parseRoute(), jid = r.jid;
+  const el = ev.target.closest('[data-act]'); if (!el || el.disabled) return;
+  const a = el.dataset.act, r = parseRoute(), jid = el.dataset.j || r.jid;
   switch (a) {
-    case 'openJ': location.hash = rJ(el.dataset.j); break;
+    case 'openJ': nav(rJ(el.dataset.j)); break;
     case 'loadJ': $('#fileJournal').click(); break;
-    case 'help': location.hash = '#/help'; break;
+    case 'help': nav('#/help'); break;
     case 'install': if (S.installEvt) { S.installEvt.prompt(); try { await S.installEvt.userChoice; } catch (e) {} S.installEvt = null; render(); } break;
     case 'tab': S.ui.tab[jid] = el.dataset.tab; render(); break;
-    case 'openC': location.hash = rC(jid, el.dataset.m); break;
-    case 'openT': location.hash = rT(jid, el.dataset.code); break;
+    case 'openC': case 'openGC': nav(rC(jid, el.dataset.m)); break;
+    case 'openT': S.ui.lastJid = r.jid; nav(rT(el.dataset.code)); break;
+    case 'openGT': S.ui.lastJid = null; nav(rT(el.dataset.code)); break;
+    case 'navC': go(rC(r.jid, el.dataset.m), {replace: true}); break;
     case 'delJ': {
       const res = S.results[jid];
       const ok = await confirmSheet(`Remove <b>${esc(jid)}</b> and all your marks for it from this phone?${res && res.unsent ? `<br><br><span class="red"><b>${plural(res.unsent, 'edit')} not sent yet!</b></span>` : ''}`, 'Remove', 'Cancel', true);
@@ -940,27 +1216,37 @@ view.addEventListener('click', async ev => {
       const rc = S.results[jid]; for (const m in (rc ? rc.cables : {})) for (const pid of (rc.cables[m].photos || [])) await Store.delPhoto(pid);
       delete S.journals[jid]; delete S.results[jid]; delete S.idx[jid];
       await Store.del('journal:' + jid); await Store.del('result:' + jid);
-      location.hash = '#/'; toast('Journal removed'); break;
+      nav('#/'); toast('Journal removed'); break;
     }
     case 'tick': { const {e} = getEntry(jid, r.mark, el.dataset.k); if (e) setDesign(jid, r.mark, e.k, e.st === ST.OK ? ST.U : ST.OK); render(); break; }
     case 'entry': openEntrySheet(jid, r.mark, el.dataset.k); break;
     case 'addStart': addAtEdge(jid, r.mark, 'start'); break;
     case 'addEnd': addAtEdge(jid, r.mark, 'end'); break;
+    case 'copyRoute': openCopy(jid, r.mark); break;
     case 'addPhoto': photoTarget = {jid, mark: r.mark}; $('#filePhoto').click(); break;
     case 'photo': openPhoto(jid, r.mark, el.dataset.p); break;
     case 'finish': toggleFinish(jid, r.mark); break;
     case 'tYes': { const {e} = getEntry(jid, el.dataset.m, el.dataset.k); setDesign(jid, el.dataset.m, el.dataset.k, e.st === ST.OK ? ST.U : ST.OK); render(); break; }
     case 'tNo': { const {e} = getEntry(jid, el.dataset.m, el.dataset.k); setDesign(jid, el.dataset.m, el.dataset.k, e.st === ST.NO ? ST.U : ST.NO); render(); break; }
     case 'tOther': openEntrySheet(jid, el.dataset.m, el.dataset.k); break;
-    case 'tAdd': trayAddCable(jid, el.dataset.code); break;
+    case 'tAdd': trayAddCable(el.dataset.code); break;
     case 'backup': doBackup(); break;
     case 'restore': $('#fileBackup').click(); break;
   }
 });
 $('#fileJournal').addEventListener('change', async ev => {
-  const f = ev.target.files && ev.target.files[0]; ev.target.value = ''; if (!f) return;
-  let o; try { o = JSON.parse(await readFileText(f)); } catch (e) { toast('Cannot read this file — is it the .ikj.json journal?'); return; }
-  try { const id = await addJournal(o); if (id) location.hash = rJ(id); render(); } catch (e) { toast(e.message); }
+  const files = [...(ev.target.files || [])]; ev.target.value = ''; if (!files.length) return;
+  const one = files.length === 1, ids = [], errs = [];
+  for (const f of files) {
+    let o;
+    try { o = JSON.parse(await readFileText(f)); }
+    catch (e) { errs.push((one ? '' : f.name + ': ') + 'Cannot read this file — is it the .ikj.json journal?'); continue; }
+    try { const id = await addJournal(o, {silent: !one}); if (id) ids.push(id); }
+    catch (e) { errs.push((one ? '' : f.name + ': ') + e.message); }
+  }
+  if (errs.length) toast(one ? errs[0] : `Loaded ${ids.length} of ${files.length}. ${errs[0]}`);
+  else if (!one) toast(`Loaded ✓ ${ids.map(shortId).join(', ')}`);
+  if (one && ids.length) nav(rJ(ids[0])); else if (ids.length) nav('#/'); else render();
 });
 $('#fileBackup').addEventListener('change', async ev => { const f = ev.target.files && ev.target.files[0]; ev.target.value = ''; if (f) doRestore(f); });
 
@@ -994,7 +1280,7 @@ function registerSW() {
     if (!S.results[id]) S.results[id] = newResult(S.journals[id]);
     for (const c of S.journals[id].cables) if (!S.results[id].cables[c.mark]) S.results[id].cables[c.mark] = newCableResult(c);
   }
-  if (EMBEDDED_JOURNAL && !S.journals[EMBEDDED_JOURNAL.id]) { try { await addJournal(EMBEDDED_JOURNAL, {silent: true}); } catch (e) { console.error(e); } }
+  for (const ej of [].concat(EMBEDDED_JOURNAL || [])) if (!S.journals[ej.id]) { try { await addJournal(ej, {silent: true}); } catch (e) { console.error(e); } }
   try { if (navigator.storage && navigator.storage.persist) { S.persisted = await navigator.storage.persisted(); if (!S.persisted) S.persisted = await navigator.storage.persist(); } } catch (e) {}
   registerSW();
   render();
