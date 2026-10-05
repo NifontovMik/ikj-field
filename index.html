@@ -32,6 +32,7 @@ header.top .title.tap{cursor:pointer}
 header.top .title.tap:active{background:rgba(255,255,255,.14)}
 header.top .title.tap .t1::after{content:" \25BE";font-size:14px;opacity:.85}
 .t1{font-weight:700;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t1.long{font-size:16px}.t1.xlong{font-size:14px}
 .t2{font-size:13px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hbtn{background:transparent;border:0;color:#fff;min-width:46px;min-height:46px;border-radius:10px;font-size:24px;line-height:1;padding:0 8px}
 .hbtn:active{background:rgba(255,255,255,.18)}
@@ -179,11 +180,12 @@ ol.route{list-style:none;margin:0 0 10px;padding:0}
 <input type="file" id="filePhoto" accept="image/*" class="hidden">
 <script>
 'use strict';
-const APP_VERSION = '1.3.0';
+const APP_VERSION = '1.4.0';
 const EMBEDDED_JOURNAL = null; /*EMBED*/
 const ST = {U:'unchecked', OK:'ok', CHG:'changed', NO:'absent', ADD:'added'};
-/* tray code; a Latin letter marks a penetration: instead of the shelf (…/A) or at the end (…/3A, …243A) */
-const CODE_RE = /^\d{2}\.\d{2}[A-Z]{3}\d{2}\.\d{3}V?(?:\/(?:\d{1,2}[A-Z]?|[A-Z])|[A-Z])?$/;
+/* tray code: building (12.12URF10.109/3) or site trestle (00USY24.195.02/3);
+   a Latin letter marks a penetration: instead of the shelf (…/A) or at the end (…/3A, …243A) */
+const CODE_RE = /^(?:\d{2}\.\d{2}[A-Z]{3}\d{2}\.\d{3}V?|\d{2}[A-Z]{3}\d{2}\.\d{3}\.\d{2})(?:\/(?:\d{1,2}[A-Z]?|[A-Z])|[A-Z])?$/;
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 const NOTE_KEYS = {box: 'in a box', hose: 'in metal hose', pipe: 'in a pipe'};
 
@@ -202,10 +204,10 @@ function matchCodes(known, raw) {
   if (!list.length) { const qs = squash(raw); if (qs) list = known.filter(c => squash(c).includes(qs)); }
   return list;
 }
-const shortId = id => { const p = String(id || '').split('.'); return p[p.length - 1] || id; };
+const shortId = id => String(id || '');   /* journals are shown by their full code: TB0002 exists in several buildings */
 function splitCode(code) { const c = String(code || ''); const i = c.lastIndexOf('/'); return i < 0 ? {section: c, shelf: null} : {section: c.slice(0, i), shelf: c.slice(i + 1)}; }
 const withShelf = (section, shelf) => (shelf === null || shelf === '' ? section : section + '/' + shelf);
-function codeBase(code) { const m = String(code).match(/^(.*\.\d{3}V?)(?:[A-Z])?$/); return m ? m[1] : String(code); }
+function codeBase(code) { const m = String(code).match(/^(.*\.\d{3}V?|.*\.\d{3}\.\d{2})(?:[A-Z])?$/); return m ? m[1] : String(code); }
 function letterCode(cur, L, mode) {
   const sp = splitCode(cur), base = sp.shelf === null ? codeBase(cur) : sp.section;
   if (mode === 'inst') return base + '/' + L;
@@ -676,7 +678,7 @@ function pickJournal(title, pref) {
     const handler = (act, ds) => { if (act === 'pickJ') fin(ds.j); else if (act === 'cancel') { fin(null); closeSheet(); } };
     handler.onClose = () => fin(null);
     openSheet(`<div class="sh-title"><div class="big">${esc(title)}</div></div><div class="clist" style="max-height:60vh">` +
-      ids.map(id => `<button class="pos" data-sact="pickJ" data-j="${esc(id)}"><b class="mono">${esc(shortId(id))}</b> <span class="jchip">${esc(S.journals[id].building || '')}</span><br><span class="tiny muted">${esc(id)}</span></button>`).join('') +
+      ids.map(id => `<button class="pos" data-sact="pickJ" data-j="${esc(id)}"><b class="mono">${esc(id)}</b><br><span class="tiny muted">${esc(tx(S.journals[id], 'title'))}</span></button>`).join('') +
       `</div><button class="btn ghost" data-sact="cancel">${T('Cancel')}</button>`, handler);
   });
 }
@@ -684,6 +686,7 @@ function pickJournal(title, pref) {
 /* ---------------------------------------------------------------- header */
 function setHeader({title, sub, back, send, onTitle}) {
   $('#hT1').textContent = title || 'IKJ Field'; $('#hT2').textContent = sub || '';
+  const tl = String(title || '').length; $('#hT1').classList.toggle('long', tl > 18 && tl <= 24); $('#hT1').classList.toggle('xlong', tl > 24);
   const b = $('#hBack'); b.classList.toggle('hidden', !back); b.onclick = back ? () => nav(back) : null;
   let a = '';
   if (send) {
@@ -803,7 +806,7 @@ function isStandalone() { return (window.matchMedia && matchMedia('(display-mode
 
 function viewJournal(jid) {
   const j = S.journals[jid], tab = S.ui.tab[jid] || 'cable', q = S.ui.q[jid + ':' + tab] || '';
-  setHeader({title: shortId(j.id), sub: j.id, back: '#/', send: jid, onTitle: openJournalSwitcher});
+  setHeader({title: j.id, sub: tx(j, 'title'), back: '#/', send: jid, onTitle: openJournalSwitcher});
   const s = journalStats(jid);
   view.innerHTML = `
     <div class="small muted" style="margin:0 2px 2px">${T('{a}/{b} trays checked · {c}/{d} cables done', {a: s.checked, b: s.total, c: s.done, d: s.cables})}${s.changes ? ` · <span class="blue">${T('{n} changes', {n: s.changes})}</span>` : ''}</div>${bar(s.checked, s.total)}
@@ -875,16 +878,18 @@ function navRow(jid, mark) {
 }
 function viewCable(jid, mark) {
   const j = S.journals[jid], c = S.idx[jid].byMark.get(mark), rc = S.results[jid].cables[mark], s = cableStats(rc);
-  setHeader({title: mark, sub: `${T('No.')} ${c.no} · ${shortId(j.id)}${c.section ? ' · ' + c.section : ''}${c.sheet ? ' · ' + T('sh.') + ' ' + c.sheet : ''}`,
+  setHeader({title: mark, sub: `${T('No.')} ${c.no}${c.section ? ' · ' + c.section : ''}${c.sheet ? ' · ' + T('sh.') + ' ' + c.sheet : ''}`,
              back: rJ(jid), send: jid, onTitle: () => openCableSwitcher(jid, mark)});
   let n = 0, rows = '';
   for (const e of rc.entries) rows += routeRow(e, e.seg !== null ? ++n : null);
   const noDesign = !(c.route && c.route.length);
   const note = c.routeNote ? `<div class="info"><b>${T('Design:')}</b> ${esc(T(c.routeNote))}</div>` : '';
+  const noteFirst = /^Before the trays/.test(c.routeNote || '');
   const empty = !rc.entries.length;
   view.innerHTML = `
     ${navRow(jid, mark)}
     <div class="card small">
+      <div class="tiny muted mono jline">${esc(j.id)}</div>
       <div><span class="cno">${esc(c.no)}</span><b class="mono">${esc(c.mark)}</b></div>
       <div style="margin-top:6px"><span class="muted">${T('Type')}</span> <b>${esc(tx(c, 'type'))} ${esc(c.size || '')}</b></div>
       <div style="margin-top:4px"><span class="muted">${T('From')}</span> ${esc(tx(c, 'from'))}${c.fromRoom ? ` <span class="muted">(${esc(c.fromRoom)})</span>` : ''}</div>
@@ -895,9 +900,10 @@ function viewCable(jid, mark) {
     </div>
     <div class="legend tiny"><span>${T('<b>black</b> = as designed')}</span><span class="red">${T('<s><b>red</b></s> = design tray not used')}</span><span class="blue">${T('<b>blue</b> = actual tray')}</span></div>
     ${noDesign ? note : `<div class="small muted" style="margin:0 2px 8px">${T('Walk along the route. Tap <b class="okc">✓</b> if the cable is on that tray. Tap the tray code for other options.')}</div>`}
+    ${!noDesign && noteFirst ? note : ''}
     ${empty ? '' : `<button class="btn add" data-act="addStart">${T('＋ Add a tray at the start')}</button>`}
     ${empty ? (noDesign && c.routeNote ? '' : `<div class="card small muted">${T('The design gives no tray route for this cable. If it runs on trays, add them.')}</div>`) : `<ol class="route">${rows}</ol>`}
-    ${noDesign ? '' : note}
+    ${noDesign || noteFirst ? '' : note}
     <button class="btn add" data-act="addEnd">${empty ? T('＋ Add a tray (actual route)') : T('＋ Add a tray at the end (route continues)')}</button>
     <button class="btn" data-act="copyRoute">${T('⧉ Copy route from another cable…')}</button>
     <div class="card">
@@ -983,7 +989,7 @@ function viewTray(code) {
   for (const jid of jids) {
     const ds = t.design.filter(d => d.jid === jid).sort(byPos(jid)), fs = t.field.filter(d => d.jid === jid).sort(byPos(jid));
     const j = S.journals[jid];
-    h += `<div class="sec-h">${esc(shortId(jid))}${j.building ? ' · ' + esc(j.building) : ''} <span class="muted">· ${T('{n} by design', {n: plural(ds.length, 'cable')})}</span></div>`;
+    h += `<div class="sec-h">${esc(jid)} <span class="muted">· ${T('{n} by design', {n: plural(ds.length, 'cable')})}</span></div>`;
     for (const d of ds) h += trayRow(jid, d);
     if (fs.length) h += `<div class="small blue" style="margin:2px 2px 8px"><b>${T('Found here in the field')}</b></div>` + fs.map(f => fieldRow(jid, f)).join('');
   }
@@ -1060,8 +1066,8 @@ function openJournalSwitcher() {
   let h = `<div class="sh-title"><div class="big">${T('Journals')}</div></div>`;
   for (const id of ids) {
     const s = journalStats(id), r = S.results[id];
-    h += `<button class="card" data-sact="pickJ" data-j="${esc(id)}"><div class="item-top"><span class="jid">${esc(shortId(id))}</span><span class="jchip">${esc(S.journals[id].building || '')}</span></div>
-      <div class="tiny muted">${esc(id)}</div>${bar(s.checked, s.total)}<div class="tiny">${T('{a}/{b} trays · {c}/{d} cables done', {a: s.checked, b: s.total, c: s.done, d: s.cables})}${r.unsent ? ` · <span class="red">${T('{n} not sent', {n: r.unsent})}</span>` : ''}</div></button>`;
+    h += `<button class="card" data-sact="pickJ" data-j="${esc(id)}"><div class="item-top"><span class="jid">${esc(id)}</span></div>
+      <div class="tiny muted">${esc(tx(S.journals[id], 'title'))}</div>${bar(s.checked, s.total)}<div class="tiny">${T('{a}/{b} trays · {c}/{d} cables done', {a: s.checked, b: s.total, c: s.done, d: s.cables})}${r.unsent ? ` · <span class="red">${T('{n} not sent', {n: r.unsent})}</span>` : ''}</div></button>`;
   }
   h += `<button class="btn" data-sact="home">${T('First screen (search all)')}</button><button class="btn ghost" data-sact="close">${T('Cancel')}</button>`;
   openSheet(h, (act, ds) => { if (act === 'pickJ') go(rJ(ds.j)); else if (act === 'home') go('#/'); });
@@ -1069,7 +1075,7 @@ function openJournalSwitcher() {
 function openCableSwitcher(jid, mark) {
   const j = S.journals[jid];
   const handler = (act, ds) => { if (act === 'pickC') go(rC(jid, ds.m)); else if (act === 'otherJ') openJournalSwitcher(); };
-  openSheet(`<div class="sh-title"><div class="big">${T('{j} — cables', {j: esc(shortId(jid))})}</div><div class="small muted">${esc(j.id)}</div></div>
+  openSheet(`<div class="sh-title"><div class="big">${T('{j} — cables', {j: esc(jid)})}</div><div class="small muted">${esc(tx(j, 'title'))}</div></div>
     <input class="inp mono" id="swq" placeholder="${T('Cable No. or mark')}" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false">
     <div class="clist" id="swl" style="max-height:55vh"></div>
     <button class="btn" data-sact="otherJ">${T('Other journal…')}</button><button class="btn ghost" data-sact="close">${T('Cancel')}</button>`, handler, () => upd());
@@ -1266,7 +1272,7 @@ function openSendHub() {
   let h = `<div class="sh-title"><div class="big">${T('Send results')}</div><div class="small muted">${T('Each journal is a separate file.')}</div></div>`;
   for (const id of ids) {
     const r = S.results[id];
-    h += `<button class="card" data-sact="pick" data-j="${esc(id)}"><div class="item-top"><span class="jid">${esc(shortId(id))}</span>${r.unsent ? `<span class="chip red">${T('{n} not sent', {n: r.unsent})}</span>` : `<span class="chip ok">${r.lastSent ? T('sent {t}', {t: fmtTime(r.lastSent)}) : T('nothing new')}</span>`}</div><div class="tiny muted">${esc(id)}</div></button>`;
+    h += `<button class="card" data-sact="pick" data-j="${esc(id)}"><div class="item-top"><span class="jid">${esc(shortId(id))}</span>${r.unsent ? `<span class="chip red">${T('{n} not sent', {n: r.unsent})}</span>` : `<span class="chip ok">${r.lastSent ? T('sent {t}', {t: fmtTime(r.lastSent)}) : T('nothing new')}</span>`}</div><div class="tiny muted">${esc(tx(S.journals[id], 'title'))}</div></button>`;
   }
   h += `<button class="btn ghost" data-sact="close">${T('Cancel')}</button>`;
   openSheet(h, (act, ds) => { if (act === 'pick') openSend(ds.j); });
@@ -1293,7 +1299,7 @@ async function openSend(jid) {
     busy(true); let text;
     try { text = await buildExport(jid, inc); } catch (e) { busy(false); toast(T('Could not build the file: ') + e.message); return; }
     busy(false);
-    const name = `IKJ_${shortId(j.id)}_${stamp()}.txt`;
+    const name = `IKJ_${j.id}_${stamp()}.txt`;
     const file = new File([text], name, {type: 'text/plain'});
     const res = await shareOrSave(file, act);
     if (res === 'cancelled') { toast(T('Not sent')); return; }
