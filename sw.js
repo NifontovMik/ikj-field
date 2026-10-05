@@ -1,5 +1,5 @@
 /* IKJ Field — service worker: keeps the app working without internet. */
-const VERSION = '1.4.0';
+const VERSION = '1.4.1';
 const CACHE = 'ikj-field-' + VERSION;
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 
