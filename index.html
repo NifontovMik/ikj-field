@@ -194,12 +194,12 @@ ol.route{list-style:none;margin:0 0 10px;padding:0}
 <input type="file" id="filePhoto" accept="image/*" class="hidden">
 <script>
 'use strict';
-const APP_VERSION = '1.5.0';
+const APP_VERSION = '1.5.1';
 const EMBEDDED_JOURNAL = null; /*EMBED*/
 const ST = {U:'unchecked', OK:'ok', CHG:'changed', NO:'absent', ADD:'added'};
-/* tray code: building (12.12URF10.109/3) or site trestle (00USY24.195.02/3);
+/* tray code: building (12.12URF10.109/3), site trestle (00USY24.195.02/3) or 07UBG structure (07UBG080P024.01/46);
    a Latin letter marks a penetration: instead of the shelf (…/A) or at the end (…/3A, …243A) */
-const CODE_RE = /^(?:\d{2}\.\d{2}[A-Z]{3}\d{2}\.\d{3}(?:\.\d)?(?:V(?:_\d{3})?|\(V\))?|\d{2}[A-Z]{3}\d{2}\.\d{3}\.\d{2}|\d{2}[A-Z]{3}\d{2}EM\d{4})(?:\/(?:\d{1,2}[A-Z]?|[A-Z])|[A-Z])?$/;
+const CODE_RE = /^(?:\d{2}\.\d{2}[A-Z]{3}\d{2}\.\d{3}(?:\.\d)?(?:V(?:_\d{3})?|\(V\))?|\d{2}[A-Z]{3}\d{2}\.\d{3}\.\d{2}|\d{2}[A-Z]{3}\d{2}EM\d{4}|\d{2}[A-Z]{3}\d{3}[A-Z]\d{3}\.\d{2})(?:\/(?:\d{1,2}[A-Z]?|[A-Z])|[A-Z])?$/;
 /* a range of site-trestle trays «00USY24.176.01/10 - 00USY24.176.05/10»: the cable runs along all sections 01…05.
    One item of the route; can be split into single trays in the app */
 const isRange = x => / - /.test(String(x || ''));
