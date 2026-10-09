@@ -115,6 +115,16 @@ ol.route{list-style:none;margin:0 0 10px;padding:0}
 .trow .tb .o{border:2px solid var(--blue);color:var(--blue)} .trow .tb .o.on{background:var(--blue);color:#fff}
 .trow.ok{border-color:#b7dfc2} .trow.no{border-color:#f1b8b8} .trow.chg{border-color:#b8d3f3}
 .trow .cbtn{background:none;border:0;padding:0;text-align:left;color:var(--ink)}
+/* handed-over cable (Сдан): green tint, edit controls look inactive (taps explain why) */
+.card.closed,.trow.closed{background:#eef8f0;border-color:#8fcb9d}
+.chip.closed{background:var(--ok);color:#fff}
+.trow.closed .tb button{opacity:.4}
+.closedbar{margin:0 0 8px;padding:7px 10px;border-radius:9px;background:var(--ok);color:#fff;font-weight:700;font-size:15px}
+.stcard{border-width:2px}
+.stcard.closed{background:#eef8f0;border-color:var(--ok)}
+.stval{font-size:19px;font-weight:800;margin:2px 2px 0}
+.locked .rr .tick,.locked .lenbox .btn,.locked .tbtn{opacity:.4}
+.locked .rr{opacity:.92}
 
 /* photos */
 .photos{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px}
@@ -175,6 +185,15 @@ ol.route{list-style:none;margin:0 0 10px;padding:0}
 .tbtn.o{border-color:var(--blue);color:var(--blue)} .tbtn.o.on{background:var(--blue);color:#fff}
 .rr .code.rng2{font-size:15px;color:var(--muted)} .rr .code.rng2.red{color:var(--red)}
 .btn.add.seg{min-height:44px;font-size:15px;margin-top:-2px}
+/* 1.7: ИКЖ в Excel, walk files, folders by building */
+.btn.xls{background:#e7f4ea;border-color:#8fcb9d;color:#14532d;margin:10px 0 0}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:8px 0 6px}
+.grid3 .btn{margin:0;min-height:58px;font-size:14px;line-height:1.25;padding:6px 4px}
+.fold .fhead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.fold .fname{font-family:var(--mono);font-weight:800;font-size:20px}
+.rescard .rname{font-family:var(--mono);font-weight:700;font-size:14px;word-break:break-all}
+.dhint{text-align:center;margin:-2px 4px 12px}
+body.drop main{outline:3px dashed var(--primary);outline-offset:-6px;border-radius:14px}
 </style>
 </head>
 <body>
@@ -194,7 +213,7 @@ ol.route{list-style:none;margin:0 0 10px;padding:0}
 <input type="file" id="filePhoto" accept="image/*" class="hidden">
 <script>
 'use strict';
-const APP_VERSION = '1.5.1';
+const APP_VERSION = '1.7.0';
 const EMBEDDED_JOURNAL = null; /*EMBED*/
 const ST = {U:'unchecked', OK:'ok', CHG:'changed', NO:'absent', ADD:'added'};
 /* tray code: building (12.12URF10.109/3), site trestle (00USY24.195.02/3) or 07UBG structure (07UBG080P024.01/46);
@@ -260,7 +279,45 @@ function stamp() { const d = new Date(), p = n => String(n).padStart(2, '0'); re
 /* ---------------------------------------------------------------- language (English / Русский) */
 let LANG = 'en';
 const RU = { "Offline": "Нет сети", "Working…": "Подождите…", "A new version of the app is ready.": "Готова новая версия приложения.", "Update": "Обновить", "Send": "Отправить", "Settings": "Настройки", "How to use": "Инструкция", "Language": "Язык", "Something went wrong: ": "Ошибка: ", "Home": "На главную", "Cancel": "Отмена", "Close": "Закрыть", "Saved": "Сохранено", "Undo": "Отменить", "Undone": "Отменено", "Could not save to phone storage! Send results now.": "Не удалось сохранить в память телефона! Срочно отправьте результаты.", "m": "м", "The file is empty or damaged.": "Файл пустой или повреждён.", "This is a RESULTS file (from “Send”), not a journal. Journals come from your supervisor.": "Это файл РЕЗУЛЬТАТОВ (из «Отправить»), а не журнал. Журналы присылает руководитель.", "This is a BACKUP file. Use Settings → Restore from backup.": "Это РЕЗЕРВНАЯ КОПИЯ. Используйте Настройки → Восстановить из резервной копии.", "This is not an IKJ journal file.": "Это не файл журнала ИКЖ.", "The journal file is damaged (cable without mark or route).": "Файл журнала повреждён (кабель без марки или трассы).", "This journal is already on the phone.": "Этот журнал уже есть в телефоне.", "Journal info updated: {id}. Your marks are kept.": "Данные журнала обновлены: {id}. Отметки сохранены.", "<b>{id}</b> is already on this phone, but this file is a different version (the design was updated).<br><br>Update it? Your marks are kept where the trays are the same.": "<b>{id}</b> уже есть в телефоне, но этот файл — другая версия (изменилась РД).<br><br>Обновить? Отметки сохранятся там, где полки совпадают.", "Update journal": "Обновить журнал", "Journal updated. Routes changed for {n}.": "Журнал обновлён. Трасса изменилась: {n}.", "Loaded: {id} ({n})": "Загружен: {id} ({n})", "Cannot read this file — is it the .ikj.json journal?": "Не удаётся прочитать файл — это журнал .ikj.json?", "Loaded {a} of {b}. {e}": "Загружено {a} из {b}. {e}", "Loaded ✓ {list}": "Загружено ✓ {list}", "Loaded ✓ {n} journals": "Загружено журналов: {n} ✓", "App installed ✓": "Приложение установлено ✓", "✗ Not here: ": "✗ Нет здесь: ", "Mark cleared": "Отметка снята", "Note: ": "Примечание: ", "Note removed": "Примечание удалено", "Length: not confirmed": "Длина: не подтверждена", "Length confirmed: {n} m": "Длина подтверждена: {n} м", "Actual length {n} m (design {d} m)": "Длина по факту {n} м (по РД {d} м)", "Added tray deleted": "Добавленная полка удалена", "Copied from {no}: +{a}, ✓{c}. Check them!": "Скопировано с {no}: +{a}, ✓{c}. Проверьте!", "Length already confirmed": "Длина уже подтверждена", "Note saved": "Примечание сохранено", "Type tray code or part of it, e.g. 109": "Код полки или его часть, например 109", "No known tray matches.": "Таких полок нет в журналах.", "Use new code: ": "Новый код: ", "Use anyway: ": "Всё равно использовать: ", "Unusual format. A full code looks like 12.12URF10.109/3 — check before using.": "Необычный формат. Полный код выглядит так: 12.12URF10.109/3 — проверьте.", "Pick from the list — or type the full code (like 12.12URF10.109/3) to add a new one. Penetration: a letter instead of the shelf (…109/A) or at the end (…109/3A).": "Выберите из списка или наберите код целиком (например, 12.12URF10.109/3), чтобы добавить новый. Проходка: буква вместо полки (…109/A) или в конце (…109/3A).", "Cable route check — as-built journal": "Проверка трасс кабелей — ИКЖ", "Phone storage is not available in this browser. Your marks will be LOST when the app is closed. Send results often.": "Память телефона недоступна в этом браузере. Отметки ПРОПАДУТ при закрытии приложения. Отправляйте результаты чаще.", "Install app on this phone": "Установить приложение на телефон", "No journal on this phone yet.": "В телефоне пока нет журналов.", "1. Your supervisor sends you a journal file (name ends with <b>.ikj.json</b>).": "1. Руководитель присылает файл журнала (имя заканчивается на <b>.ikj.json</b>).", "2. In Telegram tap <b>⋮</b> on the file → <b>Save to Downloads</b>.": "2. В Telegram нажмите <b>⋮</b> у файла → <b>Сохранить в загрузки</b>.", "3. Tap <b>Load journal files</b> below and pick them in Downloads (you can select several at once).": "3. Нажмите <b>Загрузить журналы</b> ниже и выберите файлы в «Загрузках» (можно несколько сразу).", "Find cable No., mark or tray": "Номер кабеля, марка или полка", "Other": "Другое", "Load journal files": "Загрузить журналы", "All done": "Всё готово", "{a}/{b} trays checked · {c}/{d} cables done": "Проверено полок {a}/{b} · готово кабелей {c}/{d}", "<b>{n}</b> changes": "изменений: <b>{n}</b>", "Length: {d} m by design · confirmed {c}/{n} cables": "Длина по РД {d} м · подтверждена у {c}/{n} кабелей", "Not sent yet: {n}": "Не отправлено: {n}", "Last sent {t}": "Отправлено {t}", "Done": "Готов", "tray": "полка", "Nothing found for “{q}”.": "По запросу «{q}» ничего не найдено.", "{n} more cables — type more digits.": "Ещё кабелей: {n} — уточните номер.", "{n} changes": "изменений: {n}", "Length by design <b>{d} m</b> · confirmed <b>{c}/{n}</b> cables": "Длина по РД <b>{d} м</b> · подтверждена у <b>{c}/{n}</b> кабелей", " · actual <b>{f} m</b>": " · по факту <b>{f} м</b>", "By cable": "По кабелям", "By tray": "По полкам", "Cable No. or mark, e.g. 4.0012": "Номер или марка кабеля, напр. 4.0012", "Find tray, e.g. 109": "Найти полку, напр. 109", "Remove this journal from the phone": "Удалить этот журнал из телефона", "In progress": "В работе", "Not started": "Не начат", " · sheet ": " · лист ", "From": "Откуда", "To": "Куда", "{a}/{b} trays checked": "проверено полок {a}/{b}", "Route in-situ": "Трасса по месту", "No trays in design route": "В РД нет полок", "+{n} added": "+{n} добавлено", "{n} changed": "изменено {n}", "sheets": "листы", "No cable matches “{q}”.": "Нет кабеля «{q}».", "Checked": "Проверена", "{n} by design · {c} checked": "{n} по РД · проверено {c}", "Not in design": "Нет в РД", "{n} not here/moved": "нет/перенесено {n}", "{n} found here": "найдено здесь {n}", "+{n} in {j}": "+{n} в {j}", "No tray matches “{q}”.": "Нет полки «{q}».", "‹ first": "‹ первый", "last ›": "последний ›", "No.": "№", "sh.": "л.", "Design:": "По РД:", "To be routed in-situ (no trays in design) — add the actual trays": "Прокладка по месту (в РД полок нет) — добавьте фактические полки", "After the listed trays: further to be routed in-situ — add the actual trays": "После перечисленных полок — далее по месту: добавьте фактические полки", "Type": "Тип", "Protection": "Защита", "<b>black</b> = as designed": "<b>чёрный</b> = по проекту", "<s><b>red</b></s> = design tray not used": "<s><b>красный</b></s> = проектная полка не использована", "<b>blue</b> = actual tray": "<b>синий</b> = фактическая полка", "Walk along the route. Tap <b class=\"okc\">✓</b> if the cable is on that tray. Tap the tray code for other options.": "Идите вдоль трассы. Нажмите <b class=\"okc\">✓</b>, если кабель на этой полке. Нажмите на код полки — другие варианты.", "＋ Add a tray at the start": "＋ Добавить полку в начало", "The design gives no tray route for this cable. If it runs on trays, add them.": "В РД нет трассы по полкам для этого кабеля. Если он идёт по лоткам — добавьте полки.", "＋ Add a tray (actual route)": "＋ Добавить полку (фактическая трасса)", "＋ Add a tray at the end (route continues)": "＋ Добавить полку в конец (трасса продолжается)", "⧉ Copy route from another cable…": "⧉ Скопировать трассу с другого кабеля…", "Note on this cable": "Примечание к кабелю", "Anything unusual on this cable": "Всё необычное по этому кабелю", "Photos": "Фото", "📷 Add photo": "📷 Добавить фото", "✓ Cable done (tap to reopen)": "✓ Кабель готов (нажмите, чтобы открыть снова)", "Mark cable as done": "Кабель готов", "not confirmed": "не подтверждена", "Length": "Длина", "design": "по РД", "actual": "по факту", "✓ {n} m as design": "✓ {n} м как по РД", "Actual {n} m…": "По факту {n} м…", "Other length…": "Другая длина…", "added in the field · tap to edit": "добавлена на месте · нажмите, чтобы изменить", "not checked": "не проверена", "✓ cable is here": "✓ кабель здесь", "actual tray differs": "фактическая полка другая", "✗ cable is not here": "✗ кабеля здесь нет", "No photos": "Нет фото", "✓ here": "✓ здесь", "✗ not here": "✗ нет", "actually on {c}": "на самом деле: {c}", "✓ Here": "✓ Здесь", "✗ Not here": "✗ Нет здесь", "Other…": "Другое…", "added here": "добавлен сюда", "moved here from ": "перенесён сюда с ", "Edit…": "Изменить…", "not in design": "нет в РД", "Stand at this tray. For each cable: is it here?": "Встаньте у этой полки. По каждому кабелю: он здесь?", " Cables of all loaded journals are shown.": " Показаны кабели всех загруженных журналов.", "No cable runs on this tray by design.": "По РД по этой полке кабели не идут.", "{n} by design": "{n} по РД", "Found here in the field": "Найдены здесь на месте", "＋ A cable is here that is not listed": "＋ Здесь есть кабель не из списка", "<b>NOT available</b> — marks are lost when the app closes": "<b>НЕДОСТУПНА</b> — отметки пропадут при закрытии приложения", "<b>protected</b> on this phone": "<b>защищена</b> в этом телефоне", "on this phone (install the app so the phone does not clean it up)": "в этом телефоне (установите приложение, чтобы телефон её не очистил)", "Your name (goes into the results file)": "Ваше имя (попадает в файл результатов)", "Name and surname": "Имя и фамилия", "Storage: ": "Память: ", "Backup all data to a file": "Резервная копия всех данных в файл", "Restore from a backup file": "Восстановить из резервной копии", "IKJ Field {v}. Works without internet. Your marks stay only on this phone until you send them.": "IKJ Field {v}. Работает без интернета. Отметки хранятся только в этом телефоне, пока вы их не отправите.", "Journals": "Журналы", "{a}/{b} trays · {c}/{d} cables done": "полок {a}/{b} · готово кабелей {c}/{d}", "{n} not sent": "не отправлено {n}", "First screen (search all)": "Главный экран (поиск по всем)", "{j} — cables": "{j} — кабели", "Cable No. or mark": "Номер или марка кабеля", "No match.": "Не найдено.", "Other journal…": "Другой журнал…", " · tray added in the field": " · полка добавлена на месте", " · design tray": " · полка по РД", "✓ Cable is here": "✓ Кабель здесь", "Same tray, other shelf:": "Тот же лоток, другая полка:", "Same tray, cable is on shelf:": "Тот же лоток, кабель на полке:", "no shelf": "без полки", "Penetration letter A–Z…": "Буква проходки A–Z…", "Change to another tray…": "Заменить на другую полку…", "Cable is on another tray…": "Кабель на другом лотке…", "＋ Add a tray after this one…": "＋ Добавить полку после этой…", "Note for this tray": "Примечание к полке", "Delete this added tray": "Удалить добавленную полку", "↺ Clear mark (not checked)": "↺ Снять отметку (не проверена)", "Change tray": "Заменить полку", "Where is the cable actually?": "Где кабель на самом деле?", " · instead of ": " · вместо ", "Add a tray after {c}": "Добавить полку после {c}", "in a box": "в коробе", "in metal hose": "в металлорукаве", "in a pipe": "в трубе", " along the tray": " вдоль полки", " along this tray": " вдоль этой полки", "Other text…": "Свой текст…", "Remove note": "Удалить примечание", "Note for {c}": "Примечание к {c}", "e.g. runs in a box under the tray": "например, идёт в коробе под полкой", "Save note": "Сохранить", "Not on": "Нет на", "Does the cable run along this tray in a box, metal hose or pipe? (optional)": "Кабель идёт вдоль этой полки в коробе, металлорукаве или трубе? (необязательно)", "No — skip": "Нет — пропустить", "Penetration letter": "Буква проходки", "Now: ": "Сейчас: ", "Instead of shelf": "Вместо полки", "At the end": "В конце", "Actual length": "Длина по факту", "Design length: ": "Длина по РД: ", "metres, e.g. {n}": "метры, например {n}", "Save length": "Сохранить длину", "Not confirmed (clear)": "Не подтверждена (очистить)", "Enter the length in metres, e.g. 32 or 31.5": "Введите длину в метрах, например 32 или 31,5", "Add a tray at the start": "Добавить полку в начало", "Add a tray at the end": "Добавить полку в конец", "Which journal is the cable from?": "Из какого журнала кабель?", "Which cable is here?": "Какой кабель здесь?", " · tray ": " · полка ", "No cable matches.": "Кабель не найден.", "Where in the route of {m}?": "Где в трассе {m}?", "Tray {c} goes after…": "Полка {c} идёт после…", "At the very start": "В самом начале", "after": "после", "Copy route from another cable": "Скопировать трассу с другого кабеля", "to {c}. Only trays already marked on the other cable are copied.": "на {c}. Копируются только полки, уже отмеченные на другом кабеле.", "No cable has marked trays yet. Mark the route of one cable first, then copy it to its neighbours.": "Ни у одного кабеля ещё нет отметок. Сначала отметьте трассу одного кабеля, потом копируйте её на соседние.", "Copy from {c}?": "Скопировать с {c}?", "Route of that cable ({n}):": "Трасса этого кабеля ({n}):", "To {c}:": "На {c}:", "✓ confirm design trays: ": "✓ подтвердить полки по РД: ", "＋ add at the end: ": "＋ добавить в конец: ", "nothing new — the route already contains these trays": "ничего нового — эти полки уже есть в трассе", "Check the result and correct what differs.": "Проверьте результат и исправьте отличия.", "Copy": "Скопировать", "‹ Choose another cable": "‹ Выбрать другой кабель", "Send results": "Отправка результатов", "Each journal is a separate file.": "Каждый журнал — отдельный файл.", "sent {t}": "отправлено {t}", "nothing new": "нет нового", "Your name": "Ваше имя", "Continue": "Продолжить", "Trays checked: ": "Проверено полок: ", "Cables done: ": "Готово кабелей: ", "Changes: ": "Изменений: ", "Photos: ": "Фото: ", "Inspector: ": "Электрик: ", "change": "изменить", "Last sent ": "Последняя отправка ", "The file contains <b>all</b> your work on this journal so far. Send it to your supervisor. No signal? Telegram will send it when the signal is back.": "В файле <b>вся</b> ваша работа по этому журналу. Отправьте его руководителю. Нет связи — Telegram отправит, когда связь появится.", "Include photos": "Приложить фото", "Send…": "Отправить…", "Save the file on this phone": "Сохранить файл в телефоне", "Save": "Сохранить", "Could not build the file: ": "Не удалось собрать файл: ", "Not sent": "Не отправлено", "Sent ✓": "Отправлено ✓", "Saved to Downloads: {n}": "Сохранено в «Загрузки»: {n}", "Backup not sent": "Копия не отправлена", "Backup sent ✓": "Копия отправлена ✓", "Backup saved to Downloads": "Копия сохранена в «Загрузки»", "Backup failed: ": "Ошибка резервной копии: ", "Cannot read this file.": "Не удаётся прочитать файл.", "This is not an IKJ backup file.": "Это не резервная копия IKJ.", "Restore <b>{n}</b> from the backup of {t}?<br><br>Data of the same journals on this phone will be <b>replaced</b>.": "Восстановить <b>{n}</b> из копии от {t}?<br><br>Данные этих журналов в телефоне будут <b>заменены</b>.", "Restore": "Восстановить", "Restored ✓": "Восстановлено ✓", "Restore failed: ": "Ошибка восстановления: ", "Photo added": "Фото добавлено", "Photo failed: ": "Ошибка фото: ", "Photo deleted": "Фото удалено", "Delete photo": "Удалить фото", "Cable reopened": "Кабель снова открыт", "<b>{n}</b> not checked yet": "не проверено: <b>{n}</b>", "<b>length not confirmed</b>": "<b>длина не подтверждена</b>", "This cable:<br>{w}.<br><br>Mark the cable as done anyway?": "У этого кабеля:<br>{w}.<br><br>Всё равно отметить кабель готовым?", "Mark done anyway": "Всё равно готов", "Go back": "Вернуться", "Cable marked as done": "Кабель отмечен готовым", "Remove <b>{j}</b> and all your marks for it from this phone?": "Удалить <b>{j}</b> и все отметки по нему из телефона?", "{n} not sent yet!": "Не отправлено: {n}!", "Remove": "Удалить", "Journal removed": "Журнал удалён",
+  "This cable is handed over — changes are closed. To change it: «Return to work…» at the bottom of the cable card.": "Кабель сдан — изменения закрыты. Чтобы изменить: «Вернуть в работу…» внизу карточки кабеля.",
+  "{a}/{b} trays checked · {c}/{d} cables handed over": "Проверено полок {a}/{b} · сдано кабелей {c}/{d}",
+  "{a}/{b} trays · {c}/{d} handed over": "полок {a}/{b} · сдано {c}/{d}",
+  "All handed over": "Все сданы",
+  "Cables handed over: ": "Сдано кабелей: ",
+  "✓ Handed over": "✓ Сдан",
+  "Handed over": "Сдан",
+  "Cable status": "Статус кабеля",
+  "In work": "В работе",
+  "Cable handed over…": "Кабель сдан…",
+  "Return to work…": "Вернуть в работу…",
+  "changes in this journal are closed": "изменения в этом журнале закрыты",
+  "changes are closed": "изменения закрыты",
+  "Cable <b>{m}</b> is handed over?<br><br>After that its trays, length and tags cannot be changed in this journal.": "Кабель <b>{m}</b> сдан?<br><br>После этого его полки, длину и бирки в этом журнале изменить нельзя.",
+  "Not marked yet:": "Ещё не отмечено:",
+  "Yes, the cable is handed over": "Да, кабель сдан",
+  "Cable handed over ✓": "Кабель сдан ✓",
+  "Return cable <b>{m}</b> to work?<br><br>The status «handed over» is removed and its marks can be changed again.": "Вернуть кабель <b>{m}</b> в работу?<br><br>Статус «сдан» снимется, отметки снова можно будет менять.",
+  "Return to work": "Вернуть в работу",
+  "Cable returned to work": "Кабель возвращён в работу",
   "Segment {n}: ": "Отрезок {n}: ", "Tags: present": "Бирки: есть", "Tags: none": "Бирки: нет", "Tags: add {n} pcs": "Бирки: довесить {n} шт.", "Tags: not marked": "Бирки: не отмечены", "Range split into {n}": "Диапазон раскрыт: {n}", "Add a tray to segment {n}": "Добавить полку в отрезок {n}", "＋ Add a tray to segment {n}": "＋ Добавить полку в отрезок {n}", "Cable tags": "Бирки", "not marked": "не отмечены", "Present": "Есть", "None": "Нет", "Add {n} pcs": "Довесить {n} шт.", "Add…": "Довесить…", "no trays in design": "в РД без полок", "segments {n}": "отрезки {n}", "{n} segments: confirm the length and the cable tags of each one below.": "Отрезков: {n}. Подтвердите длину и бирки каждого отрезка ниже.", "range · all {n} sections": "диапазон · все секции, {n} шт.", "from range": "из диапазона", "design: the whole range": "по РД: весь диапазон", "the mark applies to the range; split it in the cable card": "отметка относится ко всему диапазону; раскрыть по полкам можно в карточке кабеля", "Range: the cable runs along all {n} sections. ✓ confirms the whole range; «Trays one by one» lets you mark each section.": "Диапазон: кабель идёт по всем секциям ({n} шт.). ✓ подтверждает весь диапазон; «Полки по одной» — отметить каждую секцию отдельно.", "Trays one by one ({n})…": "Полки по одной ({n} шт.)…", "segment {n}": "отрезок {n}", "Cable tags to add": "Довесить бирки", "How many tags are missing on this part of the cable?": "Сколько бирок не хватает на этом отрезке кабеля?", "or type a number": "или введите число", "<b>length not confirmed</b> on segments {n}": "<b>длина не подтверждена</b> на отрезках {n}", "<b>cable tags not marked</b> on segments {n}": "<b>бирки не отмечены</b> на отрезках {n}", "<b>cable tags not marked</b>": "<b>бирки не отмечены</b>" };
+Object.assign(RU, {
+  "IKJ to Excel": "ИКЖ в Excel", "Handed-over cables": "Сданные", "Cables in work": "В работе", "All cables": "Все", "cab.": "каб.",
+  "Sheet «ИКЖ» — the journal form with the actual route (black, red, blue) and lengths; sheet «Обход» — what is left on every cable. The file is saved to Downloads: open it in Excel, WPS or Google Sheets.":
+    "Лист «ИКЖ» — форма журнала с трассой по факту (чёрный, красный, синий) и длинами; лист «Обход» — что осталось сделать по каждому кабелю. Файл сохраняется в «Загрузки»: откройте его в Excel, WPS или Google Таблицах.",
+  "This journal was loaded from an older file — it has no IKJ form yet. Ask your supervisor for the new journal file and load it: your marks are kept.":
+    "Этот журнал загружен из старого файла — в нём ещё нет формы ИКЖ. Попросите у руководителя новый файл журнала и загрузите его: отметки сохранятся.",
+  "the journal file is old": "файл журнала старый", "no cables in this group": "в этой группе нет кабелей",
+  "Walk files": "Файлы обхода", "Walk files: {n}": "Файлы обхода: {n}", "IKJ to Excel from the files of electricians": "ИКЖ в Excel по файлам электриков",
+  "Journal <b>{j}</b> is not loaded. Load its file (.ikj.json) — then the Excel buttons appear.": "Журнал <b>{j}</b> не загружен. Загрузите его файл (.ikj.json) — появятся кнопки Excel.",
+  "The journal file is old — it has no IKJ form. Load the new journal file.": "Файл журнала старый — в нём нет формы ИКЖ. Загрузите новый файл журнала.",
+  "The walk was made on another version of the journal (the design changed). The differences will be listed on sheet «Обход».":
+    "Обход сделан по другой версии журнала (менялась РД). Расхождения будут на листе «Обход».",
+  "handed over {n}": "сдано {n}", "in work {n}": "в работе {n}", "Remove from the list": "Убрать из списка",
+  "No walk files opened. Open the files IKJ_….txt that electricians sent: the button below, or drag them into this window.":
+    "Файлы обхода не открыты. Откройте файлы IKJ_….txt, которые прислали электрики: кнопка ниже или перетащите их в это окно.",
+  "Open files…": "Открыть файлы…", "Open journals or walk files": "Открыть журналы или файлы обхода",
+  "On a computer: drag journal files (.ikj.json) or walk files (IKJ_….txt) into this window.": "На компьютере файлы журналов (.ikj.json) и файлы обхода (IKJ_….txt) можно перетащить в это окно."
+});
 function T(s, p) {
   let r = LANG === 'ru' && RU[s] !== undefined ? RU[s] : s;
   if (p) r = r.replace(/\{(\w+)\}/g, (m, k) => (k in p ? p[k] : m));
@@ -328,7 +385,7 @@ const Store = (() => {
 
 /* ---------------------------------------------------------------- state */
 const S = {settings: {inspector: ''}, journals: {}, results: {}, idx: {}, persisted: null, installEvt: null, storageError: false,
-           ui: {tab: {}, q: {}, gq: '', scroll: {}, route: '', lastJid: null}};
+           ui: {tab: {}, q: {}, gq: '', scroll: {}, route: '', lastJid: null, resFiles: []}};
 
 function buildIdx(jid) {
   const j = S.journals[jid];
@@ -375,7 +432,7 @@ function ensureSegs(c, rc) {
   syncLen(rc);
 }
 function newCableResult(c) {
-  const rc = {entries: (c.route || []).map(seg => ({k: uid(), seg, st: ST.U, t: null})), finished: false, factLength: null, note: '', photos: [], updated: null, segs: []};
+  const rc = {entries: (c.route || []).map(seg => ({k: uid(), seg, st: ST.U, t: null})), finished: false, closed: false, closedAt: null, factLength: null, note: '', photos: [], updated: null, segs: []};
   ensureSegs(c, rc); return rc;
 }
 function newResult(j) {
@@ -389,7 +446,8 @@ function mergeResult(old, j) {
   for (const c of j.cables) {
     const oc = old.cables[c.mark]; if (!oc) continue;
     const nc = res.cables[c.mark];
-    Object.assign(nc, {finished: oc.finished, factLength: oc.factLength, note: oc.note, photos: oc.photos || [], updated: oc.updated, segs: oc.segs || []});
+    Object.assign(nc, {finished: oc.finished, closed: !!oc.closed, closedAt: oc.closedAt || null, reopenedAt: oc.reopenedAt || null,
+      factLength: oc.factLength, note: oc.note, photos: oc.photos || [], updated: oc.updated, segs: oc.segs || []});
     if (JSON.stringify(designItems(oc.entries)) === JSON.stringify(c.route || [])) { nc.entries = oc.entries; ensureSegs(c, nc); continue; }
     /* design changed: keep marks where the trays are the same (an expanded range = one group of entries) */
     const pool = new Map(), addsAfter = new Map(); let anchor = '', group = null, gkey = null;
@@ -424,7 +482,16 @@ function saveResult(jid) {
 async function saveSettings() { try { await Store.set('settings', S.settings); } catch (e) { console.error(e); } }
 
 let undo = null;
-function snapshotCable(jid, mark) { return {jid, mark, data: JSON.parse(JSON.stringify(S.results[jid].cables[mark]))}; }
+/* a handed-over cable (rc.closed) is locked: every change of a cable starts with snapshotCable(), which refuses */
+const isClosed = (jid, mark) => { const r = S.results[jid], rc = r && r.cables[mark]; return !!(rc && rc.closed); };
+function lockedToast() { toast(T('This cable is handed over — changes are closed. To change it: «Return to work…» at the bottom of the cable card.')); }
+class LockedError extends Error {}
+window.addEventListener('unhandledrejection', ev => { if (ev.reason instanceof LockedError) { ev.preventDefault(); lockedToast(); } });
+window.addEventListener('error', ev => { if (ev.error instanceof LockedError) { ev.preventDefault(); lockedToast(); } });
+function snapshotCable(jid, mark) {
+  if (isClosed(jid, mark)) throw new LockedError('cable handed over');
+  return {jid, mark, data: JSON.parse(JSON.stringify(S.results[jid].cables[mark]))};
+}
 function commit(jid, mark, msg, snap) {
   const r = S.results[jid]; r.unsent = (r.unsent || 0) + 1; r.updated = nowIso();
   if (mark) r.cables[mark].updated = nowIso();
@@ -434,6 +501,7 @@ function commit(jid, mark, msg, snap) {
 function doUndo() {
   if (!undo) return; const {jid, mark, data} = undo; undo = null;
   if (!S.results[jid]) return;
+  if (isClosed(jid, mark)) { lockedToast(); return; }
   S.results[jid].cables[mark] = data; S.results[jid].unsent = (S.results[jid].unsent || 0) + 1; saveResult(jid); render(); toast(T('Undone'));
 }
 
@@ -449,16 +517,22 @@ function cableStats(rc) {
 }
 function journalStats(jid) {
   const j = S.journals[jid], r = S.results[jid];
-  const t = {total: 0, checked: 0, changes: 0, cables: j.cables.length, done: 0, photos: 0, lenDesign: 0, lenConf: 0, lenFact: 0};
+  const t = {total: 0, checked: 0, changes: 0, cables: j.cables.length, done: 0, closed: 0, photos: 0, lenDesign: 0, lenConf: 0, lenFact: 0};
   for (const c of j.cables) {
     const dl = lenNum(c.len); if (dl !== null) t.lenDesign += dl;
     const rc = r.cables[c.mark]; if (!rc) continue; const s = cableStats(rc);
-    t.total += s.total; t.checked += s.checked; t.changes += s.changes; if (rc.finished) t.done++; t.photos += (rc.photos || []).length;
+    t.total += s.total; t.checked += s.checked; t.changes += s.changes; if (rc.closed) { t.done++; t.closed++; } t.photos += (rc.photos || []).length;
     if (rc.factLength !== null && rc.factLength !== undefined) { t.lenConf++; t.lenFact += Number(rc.factLength) || 0; }
   }
   return t;
 }
 const bar = (a, b) => `<div class="bar"><i style="width:${b ? Math.round(100 * a / b) : 0}%"></i></div>`;
+/* folders by building (11URB, 11URF…) on the first screen when there are many journals */
+const bldOf = id => (S.journals[id] && S.journals[id].building) || '';
+function buildings() { const m = new Map(); for (const id of journalIds()) { const b = bldOf(id); if (!m.has(b)) m.set(b, []); m.get(b).push(id); } return m; }
+const useFolders = () => { const ids = journalIds(); return ids.length > 3 && new Set(ids.map(bldOf)).size > 1; };
+const rB = b => '#/b/' + enc(b || '-');
+const backOf = jid => (useFolders() ? rB(bldOf(jid)) : '#/');
 function journalIds() {
   return Object.keys(S.journals).sort((a, b) => natCmp((S.journals[a].building || '') + ' ' + a, (S.journals[b].building || '') + ' ' + b));
 }
@@ -555,7 +629,8 @@ async function buildExport(jid, withPhotos) {
       const p = await Store.getPhoto(pid); if (!p) continue;
       const o = {name: p.name, takenAt: p.takenAt}; if (withPhotos) o.data = await blobToDataURL(p.blob); photos.push(o);
     }
-    cables.push({mark: c.mark, no: c.no, finished: !!rc.finished, designLength: c.len, factLength: rc.factLength ?? null,
+    cables.push({mark: c.mark, no: c.no, finished: !!rc.closed, closed: !!rc.closed, closedAt: rc.closedAt || null,
+                 reopenedAt: rc.reopenedAt || null, designLength: c.len, factLength: rc.factLength ?? null,
                  lengthConfirmed: rc.factLength !== null && rc.factLength !== undefined, note: rc.note || '', updated: rc.updated, segs, entries, photos});
   }
   const out = {format: 'ikj-field-results', version: 1, app: 'IKJ Field ' + APP_VERSION,
@@ -578,6 +653,801 @@ async function shareOrSave(file, mode) {
   }
   downloadBlob(file, file.name); return 'saved';
 }
+
+/*IKJX-BEGIN*/
+/* ================================================================ ИКЖ → Excel (1.7)
+   The journal (since 09.10.2026) carries the form of the ИКЖ sheet of its template: `form` (header, ИТОГО and
+   signatures, styles, column widths, print settings) and `xr` for every cable (its row of the template).
+   IKJX.build(journal, results, group) makes the same workbook as the office converter
+   (tools/ikj_tool.py apply / apply-split): sheet «ИКЖ» with the marked route and sheet «Обход».
+   group: 'all' | 'сдан' | 'в_работе'.  Everything is done on the device, no internet. */
+const IKJX = (() => {
+  'use strict';
+  /* character widths of Arial 9 (Liberation Sans, 48 px, 1/64 px) — the same table as tools/char_widths.json */
+  const CW = {" ":854,"!":854,"\"":1091,"#":1709,"$":1709,"%":2732,"&":2049,"'":587,"(":1023,")":1023,"*":1196,"+":1794,",":854,"-":1023,".":854,"/":854,"0":1709,"1":1709,"2":1709,"3":1709,"4":1709,"5":1709,"6":1709,"7":1709,"8":1709,"9":1709,":":854,";":854,"<":1794,"=":1794,">":1794,"?":1709,"@":3119,"A":2049,"B":2049,"C":2219,"D":2219,"E":2049,"F":1877,"G":2390,"H":2219,"I":854,"J":1536,"K":2049,"L":1709,"M":2559,"N":2219,"O":2390,"P":2049,"Q":2390,"R":2219,"S":2049,"T":1877,"U":2219,"V":2049,"W":2900,"X":2049,"Y":2049,"Z":1877,"[":854,"\\":854,"]":854,"^":1442,"_":1709,"`":1023,"a":1709,"b":1709,"c":1536,"d":1709,"e":1709,"f":854,"g":1709,"h":1709,"i":683,"j":683,"k":1536,"l":683,"m":2559,"n":1709,"o":1709,"p":1709,"q":1709,"r":1023,"s":1536,"t":854,"u":1709,"v":1536,"w":2219,"x":1536,"y":1536,"z":1536,"{":1026,"|":798,"}":1026,"~":1794," ":854,"¡":1023,"¢":1709,"£":1709,"¤":1709,"¥":1709,"¦":798,"§":1709,"¨":1023,"©":2264,"ª":1137,"«":1709,"¬":1794,"­":0,"®":2264,"¯":1697,"°":1229,"±":1686,"²":1023,"³":1023,"´":1023,"µ":1770,"¶":1650,"·":1023,"¸":1023,"¹":1023,"º":1122,"»":1709,"¼":2562,"½":2562,"¾":2562,"¿":1877,"À":2049,"Á":2049,"Â":2049,"Ã":2049,"Ä":2049,"Å":2049,"Æ":3072,"Ç":2219,"È":2049,"É":2049,"Ê":2049,"Ë":2049,"Ì":854,"Í":854,"Î":854,"Ï":854,"Ð":2219,"Ñ":2219,"Ò":2390,"Ó":2390,"Ô":2390,"Õ":2390,"Ö":2390,"×":1794,"Ø":2390,"Ù":2219,"Ú":2219,"Û":2219,"Ü":2219,"Ý":2049,"Þ":2049,"ß":1877,"à":1709,"á":1709,"â":1709,"ã":1709,"ä":1709,"å":1709,"æ":2732,"ç":1536,"è":1709,"é":1709,"ê":1709,"ë":1709,"ì":854,"í":854,"î":854,"ï":854,"ð":1709,"ñ":1709,"ò":1709,"ó":1709,"ô":1709,"õ":1709,"ö":1709,"÷":1686,"ø":1877,"ù":1709,"ú":1709,"û":1709,"ü":1709,"ý":1536,"þ":1709,"ÿ":1536,"Ѐ":2049,"Ё":2051,"Ђ":2657,"Ѓ":1664,"Є":2208,"Ѕ":2049,"І":854,"Ї":854,"Ј":1536,"Љ":3248,"Њ":3104,"Ћ":2624,"Ќ":1790,"Ѝ":2208,"Ў":1952,"Џ":2208,"А":2049,"Б":2016,"В":2049,"Г":1664,"Д":2081,"Е":2049,"Ж":2837,"З":1856,"И":2208,"Й":2208,"К":1790,"Л":2016,"М":2559,"Н":2219,"О":2390,"П":2208,"Р":2049,"С":2219,"Т":1877,"У":1952,"Ф":2336,"Х":2049,"Ц":2273,"Ч":2048,"Ш":2816,"Щ":2880,"Ъ":2432,"Ы":2720,"Ь":2016,"Э":2208,"Ю":3104,"Я":2219,"а":1709,"б":1760,"в":1632,"г":1121,"д":1793,"е":1709,"ж":2055,"з":1409,"и":1716,"й":1716,"к":1344,"л":1793,"м":2112,"н":1697,"о":1709,"п":1664,"р":1709,"с":1536,"т":1407,"у":1536,"ф":2528,"х":1536,"ц":1760,"ч":1601,"ш":2465,"щ":2528,"ъ":1920,"ы":2208,"ь":1601,"э":1568,"ю":2304,"я":1664,"ѐ":1709,"ё":1709,"ђ":1709,"ѓ":1121,"є":1568,"ѕ":1536,"і":683,"ї":854,"ј":683,"љ":2784,"њ":2496,"ћ":1709,"ќ":1344,"ѝ":1716,"ў":1536,"џ":1697,"—":3072,"–":1709,"‐":1023,"−":1794,"„":1023,"“":1023,"”":1023,"‘":683,"’":683,"‚":683,"…":3072,"№":3296,"∅":2304,"⌀":2304,"≈":1686,"≤":1686,"≥":1686,"✓":2304,"✗":2304,"•":1076,"′":576,"″":1088,"€":1709,"₽":2304," ":615," ":615}, CW_D = 1709;
+  const w64 = t => { let s = 0; for (const ch of t) s += (CW[ch] ?? CW_D); return s; };
+  /* lines of text in a cell width_chars wide (wrap at spaces) — as ikj_tool._lines */
+  function nLines(text, wc) {
+    const lim = (wc * 7 + 5 - 8) * 4 * 64, sp = w64(' ');
+    let n = 1, cur = null;
+    for (const w of String(text).split(' ')) {
+      if (!w) continue;
+      const ww = w64(w);
+      if (cur === null) cur = ww;
+      else if (cur + sp + ww <= lim) cur += sp + ww;
+      else { n++; cur = ww; }
+    }
+    return n;
+  }
+
+  /* ---------------------------------------------------------------- Python-like helpers */
+  const RED = 'FFC00000', BLUE = 'FF0066CC', BLACK = 'FF000000';
+  const NOTE_RU = {box: 'в коробе', hose: 'в металлорукаве', pipe: 'в трубе'};
+  const TAGS_RU = {yes: 'есть', no: 'нет'};
+  const ST_OK = 'ok', ST_CHG = 'changed', ST_NO = 'absent';
+  class PyErr extends Error {}
+  const isNone = v => v === null || v === undefined;
+  const normMark = m => String(isNone(m) ? '' : m).replace(/\s+/g, '').toUpperCase();
+  /* float(v): numbers, numeric strings; anything else raises (as in Python) */
+  function pyFloat(v) {
+    if (typeof v === 'number') return v;
+    if (typeof v === 'boolean') return v ? 1 : 0;
+    if (typeof v === 'string') {
+      const s = v.trim().replace(/_/g, '');
+      if (/^[+-]?(\d+\.?\d*(e[+-]?\d+)?|\.\d+(e[+-]?\d+)?)$/i.test(s)) return Number(s);
+      if (/^[+-]?(inf|infinity)$/i.test(s)) return s.startsWith('-') ? -Infinity : Infinity;
+    }
+    throw new PyErr('float');
+  }
+  const isInt = f => Number.isFinite(f) && Math.floor(f) === f;
+  /* round(f, 2) as Python: by the exact binary value (toFixed does the same), exact ties (x.125, x.375…) to even */
+  function round2(f) {
+    if (!Number.isFinite(f)) return f;
+    const e = f * 8;                                   /* exact: a tie at 2 decimals is m/8 with m odd */
+    if (Number.isInteger(e) && Math.abs(e) % 2 === 1) { const lo = Math.floor(f * 100); return (lo % 2 === 0 ? lo : lo + 1) / 100; }
+    return Number(f.toFixed(2));
+  }
+  /* str(x) of a Python number; float: integral values keep «.0» (str(13.0) == '13.0') */
+  const pyNumStr = f => (Number.isFinite(f) ? String(f) : (Number.isNaN(f) ? 'nan' : (f > 0 ? 'inf' : '-inf')));
+  const pyFloatStr = f => (Number.isFinite(f) && isInt(f) ? String(f) + '.0' : pyNumStr(f));
+  function pyStr(v) {
+    if (isNone(v)) return 'None';
+    if (typeof v === 'boolean') return v ? 'True' : 'False';
+    if (typeof v === 'number') return pyNumStr(v);
+    return String(v);
+  }
+  function fmtLen(v) {
+    let f; try { f = pyFloat(v); } catch (e) { return pyStr(v); }
+    return isInt(f) ? String(f) : pyFloatStr(round2(f));
+  }
+  const pyRepr = v => (isNone(v) ? 'None' : (typeof v === 'string' ? "'" + v + "'" : pyStr(v)));
+  /* to_local: ISO time -> «dd.mm.yyyy HH:MM» at the site (Asia/Dhaka, UTC+6) */
+  function toLocal(iso) {
+    if (!iso) return '';
+    const d = new Date(String(iso));
+    if (Number.isNaN(d.getTime())) return String(iso);
+    const t = new Date(d.getTime() + 6 * 3600e3), p = n => String(n).padStart(2, '0');
+    return `${p(t.getUTCDate())}.${p(t.getUTCMonth() + 1)}.${t.getUTCFullYear()} ${p(t.getUTCHours())}:${p(t.getUTCMinutes())}`;
+  }
+  const pyStrip = s => s.replace(/^\s+|\s+$/g, '');
+  const rstripColon = s => s.replace(/:+$/, '');
+
+  /* ---------------------------------------------------------------- route text of the template (ikj_tool.parse_route) */
+  const CODE_P = String.raw`(?:\d{2}\.\d{2}[A-Z]{3}\d{2}\.\d{3}(?:\.\d)?(?:V(?:_\d{3})?|\(V\))?|\d{2}[A-Z]{3}\d{2}\.\d{3}\.\d{2}|\d{2}[A-Z]{3}\d{2}EM\d{4}|\d{2}[A-Z]{3}\d{3}[A-Z]\d{3}\.\d{2})(?:\/(?:\d{1,2}[A-Z]?|[A-Z])|[A-Z])?(?![A-Za-z0-9])`;
+  const ITEM_P = CODE_P + String.raw`(?:\s*[-–]\s*` + CODE_P + ')?';
+  const SEG_START = /^\s*1\)\s/, SEG_SPLIT = /;\s*(?=\d{1,2}\)\s)/;
+  const SEG_HEAD = /^(\d{1,2})\)\s*(\?|\d+(?:[.,]\d+)?)\s*м(?![\p{L}\p{N}_])\.?\s*(?:—\s*)?(.*)$/su;
+  const normItem = x => x.replace(/\s*[-–]\s*/g, ' - ');
+  const junk = t => t.replace(/[\s,;.]+/g, '');
+  const items = text => [...text.matchAll(new RegExp(ITEM_P, 'g'))].map(m => ({s: m.index, e: m.index + m[0].length, t: m[0]}));
+  function parseRoute(text) {
+    text = isNone(text) ? '' : String(text);
+    if (SEG_START.test(text)) {
+      const segs = [], codes = []; let rest = '';
+      for (const chunk of pyStrip(text).split(SEG_SPLIT)) {
+        const m = pyStrip(chunk).match(SEG_HEAD);
+        if (!m) { rest += junk(chunk); continue; }
+        const [, n, L, body] = m, ms = items(body);
+        let txt, its;
+        if (ms.length) {
+          txt = pyStrip(rstripColon(body.slice(0, ms[0].s).replace(/\s+$/, '')));
+          its = ms.map(x => normItem(x.t));
+          for (let i = 1; i < ms.length; i++) rest += junk(body.slice(ms[i - 1].e, ms[i].s));
+          rest += junk(body.slice(ms[ms.length - 1].e));
+        } else { txt = pyStrip(rstripColon(pyStrip(body))); its = []; }
+        let ln = L === '?' ? null : Number(L.replace(',', '.'));
+        segs.push({n: parseInt(n, 10), len: ln, text: txt, items: its});
+        codes.push(...its);
+      }
+      return {codes, prefix: '', suffix: '', rest, segs};
+    }
+    const ms = items(text);
+    if (!ms.length) return {codes: [], prefix: text, suffix: '', rest: '', segs: null};
+    let mid = '';
+    for (let i = 1; i < ms.length; i++) mid += text.slice(ms[i - 1].e, ms[i].s);
+    return {codes: ms.map(x => normItem(x.t)), prefix: text.slice(0, ms[0].s), suffix: text.slice(ms[ms.length - 1].e), rest: junk(mid), segs: null};
+  }
+
+  /* ---------------------------------------------------------------- marks of the phone -> rich text (ikj_tool) */
+  const F_BLACK = {n: 'Arial', s: 9, c: BLACK}, F_RED = {n: 'Arial', s: 9, c: RED, st: 1}, F_BLUE = {n: 'Arial', s: 9, c: BLUE};
+  function noteRu(e) {
+    const key = e.noteKey, txt = pyStrip(String(e.note || ''));
+    if (Object.prototype.hasOwnProperty.call(NOTE_RU, key)) {
+      let t = NOTE_RU[key];
+      if (!isNone(e.seg) && e.status === ST_NO) t += ' вдоль полки';
+      return t;
+    }
+    return txt;
+  }
+  function designItems(entries) {
+    const out = []; let lastRg = null;
+    for (const e of entries) {
+      if (isNone(e.seg)) continue;
+      const rg = e.rg;
+      if (rg) { if (rg !== lastRg) out.push(rg); lastRg = rg; }
+      else { out.push(e.seg); lastRg = null; }
+    }
+    return out;
+  }
+  function assignSg(entries, tplSegs) {
+    const design = entries.filter(e => !isNone(e.seg)), nSeg = (tplSegs || []).length;
+    if (!design.length || design.every(e => !isNone(e.sg))) {
+      let last = design.length ? (isNone(design[0].sg) ? 0 : design[0].sg) : 0;
+      for (const e of entries) { if (isNone(e.sg)) e.sg = last; else last = e.sg; }
+      return;
+    }
+    const counts = tplSegs.map(sg => sg.items.length);
+    let si = 0, used = 0, lastRg = null;
+    for (const e of entries) {
+      if (isNone(e.seg)) { e.sg = Math.min(si, nSeg - 1); continue; }
+      const rg = e.rg;
+      while (si < nSeg - 1 && used >= counts[si]) { si++; used = 0; lastRg = null; }
+      e.sg = si;
+      if (rg && rg === lastRg) continue;
+      used++; lastRg = rg;
+    }
+  }
+  function itemBlocks(entries) {
+    const its = [];
+    for (const e of entries) {
+      const st = e.status, seg = e.seg, fact = e.fact, nt = noteRu(e);
+      if (isNone(seg)) { if (fact) its.push([fact, F_BLUE, nt]); }
+      else if (st === ST_CHG && fact) its.push([seg, F_RED, ''], [fact, F_BLUE, nt]);
+      else if (st === ST_NO) its.push([seg, F_RED, nt]);
+      else its.push([seg, F_BLACK, nt]);
+    }
+    const parts = [], plain = [];
+    its.forEach(([t, f, nt], i) => {
+      if (i) parts.push([', ', F_BLACK]);
+      parts.push([String(t), f]); plain.push(String(t));
+      if (nt) { parts.push([` (${nt})`, F_BLUE]); plain[plain.length - 1] += ` (${nt})`; }
+    });
+    return [parts, plain.join(', ')];
+  }
+  function richRoute(entries, prefix, suffix) {
+    const [parts, plain] = itemBlocks(entries);
+    if (!parts.length && !(prefix || suffix)) return [null, ''];
+    let pre = prefix.replace(/\s+$/, '');
+    if (parts.length && pre) pre = pre.replace(/;+$/, '').replace(/\s+$/, '') + '; ';
+    if (pre) parts.unshift([pre, F_BLACK]);
+    if (suffix && parts.length) parts.push([suffix, F_BLACK]);
+    const text = (pre || '') + plain + (parts.length ? suffix : '');
+    return [{rt: parts}, text];
+  }
+  function segLenBlocks(tplLen, rs) {
+    const d = isNone(tplLen) ? '?' : fmtLen(tplLen), fl = (rs || {}).factLength;
+    if (isNone(fl) || fl === '' || isNone(tplLen)) return [[[`${d} м`, F_BLACK]], `${d} м`];
+    try {
+      if (pyFloat(fl) === pyFloat(tplLen)) return [[[`${d} м`, F_BLACK]], `${d} м`];
+      return [[[`${d} м`, F_RED], [` ${fmtLen(fl)} м`, F_BLUE]], `${d} м ${fmtLen(fl)} м`];
+    } catch (e) { if (!(e instanceof PyErr)) throw e; return [[[`${d} м`, F_BLACK]], `${d} м`]; }
+  }
+  function richSegmented(tplSegs, entries, rcSegs) {
+    const parts = [], plain = [];
+    tplSegs.forEach((sg, i) => {
+      const rs = rcSegs && i < rcSegs.length ? rcSegs[i] : null, ents = entries.filter(e => e.sg === i);
+      if (parts.length) parts.push(['; ', F_BLACK]);
+      parts.push([`${sg.n}) `, F_BLACK]);
+      const [lb, lt] = segLenBlocks(sg.len, rs); parts.push(...lb);
+      let head = `${sg.n}) ${lt}`;
+      if (sg.text) { parts.push([` — ${sg.text}`, F_BLACK]); head += ` — ${sg.text}`; }
+      const [ip, it] = itemBlocks(ents);
+      if (ip.length) { parts.push([': ', F_BLACK], ...ip); head += ': ' + it; }
+      plain.push(head);
+    });
+    return [{rt: parts}, plain.join('; ')];
+  }
+  function tagsRu(rcSegs, multi) {
+    if (!rcSegs || !rcSegs.length) return '';
+    const out = [];
+    for (const rs of rcSegs) {
+      const t = rs.tags; let v;
+      if (t === 'add') { const n = rs.tagsN; v = `довесить ${isNone(n) || n === '' ? '?' : Math.trunc(pyFloat(n))} шт.`; }
+      else v = Object.prototype.hasOwnProperty.call(TAGS_RU, t) ? TAGS_RU[t] : '—';
+      out.push(multi ? `${isNone(rs.n) ? out.length + 1 : rs.n}) ${v}` : v);
+    }
+    return out.join('; ');
+  }
+  function segLensRu(rcSegs) {
+    const out = [];
+    for (const rs of rcSegs || []) {
+      const fl = rs.factLength;
+      out.push(`${isNone(rs.n) ? out.length + 1 : rs.n}) ${fmtLen(rs.designLength)} / ${isNone(fl) || fl === '' ? '—' : fmtLen(fl)}`);
+    }
+    return out.join('; ');
+  }
+  /* cables by status (ikj_tool.split_marks): 1.6+ — field closed; older files — note «Сдан» */
+  function splitMarks(res, keys) {
+    const g = {'сдан': new Set(), 'в_работе': new Set()};
+    for (const c of res.cables || []) {
+      let closed = c.closed;
+      if (isNone(closed)) closed = pyStrip(String(c.note || '')).toLowerCase() === 'сдан';
+      g[closed ? 'сдан' : 'в_работе'].add(normMark(c.mark));
+    }
+    for (const k of keys) if (!g['сдан'].has(normMark(k))) g['в_работе'].add(normMark(k));
+    return g;
+  }
+
+  /* ---------------------------------------------------------------- the workbook (ikj_tool.apply_results) */
+  const C_AL = {h: 'center', v: 'center', w: 1}, L_AL = {h: 'left', v: 'center', w: 1};
+  const THIN = ['thin', BLACK], BORDER = {l: THIN, r: THIN, t: THIN, b: THIN};
+  function build(J, res0, group, fileName) {
+    const F = J && J.form;
+    if (!F || !(F.v >= 1)) throw new Error('no-form');
+    const res = JSON.parse(JSON.stringify(res0));
+    if (res.format !== 'ikj-field-results') throw new Error('Это не файл результатов обхода IKJ Field.');
+    const jinfo = res.journal || {};
+    const rows = J.cables.map((c, i) => {
+      const cells = new Map(); for (const [col, v, s] of c.xr[1]) cells.set(col, {v, s});
+      const lv = cells.get(12), pr = parseRoute(lv && typeof lv.v === 'string' ? lv.v : null);
+      const av = cells.get(1), jv = cells.get(10);
+      return {key: c.mark, trow: isNone(c.row) ? F.first + i : c.row, h: c.xr[0], cells, doc: pyStrip(String(av && !isNone(av.v) ? av.v : '')),
+              len: jv ? (isNone(jv.v) ? null : jv.v) : null, route: pr.codes, lPrefix: pr.prefix, lSuffix: pr.suffix, segs: pr.segs};
+    }).sort((a, b) => a.trow - b.trow);
+    rows.forEach((x, i) => { if (x.trow !== F.first + i) throw new Error('form-rows'); });
+    const tplId = rows.length ? rows[0].doc : '';
+    if (jinfo.id && jinfo.id !== tplId) throw new Error(`Файл обхода относится к журналу ${jinfo.id}, а шаблон — к ${tplId}.`);
+    const notes = [];
+    if (jinfo.hash && jinfo.hash !== J.hash) notes.push('Версия журнала в телефоне отличается от шаблона (после выдачи журнала менялась РД). Расхождения по кабелям — в графе «Замечания конвертера».');
+    const byMark = new Map(); for (const c of res.cables || []) byMark.set(normMark(c.mark), c);
+    const used = new Set();
+    const styles = F.styles;
+    const colW = c => { const d = (F.cols || []).find(x => x[0] <= c && c <= x[1]); return d && d[2] ? d[2] : 13; };
+    const widthL = colW(12) || 9.0;
+    const report = [];
+    rows.forEach((x, i) => {
+      const r = F.first + i;
+      x.row = r;
+      const rc = byMark.get(normMark(x.key));
+      const multi = !!(x.segs && x.segs.length);
+      const item = {row: r, mark: x.key, design: x.route.length, len: x.len, conv: [], multi};
+      if (!rc) { item.status = 'нет в файле обхода'; report.push(item); return; }
+      used.add(normMark(x.key));
+      const entries = rc.entries || [];
+      const di = designItems(entries);
+      if (di.length !== x.route.length || di.some((v, k) => v !== x.route[k])) item.conv.push('трасса по РД в телефоне отличается от шаблона — применено по телефону');
+      const cnt = {ok: 0, chg: 0, no: 0, add: 0, u: 0}, unchecked = [];
+      for (const e of entries) {
+        const st = e.status;
+        if (isNone(e.seg)) cnt.add++;
+        else if (st === ST_OK) cnt.ok++;
+        else if (st === ST_CHG) cnt.chg++;
+        else if (st === ST_NO) cnt.no++;
+        else { cnt.u++; unchecked.push(e.seg); }
+      }
+      let rcSegs = rc.segs || [], rich, plain;
+      if (multi) {
+        assignSg(entries, x.segs);
+        if (rcSegs.length !== x.segs.length) {
+          if (rcSegs.length) item.conv.push(`в телефоне ${rcSegs.length} отрезков, в шаблоне ${x.segs.length} — длины по отрезкам не применены`);
+          rcSegs = [];
+        }
+        [rich, plain] = richSegmented(x.segs, entries, rcSegs);
+      } else [rich, plain] = richRoute(entries, x.lPrefix || '', x.lSuffix || '');
+      const L = x.cells.get(12) || {v: null, s: null};
+      x.cells.set(12, {v: rich, s: L.s});
+      const K = x.cells.get(11) || {v: null, s: null};
+      const kfont = (K.s !== null && styles[K.s] && styles[K.s].font) || {};
+      const kf = differs => Object.assign({}, K.s !== null ? styles[K.s] : {}, {font: {n: kfont.n || 'Arial', s: kfont.s || 8, c: differs ? BLUE : BLACK}});
+      const setK = (v, st) => x.cells.set(11, {v, s: K.s, st});
+      let lenOk = false, lenWhy = '', fl = rc.factLength;
+      let kStyle = null;
+      if (multi && rcSegs.length) {
+        const facts = rcSegs.map(rs => rs.factLength);
+        const miss = []; rcSegs.forEach((rs, k) => { if (isNone(rs.factLength) || rs.factLength === '') miss.push(String(isNone(rs.n) ? k + 1 : rs.n)); });
+        if (!miss.length) {
+          try {
+            const fv = facts.map(pyFloat);
+            const kv = fv.map(fmtLen).join('+');
+            let s = 0; for (const v of fv) s += v;
+            fl = isInt(s) ? s : round2(s);
+            lenOk = true;
+            kStyle = kf(!isNone(x.len) && pyFloat(x.len) !== pyFloat(fl));
+            setK({f: kv}, kStyle);
+          } catch (e) {
+            if (!(e instanceof PyErr)) throw e;
+            setK(null, kStyle); item.conv.push(`длина отрезков не число: [${facts.map(pyRepr).join(', ')}]`);
+          }
+        } else { setK(null, kStyle); lenWhy = 'не подтверждена длина отрезков ' + miss.join(', '); }
+      } else if (!isNone(fl) && fl !== '') {
+        try {
+          const flv = pyFloat(fl);
+          fl = flv; lenOk = true;
+          kStyle = kf(!isNone(x.len) && pyFloat(x.len) !== flv);
+          setK(flv, kStyle);
+        } catch (e) {
+          if (!(e instanceof PyErr)) throw e;
+          setK(null, null); item.conv.push(`длина по факту не число: ${pyRepr(fl)}`);
+        }
+      } else setK(null, null);
+      const trayNotes = [];
+      for (const e of entries) {
+        const nt = noteRu(e);
+        if (nt) { const where = (isNone(e.seg) || e.status === ST_CHG) ? e.fact : e.seg; trayNotes.push(`${pyStr(where)} — ${nt}`); }
+      }
+      const need = nLines(plain, widthL) * 12.0 + 6, cur = x.h || 15;
+      if (need > cur) x.h = Math.round(need * 100) / 100;
+      const pnames = (rc.photos || []).map((p, k) => (p && p.name) || `${String(x.key).replace(/[^A-Za-z0-9-]/g, '_')}_${k + 1}.jpg`);
+      const finished = !!rc.finished, closed = isNone(rc.closed) ? null : !!rc.closed;
+      let status;
+      const touched = cnt.ok + cnt.chg + cnt.no + cnt.add;
+      if (closed !== null) {
+        if (closed) {
+          const why = []; if (cnt.u) why.push('есть непроверенные полки'); if (!lenOk) why.push(lenWhy || 'длина не подтверждена');
+          status = 'сдан' + (why.length ? ', но ' + why.join(' и ') : '');
+        } else if (touched === 0) status = 'не начат';
+        else if (cnt.u === 0 && lenOk) status = 'проверен, не сдан';
+        else status = 'в работе';
+      } else if (finished && cnt.u === 0 && lenOk) status = 'проверен';
+      else if (finished) {
+        const why = []; if (cnt.u) why.push('есть непроверенные полки'); if (!lenOk) why.push(lenWhy || 'длина не подтверждена');
+        status = 'отмечен «done», но ' + why.join(' и ');
+      } else if (touched === 0) status = 'не начат';
+      else if (cnt.u === 0 && lenOk) status = 'проверен, «готов» не нажат';
+      else status = 'в работе';
+      Object.assign(item, {status, closed: !!closed, closed_at: closed ? rc.closedAt : null, ...cnt, unchecked,
+        fact_len: lenOk ? fl : null, note: rc.note || '', tray_notes: trayNotes, photos: pnames, updated: rc.updated,
+        seg_lens: multi ? segLensRu(rcSegs) : '', tags: tagsRu(rcSegs, multi)});
+      report.push(item);
+    });
+    /* which cables go into this file */
+    let only = null;
+    if (group === 'сдан' || group === 'в_работе') only = splitMarks(res, rows.map(x => x.key))[group];
+    const keep = only ? rows.filter(x => only.has(normMark(x.key))) : rows;
+    if (!keep.length) throw new Error('empty');
+    const rep = only ? report.filter(it => only.has(normMark(it.mark))) : report;
+    const extra = (res.cables || []).filter(c => !used.has(normMark(c.mark))).map(c => c.mark);
+    if (extra.length) notes.push('В файле обхода есть кабели, которых нет в шаблоне: ' + extra.join(', '));
+
+    /* ---------- sheet «ИКЖ» */
+    const sh = {name: F.sheet || 'ИКЖ', rows: new Map(), cols: F.cols, fmt: F.fmt, page: F.page, mar: F.mar, po: F.po, view: F.view,
+                tabSelected: true, merges: [], area: F.area, titles: F.titles};
+    const put = (r, h, cells) => { const row = {h: isNone(h) ? null : h, cells: new Map()}; for (const [c, v, s] of cells) row.cells.set(c, {v, s}); sh.rows.set(r, row); return row; };
+    for (const [r, h, cells] of F.head) put(r, h, cells);
+    for (const m of F.mh || []) sh.merges.push(m);
+    const first = F.first, newpos = new Map();
+    keep.forEach((x, i) => {
+      const r = first + i, row = {h: x.h, cells: new Map()};
+      for (const [c, cell] of x.cells) {
+        let v = cell.v;
+        if (only && c === 11 && v && typeof v === 'object' && v.f && /^J\d+$/.test(v.f)) v = {f: `J${r}`};
+        row.cells.set(c, {v, s: cell.s, st: cell.st});
+      }
+      sh.rows.set(r, row); newpos.set(x.row, r);
+    });
+    const lastData = first + keep.length - 1;
+    if (!only || F.tot) {
+      const t0 = only ? lastData + 1 : first + rows.length;
+      F.tail.forEach(([o, h, cells], i) => {
+        const row = put(t0 + o, h, cells);
+        if (only && o === 0 && i === 0) for (const [c, cell] of row.cells) {
+          if (cell.v && typeof cell.v === 'object' && typeof cell.v.f === 'string' && /^SUM\(/i.test(cell.v.f)) {
+            const col = colLetter(c); cell.v = {f: `SUM(${col}${first}:${col}${Math.max(first, lastData)})`};
+          }
+        }
+      });
+      for (const [o1, c1, o2, c2] of F.mt || []) sh.merges.push([t0 + o1, c1, t0 + o2, c2]);
+    }
+    if (only) { const lastRow = Math.max(...sh.rows.keys()); sh.area = `A1:L${lastRow}`; }
+    for (const it of rep) it.row = newpos.get(it.row) ?? it.row;
+    computeCache(sh);
+
+    /* ---------- sheet «Обход» */
+    const F9 = {n: 'Arial', s: 9}, F9B = {n: 'Arial', s: 9, b: 1}, F12B = {n: 'Arial', s: 12, b: 1};
+    const HF = {t: 'solid', fg: 'FFD9D9D9'};
+    const FILL = {'проверен': 'FFE2EFDA', 'проверен, «готов» не нажат': 'FFE2EFDA', 'в работе': 'FFFFF2CC', 'не начат': 'FFF8CBAD',
+                  'сдан': 'FFC6E0B4', 'проверен, не сдан': 'FFE2EFDA', 'нет в файле обхода': 'FFF8CBAD'};
+    const factCell = it => (!isNone(it.fact_len) && it.fact_len !== '' ? it.fact_len : ('ok' in it ? 'не подтв.' : ''));
+    const g = (it, k) => (k in it ? it[k] : '');
+    const cols = [['№', 5, C_AL, (n, it) => n], ['Строка ИКЖ', 7, C_AL, (n, it) => it.row],
+      ['Монтажная марка', 20, L_AL, (n, it) => it.mark], ['Статус', 17, L_AL, (n, it) => it.status],
+      ['Сдан', 14, C_AL, (n, it) => (it.closed ? toLocal(it.closed_at) : '')],
+      ['Полок по РД', 7, C_AL, (n, it) => it.design], ['✓ по РД', 7, C_AL, (n, it) => g(it, 'ok')],
+      ['Изменено', 8, C_AL, (n, it) => g(it, 'chg')], ['Нет', 6, C_AL, (n, it) => g(it, 'no')],
+      ['Добавлено', 9, C_AL, (n, it) => g(it, 'add')],
+      ['Не проверено', 26, L_AL, (n, it) => (it.unchecked || []).map(pyStr).join(', ')],
+      ['Длина по РД', 8, C_AL, (n, it) => it.len], ['Длина факт', 10, C_AL, (n, it) => factCell(it)],
+      ['Отрезки: по РД / факт, м', 24, L_AL, (n, it) => g(it, 'seg_lens')],
+      ['Бирки', 20, L_AL, (n, it) => g(it, 'tags')],
+      ['Примечание к кабелю', 30, L_AL, (n, it) => g(it, 'note')],
+      ['Примечания к полкам', 34, L_AL, (n, it) => (it.tray_notes || []).join('; ')],
+      ['Фото', 22, L_AL, (n, it) => (it.photos || []).join(', ')],
+      ['Последняя отметка', 14, C_AL, (n, it) => toLocal(it.updated)],
+      ['Замечания конвертера', 30, L_AL, (n, it) => it.conv.join('; ')]];
+    const ob = {name: 'Обход', rows: new Map(), cols: cols.map((c, i) => [i + 1, i + 1, c[1], 1, 0]), fmt: {dh: 15, bw: 8},
+                page: {o: 'landscape', p: 9, fw: 1, fh: 0, fit: 1}, mar: [0.75, 0.75, 1, 1, 0.5, 0.5], view: {}, merges: []};
+    const cell = (r, c, v, st) => { if (!ob.rows.has(r)) ob.rows.set(r, {h: null, cells: new Map()}); ob.rows.get(r).cells.set(c, {v: v === '' ? null : v, s: null, st}); };
+    cell(1, 1, `Результаты обхода трасс — ${'id' in jinfo ? jinfo.id : tplId}`, {font: F12B});
+    const meta = [['Электрик', res.inspector || '—'], ['Файл обхода выгружен', toLocal(res.exportedAt)], ['Приложение', res.app || ''], ['Файл', fileName || '']];
+    meta.forEach(([k, v], i) => { cell(i + 2, 1, k, {font: F9B}); cell(i + 2, 4, v, {font: F9}); });
+    let rr = 2 + meta.length;
+    for (const n of notes) { cell(rr, 1, 'ВНИМАНИЕ: ' + n, {font: {n: 'Arial', s: 9, b: 1, c: RED}}); rr++; }
+    rr++;
+    const hdrRow = rr;
+    cols.forEach((c, i) => cell(rr, i + 1, c[0], {font: F9B, al: C_AL, border: BORDER, fill: HF}));
+    ob.rows.get(rr).h = 30;
+    const factIdx = cols.findIndex(c => c[0] === 'Длина факт') + 1;
+    rep.forEach((it, k) => {
+      rr++; let h = 1;
+      cols.forEach(([, w, al, fn], i) => {
+        const v = fn(k + 1, it);
+        cell(rr, i + 1, isNone(v) ? null : v, {font: F9, border: BORDER, al});
+        if (al === L_AL && !isNone(v) && v !== '') h = Math.max(h, nLines(pyStr(v), w));
+      });
+      if (factCell(it) === 'не подтв.') ob.rows.get(rr).cells.get(factIdx).st.font = {n: 'Arial', s: 9, c: RED};
+      const fill = FILL[it.status] || (String(it.status).startsWith('сдан') ? 'FFFCE4D6' : 'FFFFF2CC');
+      ob.rows.get(rr).cells.get(4).st.fill = {t: 'solid', fg: fill};
+      ob.rows.get(rr).h = Math.max(15, h * 12 + 4);
+    });
+    ob.freeze = {col: 4, row: hdrRow + 1};
+    return {sheets: [sh, ob], styles, dfont: F.dfont, calcId: 124519, cables: keep.length,
+            counts: {all: rows.length, ...(() => { const s = splitMarks(res, rows.map(x => x.key)); return {'сдан': rows.filter(x => s['сдан'].has(normMark(x.key))).length, 'в_работе': rows.filter(x => s['в_работе'].has(normMark(x.key))).length}; })()}};
+  }
+  /* number of cables per group: {all, сдан, в_работе} */
+  function counts(J, res) {
+    const keys = J.cables.map(c => c.mark), s = splitMarks(res, keys);
+    return {all: keys.length, 'сдан': keys.filter(k => s['сдан'].has(normMark(k))).length, 'в_работе': keys.filter(k => s['в_работе'].has(normMark(k))).length};
+  }
+
+  /* cached values of formulas (=J11, =195+335, =SUM(J11:J40)) so that viewers that do not calculate show numbers */
+  function computeCache(sh) {
+    const val = (c, r) => { const row = sh.rows.get(r); const x = row && row.cells.get(c); if (!x) return null; const v = x.v;
+      if (typeof v === 'number') return v; if (v && typeof v === 'object' && typeof v.f === 'string') return isNone(v.c) ? null : v.c; return null; };
+    const order = [...sh.rows.keys()].sort((a, b) => a - b);
+    for (const pass of [0, 1]) for (const r of order) for (const [c, x] of sh.rows.get(r).cells) {
+      const v = x.v; if (!v || typeof v !== 'object' || typeof v.f !== 'string') continue;
+      let m;
+      if ((m = v.f.match(/^([A-Z]+)(\d+)$/))) { const t = val(colIndex(m[1]), +m[2]); v.c = isNone(t) ? 0 : t; }
+      else if (/^[\d.+]+$/.test(v.f)) v.c = v.f.split('+').reduce((s, t) => s + Number(t), 0);
+      else if ((m = v.f.match(/^SUM\(([A-Z]+)(\d+):([A-Z]+)(\d+)\)$/i))) {
+        let s = 0; const c1 = colIndex(m[1].toUpperCase()), c2 = colIndex(m[3].toUpperCase());
+        for (let rr = +m[2]; rr <= +m[4]; rr++) for (let cc = c1; cc <= c2; cc++) { const t = val(cc, rr); if (typeof t === 'number') s += t; }
+        v.c = s;
+      }
+    }
+  }
+  const colLetter = c => { let s = ''; while (c > 0) { const m = (c - 1) % 26; s = String.fromCharCode(65 + m) + s; c = Math.floor((c - 1) / 26); } return s; };
+  const colIndex = L => { let n = 0; for (const ch of L) n = n * 26 + (ch.charCodeAt(0) - 64); return n; };
+
+  /* ---------------------------------------------------------------- xlsx writer */
+  const XML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n';
+  const NS = 'http://schemas.openxmlformats.org/spreadsheetml/2006/main';
+  const RNS = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships';
+  /* characters XML does not allow: control characters, U+FFFE/U+FFFF, lone surrogates (no look-behind: older Safari cannot parse it) */
+  const xmlSafe = s => String(s).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\uFFFE\uFFFF]/g, '')
+    .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDFFF]/g, m => (m.length === 2 ? m : ''));
+  const esc = s => xmlSafe(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const num = n => (Object.is(n, -0) ? '0' : String(n));
+  const canon = o => (o === null || typeof o !== 'object' ? JSON.stringify(o) : Array.isArray(o) ? '[' + o.map(canon).join(',') + ']'
+    : '{' + Object.keys(o).filter(k => o[k] !== undefined).sort().map(k => JSON.stringify(k) + ':' + canon(o[k])).join(',') + '}');
+  const BUILTIN_FMT = {'General': 0, '0': 1, '0.00': 2, '#,##0': 3, '#,##0.00': 4, '0%': 9, '0.00%': 10, '0.00E+00': 11, 'mm-dd-yy': 14, 'd-mmm-yy': 15, 'h:mm': 20, '@': 49};
+  function colorXml(tag, c) {
+    if (isNone(c)) return '';
+    if (typeof c === 'string') return `<${tag} rgb="${esc(c)}"/>`;
+    const tn = c.tn ? ` tint="${num(c.tn)}"` : '';
+    if (!isNone(c.rgb)) return `<${tag} rgb="${esc(c.rgb)}"${tn}/>`;
+    if (!isNone(c.th)) return `<${tag} theme="${c.th}"${tn}/>`;
+    if (!isNone(c.ix)) return `<${tag} indexed="${c.ix}"${tn}/>`;
+    return '';
+  }
+  function fontXml(f, rich) {
+    f = f || {};
+    let x = (f.b ? '<b/>' : '') + (f.i ? '<i/>' : '') + (f.st ? '<strike/>' : '') + (f.u ? `<u val="${esc(f.u)}"/>` : '') +
+      (f.va ? `<vertAlign val="${esc(f.va)}"/>` : '') + (isNone(f.s) ? '' : `<sz val="${num(f.s)}"/>`) + colorXml('color', f.c) +
+      (f.n ? `<${rich ? 'rFont' : 'name'} val="${esc(f.n)}"/>` : '') + (isNone(f.fa) ? '' : `<family val="${f.fa}"/>`) +
+      (isNone(f.cs) ? '' : `<charset val="${f.cs}"/>`) + (f.sc ? `<scheme val="${esc(f.sc)}"/>` : '');
+    return rich ? (x ? `<rPr>${x}</rPr>` : '') : `<font>${x}</font>`;
+  }
+  function borderXml(b) {
+    b = b || {};
+    const side = (tag, s) => (s && s[0] ? `<${tag} style="${esc(s[0])}">${colorXml('color', s[1])}</${tag}>` : `<${tag}/>`);
+    return `<border${b.du ? ' diagonalUp="1"' : ''}${b.dd ? ' diagonalDown="1"' : ''}>${side('left', b.l)}${side('right', b.r)}${side('top', b.t)}${side('bottom', b.b)}${side('diagonal', b.d)}</border>`;
+  }
+  const fillXml = f => `<fill><patternFill patternType="${esc(f.t)}">${colorXml('fgColor', f.fg)}${colorXml('bgColor', f.bg)}</patternFill></fill>`;
+  function Styles(dfont) {
+    const fonts = [fontXml(dfont || {n: 'Calibri', s: 11, c: {th: 1}, fa: 2, sc: 'minor'})], fontIdx = new Map([[fonts[0], 0]]);
+    const fills = ['<fill><patternFill patternType="none"/></fill>', '<fill><patternFill patternType="gray125"/></fill>'], fillIdx = new Map();
+    const borders = [borderXml({})], borderIdx = new Map([[borders[0], 0]]);
+    const fmts = [], fmtIdx = new Map();
+    const xfs = ['<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'], xfIdx = new Map(), styleIdx = new Map();
+    const idx = (list, map, x) => { if (!map.has(x)) { map.set(x, list.length); list.push(x); } return map.get(x); };
+    function xf(st) {
+      if (!st) return 0;
+      const key = canon(st);
+      if (styleIdx.has(key)) return styleIdx.get(key);
+      const fo = st.font ? idx(fonts, fontIdx, fontXml(st.font)) : 0;
+      const fi = st.fill && st.fill.t ? idx(fills, fillIdx, fillXml(st.fill)) : 0;
+      const bo = st.border ? idx(borders, borderIdx, borderXml(st.border)) : 0;
+      let nf = 0;
+      if (st.nf && st.nf !== 'General') nf = st.nf in BUILTIN_FMT ? BUILTIN_FMT[st.nf] : (fmtIdx.has(st.nf) ? fmtIdx.get(st.nf) : (fmtIdx.set(st.nf, 164 + fmts.length), fmts.push(st.nf), fmtIdx.get(st.nf)));
+      const a = st.al || {};
+      const al = (a.h ? ` horizontal="${esc(a.h)}"` : '') + (a.v ? ` vertical="${esc(a.v)}"` : '') + (a.ro ? ` textRotation="${a.ro}"` : '') +
+        (a.w ? ' wrapText="1"' : '') + (a.in ? ` indent="${a.in}"` : '') + (a.sh ? ' shrinkToFit="1"' : '');
+      const x = `<xf numFmtId="${nf}" fontId="${fo}" fillId="${fi}" borderId="${bo}" xfId="0"${nf ? ' applyNumberFormat="1"' : ''}${fo ? ' applyFont="1"' : ''}${fi ? ' applyFill="1"' : ''}${bo ? ' applyBorder="1"' : ''}${al ? ' applyAlignment="1"><alignment' + al + '/></xf>' : '/>'}`;
+      const i = idx(xfs, xfIdx, x); styleIdx.set(key, i); return i;
+    }
+    function xml() {
+      return XML + `<styleSheet xmlns="${NS}">` +
+        (fmts.length ? `<numFmts count="${fmts.length}">${fmts.map((f, i) => `<numFmt numFmtId="${164 + i}" formatCode="${esc(f)}"/>`).join('')}</numFmts>` : '') +
+        `<fonts count="${fonts.length}">${fonts.join('')}</fonts><fills count="${fills.length}">${fills.join('')}</fills>` +
+        `<borders count="${borders.length}">${borders.join('')}</borders>` +
+        '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>' +
+        `<cellXfs count="${xfs.length}">${xfs.join('')}</cellXfs>` +
+        '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles><dxfs count="0"/><tableStyles count="0" defaultTableStyle="TableStyleMedium9" defaultPivotStyle="PivotStyleLight16"/></styleSheet>';
+    }
+    return {xf, xml};
+  }
+  function Strings() {
+    const list = [], map = new Map();
+    const tx = t => `<t xml:space="preserve">${esc(t)}</t>`;
+    function add(v) {
+      let key, x;
+      if (typeof v === 'string') { key = 's' + v; x = `<si>${tx(v)}</si>`; }
+      else { key = 'r' + canon(v.rt); x = '<si>' + v.rt.filter(([t]) => t !== '').map(([t, f]) => `<r>${f ? fontXml(f, true) : ''}${tx(t)}</r>`).join('') + '</si>'; }
+      if (!map.has(key)) { map.set(key, list.length); list.push(x); }
+      return map.get(key);
+    }
+    let count = 0;
+    const xml = () => XML + `<sst xmlns="${NS}" count="${count}" uniqueCount="${list.length}">${list.join('')}</sst>`;
+    return {add: v => { count++; return add(v); }, xml};
+  }
+  function sheetXml(sh, styles, ST, SS) {
+    const rows = [...sh.rows.keys()].sort((a, b) => a - b);
+    let maxC = 1;
+    for (const r of rows) for (const c of sh.rows.get(r).cells.keys()) maxC = Math.max(maxC, c);
+    const ref = rows.length ? `A1:${colLetter(maxC)}${rows[rows.length - 1]}` : 'A1';
+    const p = sh.page || {}, v = sh.view || {};
+    let x = XML + `<worksheet xmlns="${NS}" xmlns:r="${RNS}"><sheetPr><outlinePr summaryBelow="1" summaryRight="1"/><pageSetUpPr fitToPage="${p.fit ? 1 : 0}"/></sheetPr>`;
+    x += `<dimension ref="${ref}"/><sheetViews><sheetView${sh.tabSelected ? ' tabSelected="1"' : ''}${v.gl === 0 ? ' showGridLines="0"' : ''}` +
+      `${v.z ? ` zoomScale="${v.z}"` : ''}${v.zn ? ` zoomScaleNormal="${v.zn}"` : ''}${v.tl ? ` topLeftCell="${esc(v.tl)}"` : ''} workbookViewId="0">`;
+    if (sh.freeze) {
+      const tl = colLetter(sh.freeze.col) + sh.freeze.row;
+      x += `<pane xSplit="${sh.freeze.col - 1}" ySplit="${sh.freeze.row - 1}" topLeftCell="${tl}" activePane="bottomRight" state="frozen"/>` +
+        `<selection pane="topRight"/><selection pane="bottomLeft"/><selection pane="bottomRight" activeCell="${tl}" sqref="${tl}"/>`;
+    } else if (v.ac) x += `<selection activeCell="${esc(v.ac)}" sqref="${esc(v.sq || v.ac)}"/>`;
+    x += '</sheetView></sheetViews>';
+    const fm = sh.fmt || {};
+    x += `<sheetFormatPr${isNone(fm.bw) ? '' : ` baseColWidth="${num(fm.bw)}"`}${isNone(fm.dw) ? '' : ` defaultColWidth="${num(fm.dw)}"`} defaultRowHeight="${num(isNone(fm.dh) ? 15 : fm.dh)}"/>`;
+    if (sh.cols && sh.cols.length) x += '<cols>' + sh.cols.map(([a, b, w, cw, hd]) => `<col min="${a}" max="${b}" width="${num(isNone(w) ? 9.140625 : w)}"${cw ? ' customWidth="1"' : ''}${hd ? ' hidden="1"' : ''}/>`).join('') + '</cols>';
+    x += '<sheetData>';
+    for (const r of rows) {
+      const row = sh.rows.get(r);
+      x += `<row r="${r}"${isNone(row.h) ? '' : ` ht="${num(row.h)}" customHeight="1"`}>`;
+      for (const c of [...row.cells.keys()].sort((a, b) => a - b)) {
+        const cl = row.cells.get(c), val = cl.v, s = cl.st ? ST.xf(cl.st) : (isNone(cl.s) ? 0 : ST.xf(styles[cl.s])), refc = colLetter(c) + r;
+        const sa = s ? ` s="${s}"` : '';
+        if (isNone(val) || val === '') { if (s) x += `<c r="${refc}"${sa}/>`; continue; }
+        if (typeof val === 'number') { x += Number.isFinite(val) ? `<c r="${refc}"${sa}><v>${num(val)}</v></c>` : `<c r="${refc}"${sa}/>`; continue; }
+        if (typeof val === 'boolean') { x += `<c r="${refc}"${sa} t="b"><v>${val ? 1 : 0}</v></c>`; continue; }
+        if (typeof val === 'string') { x += `<c r="${refc}"${sa} t="s"><v>${SS.add(val)}</v></c>`; continue; }
+        if (typeof val.f === 'string') {
+          const cv = val.c;
+          x += `<c r="${refc}"${sa}${typeof cv === 'string' ? ' t="str"' : ''}><f>${esc(val.f)}</f>${isNone(cv) ? '' : `<v>${typeof cv === 'number' ? num(cv) : esc(cv)}</v>`}</c>`;
+          continue;
+        }
+        if (Array.isArray(val.rt)) {
+          if (!val.rt.some(([t]) => t !== '')) { if (s) x += `<c r="${refc}"${sa}/>`; continue; }
+          x += `<c r="${refc}"${sa} t="s"><v>${SS.add(val)}</v></c>`; continue;
+        }
+      }
+      x += '</row>';
+    }
+    x += '</sheetData>';
+    if (sh.merges.length) x += `<mergeCells count="${sh.merges.length}">` + sh.merges.map(([r1, c1, r2, c2]) => `<mergeCell ref="${colLetter(c1)}${r1}:${colLetter(c2)}${r2}"/>`).join('') + '</mergeCells>';
+    const po = sh.po || {};
+    if (po.hc || po.vc) x += `<printOptions${po.hc ? ' horizontalCentered="1"' : ''}${po.vc ? ' verticalCentered="1"' : ''}/>`;
+    const m = sh.mar || [0.75, 0.75, 1, 1, 0.5, 0.5];
+    x += `<pageMargins left="${num(m[0])}" right="${num(m[1])}" top="${num(m[2])}" bottom="${num(m[3])}" header="${num(m[4])}" footer="${num(m[5])}"/>`;
+    x += `<pageSetup${isNone(p.p) ? '' : ` paperSize="${p.p}"`}${isNone(p.sc) ? '' : ` scale="${p.sc}"`}${isNone(p.fw) ? '' : ` fitToWidth="${p.fw}"`}` +
+      `${isNone(p.fh) ? '' : ` fitToHeight="${p.fh}"`}${p.o ? ` orientation="${esc(p.o)}"` : ''}${isNone(p.hd) ? '' : ` horizontalDpi="${p.hd}"`}${isNone(p.vd) ? '' : ` verticalDpi="${p.vd}"`}/>`;
+    return x + '</worksheet>';
+  }
+  const absRef = a => a.split(':').map(p => p.replace(/^([A-Z]+)?(\d+)?$/, (_, c, r) => (c ? '$' + c : '') + (r ? '$' + r : ''))).join(':');
+  function workbookFiles(wbm, title) {
+    const ST = Styles(wbm.dfont), SS = Strings();
+    const sheets = wbm.sheets.map(sh => sheetXml(sh, wbm.styles, ST, SS));
+    const n = sheets.length;
+    const names = [];
+    wbm.sheets.forEach((sh, i) => {
+      const q = `'${String(sh.name).replace(/'/g, "''")}'`;
+      if (sh.titles) names.push(`<definedName name="_xlnm.Print_Titles" localSheetId="${i}">${esc(q + '!' + absRef(sh.titles))}</definedName>`);
+      if (sh.area) names.push(`<definedName name="_xlnm.Print_Area" localSheetId="${i}">${esc(q + '!' + absRef(sh.area))}</definedName>`);
+    });
+    const wb = XML + `<workbook xmlns="${NS}" xmlns:r="${RNS}"><workbookPr/><bookViews><workbookView activeTab="0"/></bookViews><sheets>` +
+      wbm.sheets.map((sh, i) => `<sheet name="${esc(sh.name)}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`).join('') + '</sheets>' +
+      (names.length ? `<definedNames>${names.join('')}</definedNames>` : '') + `<calcPr calcId="${wbm.calcId || 124519}" fullCalcOnLoad="1"/></workbook>`;
+    const rels = XML + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+      sheets.map((_, i) => `<Relationship Id="rId${i + 1}" Type="${RNS}/worksheet" Target="worksheets/sheet${i + 1}.xml"/>`).join('') +
+      `<Relationship Id="rId${n + 1}" Type="${RNS}/styles" Target="styles.xml"/><Relationship Id="rId${n + 2}" Type="${RNS}/sharedStrings" Target="sharedStrings.xml"/>` +
+      `<Relationship Id="rId${n + 3}" Type="${RNS}/theme" Target="theme/theme1.xml"/></Relationships>`;
+    const now = new Date().toISOString().replace(/\.\d+Z$/, 'Z');
+    const files = [
+      ['[Content_Types].xml', XML + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/>' +
+        '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>' +
+        sheets.map((_, i) => `<Override PartName="/xl/worksheets/sheet${i + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('') +
+        '<Override PartName="/xl/theme/theme1.xml" ContentType="application/vnd.openxmlformats-officedocument.theme+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>' +
+        '<Override PartName="/xl/sharedStrings.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"/>' +
+        '<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/><Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/></Types>'],
+      ['_rels/.rels', XML + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>' +
+        '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/></Relationships>'],
+      ['docProps/app.xml', XML + '<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"><Application>IKJ Field</Application></Properties>'],
+      ['docProps/core.xml', XML + '<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dcmitype="http://purl.org/dc/dcmitype/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">' +
+        `<dc:title>${esc(title || '')}</dc:title><dc:creator>IKJ Field</dc:creator><dcterms:created xsi:type="dcterms:W3CDTF">${now}</dcterms:created><dcterms:modified xsi:type="dcterms:W3CDTF">${now}</dcterms:modified></cp:coreProperties>`],
+      ['xl/workbook.xml', wb], ['xl/_rels/workbook.xml.rels', rels],
+      ...sheets.map((s, i) => [`xl/worksheets/sheet${i + 1}.xml`, s]),
+      ['xl/theme/theme1.xml', THEME], ['xl/styles.xml', ST.xml()], ['xl/sharedStrings.xml', SS.xml()]];
+    return files;
+  }
+  const THEME = `<?xml version="1.0"?><a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" name="Office Theme"><a:themeElements><a:clrScheme name="Office"><a:dk1><a:sysClr val="windowText" lastClr="000000"/></a:dk1><a:lt1><a:sysClr val="window" lastClr="FFFFFF"/></a:lt1><a:dk2><a:srgbClr val="1F497D"/></a:dk2><a:lt2><a:srgbClr val="EEECE1"/></a:lt2><a:accent1><a:srgbClr val="4F81BD"/></a:accent1><a:accent2><a:srgbClr val="C0504D"/></a:accent2><a:accent3><a:srgbClr val="9BBB59"/></a:accent3><a:accent4><a:srgbClr val="8064A2"/></a:accent4><a:accent5><a:srgbClr val="4BACC6"/></a:accent5><a:accent6><a:srgbClr val="F79646"/></a:accent6><a:hlink><a:srgbClr val="0000FF"/></a:hlink><a:folHlink><a:srgbClr val="800080"/></a:folHlink></a:clrScheme><a:fontScheme name="Office"><a:majorFont><a:latin typeface="Cambria"/><a:ea typeface=""/><a:cs typeface=""/><a:font script="Jpan" typeface="&#xFF2D;&#xFF33; &#xFF30;&#x30B4;&#x30B7;&#x30C3;&#x30AF;"/><a:font script="Hang" typeface="&#xB9D1;&#xC740; &#xACE0;&#xB515;"/><a:font script="Hans" typeface="&#x5B8B;&#x4F53;"/><a:font script="Hant" typeface="&#x65B0;&#x7D30;&#x660E;&#x9AD4;"/><a:font script="Arab" typeface="Times New Roman"/><a:font script="Hebr" typeface="Times New Roman"/><a:font script="Thai" typeface="Tahoma"/><a:font script="Ethi" typeface="Nyala"/><a:font script="Beng" typeface="Vrinda"/><a:font script="Gujr" typeface="Shruti"/><a:font script="Khmr" typeface="MoolBoran"/><a:font script="Knda" typeface="Tunga"/><a:font script="Guru" typeface="Raavi"/><a:font script="Cans" typeface="Euphemia"/><a:font script="Cher" typeface="Plantagenet Cherokee"/><a:font script="Yiii" typeface="Microsoft Yi Baiti"/><a:font script="Tibt" typeface="Microsoft Himalaya"/><a:font script="Thaa" typeface="MV Boli"/><a:font script="Deva" typeface="Mangal"/><a:font script="Telu" typeface="Gautami"/><a:font script="Taml" typeface="Latha"/><a:font script="Syrc" typeface="Estrangelo Edessa"/><a:font script="Orya" typeface="Kalinga"/><a:font script="Mlym" typeface="Kartika"/><a:font script="Laoo" typeface="DokChampa"/><a:font script="Sinh" typeface="Iskoola Pota"/><a:font script="Mong" typeface="Mongolian Baiti"/><a:font script="Viet" typeface="Times New Roman"/><a:font script="Uigh" typeface="Microsoft Uighur"/></a:majorFont><a:minorFont><a:latin typeface="Calibri"/><a:ea typeface=""/><a:cs typeface=""/><a:font script="Jpan" typeface="&#xFF2D;&#xFF33; &#xFF30;&#x30B4;&#x30B7;&#x30C3;&#x30AF;"/><a:font script="Hang" typeface="&#xB9D1;&#xC740; &#xACE0;&#xB515;"/><a:font script="Hans" typeface="&#x5B8B;&#x4F53;"/><a:font script="Hant" typeface="&#x65B0;&#x7D30;&#x660E;&#x9AD4;"/><a:font script="Arab" typeface="Arial"/><a:font script="Hebr" typeface="Arial"/><a:font script="Thai" typeface="Tahoma"/><a:font script="Ethi" typeface="Nyala"/><a:font script="Beng" typeface="Vrinda"/><a:font script="Gujr" typeface="Shruti"/><a:font script="Khmr" typeface="DaunPenh"/><a:font script="Knda" typeface="Tunga"/><a:font script="Guru" typeface="Raavi"/><a:font script="Cans" typeface="Euphemia"/><a:font script="Cher" typeface="Plantagenet Cherokee"/><a:font script="Yiii" typeface="Microsoft Yi Baiti"/><a:font script="Tibt" typeface="Microsoft Himalaya"/><a:font script="Thaa" typeface="MV Boli"/><a:font script="Deva" typeface="Mangal"/><a:font script="Telu" typeface="Gautami"/><a:font script="Taml" typeface="Latha"/><a:font script="Syrc" typeface="Estrangelo Edessa"/><a:font script="Orya" typeface="Kalinga"/><a:font script="Mlym" typeface="Kartika"/><a:font script="Laoo" typeface="DokChampa"/><a:font script="Sinh" typeface="Iskoola Pota"/><a:font script="Mong" typeface="Mongolian Baiti"/><a:font script="Viet" typeface="Arial"/><a:font script="Uigh" typeface="Microsoft Uighur"/></a:minorFont></a:fontScheme><a:fmtScheme name="Office"><a:fillStyleLst><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:gradFill rotWithShape="1"><a:gsLst><a:gs pos="0"><a:schemeClr val="phClr"><a:tint val="50000"/><a:satMod val="300000"/></a:schemeClr></a:gs><a:gs pos="35000"><a:schemeClr val="phClr"><a:tint val="37000"/><a:satMod val="300000"/></a:schemeClr></a:gs><a:gs pos="100000"><a:schemeClr val="phClr"><a:tint val="15000"/><a:satMod val="350000"/></a:schemeClr></a:gs></a:gsLst><a:lin ang="16200000" scaled="1"/></a:gradFill><a:gradFill rotWithShape="1"><a:gsLst><a:gs pos="0"><a:schemeClr val="phClr"><a:shade val="51000"/><a:satMod val="130000"/></a:schemeClr></a:gs><a:gs pos="80000"><a:schemeClr val="phClr"><a:shade val="93000"/><a:satMod val="130000"/></a:schemeClr></a:gs><a:gs pos="100000"><a:schemeClr val="phClr"><a:shade val="94000"/><a:satMod val="135000"/></a:schemeClr></a:gs></a:gsLst><a:lin ang="16200000" scaled="0"/></a:gradFill></a:fillStyleLst><a:lnStyleLst><a:ln w="9525" cap="flat" cmpd="sng" algn="ctr"><a:solidFill><a:schemeClr val="phClr"><a:shade val="95000"/><a:satMod val="105000"/></a:schemeClr></a:solidFill><a:prstDash val="solid"/></a:ln><a:ln w="25400" cap="flat" cmpd="sng" algn="ctr"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:prstDash val="solid"/></a:ln><a:ln w="38100" cap="flat" cmpd="sng" algn="ctr"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:prstDash val="solid"/></a:ln></a:lnStyleLst><a:effectStyleLst><a:effectStyle><a:effectLst><a:outerShdw blurRad="40000" dist="20000" dir="5400000" rotWithShape="0"><a:srgbClr val="000000"><a:alpha val="38000"/></a:srgbClr></a:outerShdw></a:effectLst></a:effectStyle><a:effectStyle><a:effectLst><a:outerShdw blurRad="40000" dist="23000" dir="5400000" rotWithShape="0"><a:srgbClr val="000000"><a:alpha val="35000"/></a:srgbClr></a:outerShdw></a:effectLst></a:effectStyle><a:effectStyle><a:effectLst><a:outerShdw blurRad="40000" dist="23000" dir="5400000" rotWithShape="0"><a:srgbClr val="000000"><a:alpha val="35000"/></a:srgbClr></a:outerShdw></a:effectLst><a:scene3d><a:camera prst="orthographicFront"><a:rot lat="0" lon="0" rev="0"/></a:camera><a:lightRig rig="threePt" dir="t"><a:rot lat="0" lon="0" rev="1200000"/></a:lightRig></a:scene3d><a:sp3d><a:bevelT w="63500" h="25400"/></a:sp3d></a:effectStyle></a:effectStyleLst><a:bgFillStyleLst><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:gradFill rotWithShape="1"><a:gsLst><a:gs pos="0"><a:schemeClr val="phClr"><a:tint val="40000"/><a:satMod val="350000"/></a:schemeClr></a:gs><a:gs pos="40000"><a:schemeClr val="phClr"><a:tint val="45000"/><a:shade val="99000"/><a:satMod val="350000"/></a:schemeClr></a:gs><a:gs pos="100000"><a:schemeClr val="phClr"><a:shade val="20000"/><a:satMod val="255000"/></a:schemeClr></a:gs></a:gsLst><a:path path="circle"><a:fillToRect l="50000" t="-80000" r="50000" b="180000"/></a:path></a:gradFill><a:gradFill rotWithShape="1"><a:gsLst><a:gs pos="0"><a:schemeClr val="phClr"><a:tint val="80000"/><a:satMod val="300000"/></a:schemeClr></a:gs><a:gs pos="100000"><a:schemeClr val="phClr"><a:shade val="30000"/><a:satMod val="200000"/></a:schemeClr></a:gs></a:gsLst><a:path path="circle"><a:fillToRect l="50000" t="50000" r="50000" b="50000"/></a:path></a:gradFill></a:bgFillStyleLst></a:fmtScheme></a:themeElements><a:objectDefaults/><a:extraClrSchemeLst/></a:theme>`;
+
+  /* ---------------------------------------------------------------- zip */
+  const CRC = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+  function crc32(b) { let c = 0xFFFFFFFF; for (let i = 0; i < b.length; i++) c = CRC[(c ^ b[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+  async function deflateRaw(b) {
+    if (typeof CompressionStream === 'undefined') return null;
+    try { return new Uint8Array(await new Response(new Blob([b]).stream().pipeThrough(new CompressionStream('deflate-raw'))).arrayBuffer()); }
+    catch (e) { return null; }
+  }
+  async function zip(files) {
+    const enc = new TextEncoder(), d = new Date();
+    const tm = ((d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1)) & 0xFFFF;
+    const dt = (((d.getFullYear() - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate()) & 0xFFFF;
+    const parts = [], central = []; let off = 0;
+    for (const [name, text] of files) {
+      const nb = enc.encode(name), data = enc.encode(text), crc = crc32(data);
+      let comp = await deflateRaw(data), method = 8;
+      if (!comp || comp.length >= data.length) { comp = data; method = 0; }
+      const h = new DataView(new ArrayBuffer(30));
+      h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(6, 0, true); h.setUint16(8, method, true);
+      h.setUint16(10, tm, true); h.setUint16(12, dt, true); h.setUint32(14, crc, true); h.setUint32(18, comp.length, true);
+      h.setUint32(22, data.length, true); h.setUint16(26, nb.length, true); h.setUint16(28, 0, true);
+      parts.push(new Uint8Array(h.buffer), nb, comp);
+      const c = new DataView(new ArrayBuffer(46));
+      c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint16(8, 0, true); c.setUint16(10, method, true);
+      c.setUint16(12, tm, true); c.setUint16(14, dt, true); c.setUint32(16, crc, true); c.setUint32(20, comp.length, true);
+      c.setUint32(24, data.length, true); c.setUint16(28, nb.length, true); c.setUint32(42, off, true);
+      central.push(new Uint8Array(c.buffer), nb);
+      off += 30 + nb.length + comp.length;
+    }
+    const size = central.reduce((n, a) => n + a.length, 0), e = new DataView(new ArrayBuffer(22));
+    e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true);
+    e.setUint32(12, size, true); e.setUint32(16, off, true);
+    return new Blob([...parts, ...central, new Uint8Array(e.buffer)], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  }
+  /* journal + results -> Blob of the xlsx */
+  async function xlsx(J, res, group, fileName) {
+    const wbm = build(J, res, group, fileName);
+    return {blob: await zip(workbookFiles(wbm, `ИКЖ ${J.id}`)), cables: wbm.cables};
+  }
+  return {xlsx, build, counts, splitMarks, parseRoute, nLines, toLocal, fmtLen, round2, hasForm: J => !!(J && J.form && J.form.v >= 1 && J.cables.every(c => Array.isArray(c.xr)))};
+})();
+if (typeof module !== 'undefined' && module.exports) module.exports = IKJX;
+/*IKJX-END*/
+
+/* ---------------------------------------------------------------- ИКЖ в Excel: from this phone, or from walk files (computer) */
+const isMobile = () => /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
+const isDesktop = () => !isMobile();
+const xlsStem = id => String(id || '').replace(/^RPR\.\d{4}\./, '');
+const XGROUPS = [['сдан', 'Handed-over cables'], ['в_работе', 'Cables in work'], ['all', 'All cables']];
+const xlsErr = e => (e && e.message === 'no-form' ? T('the journal file is old') : (e && e.message === 'empty' ? T('no cables in this group') : ((e && e.message) || String(e))));
+function xlsButtons(cnt, act, i) {
+  return `<div class="grid3">${XGROUPS.map(([g, l]) => `<button class="btn ${g === 'сдан' ? 'primary' : ''}" data-${act === 'xg' ? 'sact' : 'act'}="${act}" data-g="${g}"${i === undefined ? '' : ` data-i="${i}"`} ${cnt[g] ? '' : 'disabled'}>${T(l)}<br><b>${cnt[g]}</b> ${T('cab.')}</button>`).join('')}</div>`;
+}
+async function saveXls(j, res, g, srcName) {
+  const {blob} = await IKJX.xlsx(j, res, g, srcName);
+  const name = `${xlsStem(j.id)}_ИКЖ_${g === 'all' ? 'все' : g}_${stamp()}.xlsx`;
+  const file = new File([blob], name, {type: blob.type});
+  const r = await shareOrSave(file, isMobile() ? 'share' : 'save');
+  toast(r === 'shared' ? T('Sent ✓') : (r === 'cancelled' ? T('Not sent') : T('Saved to Downloads: {n}', {n: name})));
+}
+async function openXls(jid) {
+  const j = S.journals[jid];
+  if (!IKJX.hasForm(j)) {
+    openSheet(`<div class="sh-title"><div class="big">${T('IKJ to Excel')}</div><div class="small muted mono">${esc(j.id)}</div></div>
+      <div class="warnbox">${T('This journal was loaded from an older file — it has no IKJ form yet. Ask your supervisor for the new journal file and load it: your marks are kept.')}</div>
+      <button class="btn" data-sact="close">${T('Close')}</button>`);
+    return;
+  }
+  if (!S.settings.inspector) {            /* the name goes into the Excel (sheet «Обход»), as into the results file */
+    const name = await promptSheet(T('Your name'), '', T('Name and surname'), T('Continue')); if (!name) return;
+    S.settings.inspector = name; await saveSettings();
+  }
+  const s = journalStats(jid), cnt = {'сдан': s.done, 'в_работе': s.cables - s.done, all: s.cables};
+  openSheet(`<div class="sh-title"><div class="big">${T('IKJ to Excel')}</div><div class="small muted mono">${esc(j.id)}</div></div>
+    ${xlsButtons(cnt, 'xg')}
+    <p class="small muted" style="margin:8px 2px 12px">${T('Sheet «ИКЖ» — the journal form with the actual route (black, red, blue) and lengths; sheet «Обход» — what is left on every cable. The file is saved to Downloads: open it in Excel, WPS or Google Sheets.')}</p>
+    <button class="btn ghost" data-sact="close">${T('Cancel')}</button>`, async (act, ds) => {
+    if (act !== 'xg') return;
+    busy(true);
+    try { const res = JSON.parse(await buildExport(jid, false)); await saveXls(j, res, ds.g, 'выгрузка из приложения'); closeSheet(); }
+    catch (e) { console.error(e); toast(T('Could not build the file: ') + xlsErr(e)); }
+    finally { busy(false); }
+  });
+}
+/* walk files IKJ_….txt (from «Send») opened in the app — on the office computer: ИКЖ in Excel from them */
+const isClosedRes = c => (c.closed === undefined || c.closed === null ? String(c.note || '').trim().toLowerCase() === 'сдан' : !!c.closed);
+function addResFile(name, o) {
+  S.ui.resFiles = S.ui.resFiles.filter(x => !(x.name === name && x.o.exportedAt === o.exportedAt));
+  S.ui.resFiles.unshift({name, o});
+}
+function resCard(rf, i) {
+  const o = rf.o, jid = (o.journal || {}).id || '', j = S.journals[jid], cabs = o.cables || [];
+  let warn = '', cnt = null;
+  if (!j) warn = T('Journal <b>{j}</b> is not loaded. Load its file (.ikj.json) — then the Excel buttons appear.', {j: esc(jid)});
+  else if (!IKJX.hasForm(j)) warn = T('The journal file is old — it has no IKJ form. Load the new journal file.');
+  else {
+    cnt = IKJX.counts(j, o);
+    if (o.journal && o.journal.hash && o.journal.hash !== j.hash) warn = T('The walk was made on another version of the journal (the design changed). The differences will be listed on sheet «Обход».');
+  }
+  const closed = cabs.filter(isClosedRes).length;
+  return `<div class="card rescard">
+    <div class="rname">📄 ${esc(rf.name)}</div>
+    <div class="small"><b class="mono">${esc(jid)}</b></div>
+    <div class="small muted">${T('Inspector: ')}${esc(o.inspector || '—')} · ${fmtTime(o.exportedAt)}${o.app ? ' · ' + esc(o.app) : ''}</div>
+    <div class="small">${plural(cabs.length, 'cable')} · ${T('handed over {n}', {n: closed})} · ${T('in work {n}', {n: cabs.length - closed})}</div>
+    ${warn ? `<div class="warnbox small" style="margin:8px 0 0">${warn}</div>` : ''}
+    ${cnt ? xlsButtons(cnt, 'resX', i) : ''}
+    <button class="btn ghost" data-act="resDel" data-i="${i}" style="margin:4px 0 0;min-height:40px">${T('Remove from the list')}</button>
+  </div>`;
+}
+function viewResFiles() {
+  setHeader({title: T('Walk files'), sub: T('IKJ to Excel from the files of electricians'), back: '#/'});
+  let h = '';
+  if (!S.ui.resFiles.length) h += `<div class="card small muted">${T('No walk files opened. Open the files IKJ_….txt that electricians sent: the button below, or drag them into this window.')}</div>`;
+  S.ui.resFiles.forEach((rf, i) => { h += resCard(rf, i); });
+  h += `<button class="btn primary big" data-act="loadJ">${T('Open files…')}</button>`;
+  view.innerHTML = h;
+}
+/* journals and walk files: «Load» button and drag & drop */
+async function loadFiles(list) {
+  const files = [...(list || [])]; if (!files.length) return;
+  const objs = [], res = [], ids = [], errs = [];
+  for (const f of files) {
+    let o;
+    try { o = JSON.parse(await readFileText(f)); }
+    catch (e) { errs.push((files.length === 1 ? '' : f.name + ': ') + T('Cannot read this file — is it the .ikj.json journal?')); continue; }
+    if (o && o.format === 'ikj-field-results') res.push({name: f.name, o}); else objs.push({f, o});
+  }
+  const one = objs.length === 1 && files.length === 1;
+  for (const {f, o} of objs) {
+    try { const id = await addJournal(o, {silent: !one}); if (id) ids.push(id); }
+    catch (e) { errs.push((one ? '' : f.name + ': ') + e.message); }
+  }
+  for (const r of res) addResFile(r.name, r.o);
+  if (errs.length) toast(one ? errs[0] : T('Loaded {a} of {b}. {e}', {a: ids.length + res.length, b: files.length, e: errs[0]}));
+  else if (!one && ids.length) toast(ids.length > 3 ? T('Loaded ✓ {n} journals', {n: ids.length}) : T('Loaded ✓ {list}', {list: ids.map(shortId).join(', ')}));
+  if (res.length) nav('#/r');
+  else if (one && ids.length) nav(rJ(ids[0])); else if (ids.length) nav('#/'); else render();
+}
+let dragN = 0;
+const hasFiles = e => e.dataTransfer && [...(e.dataTransfer.types || [])].includes('Files');
+window.addEventListener('dragenter', e => { if (hasFiles(e)) { dragN++; document.body.classList.add('drop'); } });
+window.addEventListener('dragleave', e => { if (hasFiles(e) && --dragN <= 0) { dragN = 0; document.body.classList.remove('drop'); } });
+window.addEventListener('dragover', e => { if (hasFiles(e)) e.preventDefault(); });
+window.addEventListener('drop', e => {
+  if (!e.dataTransfer || !e.dataTransfer.files || !e.dataTransfer.files.length) return;
+  e.preventDefault(); dragN = 0; document.body.classList.remove('drop'); loadFiles(e.dataTransfer.files);
+});
 
 /* ---------------------------------------------------------------- mutations */
 function getEntry(jid, mark, k) { const rc = S.results[jid].cables[mark]; const i = rc.entries.findIndex(e => e.k === k); return {rc, i, e: rc.entries[i]}; }
@@ -825,6 +1695,8 @@ function parseRoute() {
   if (p[0] === 't' && p.length >= 2) return {v: 'tray', jid: null, code: p.slice(1).join('/')};
   if (p[0] === 'settings') return {v: 'settings'};
   if (p[0] === 'help') return {v: 'help'};
+  if (p[0] === 'b' && p[1]) return {v: 'folder', b: p[1] === '-' ? '' : p[1]};
+  if (p[0] === 'r') return {v: 'res'};
   return {v: 'home'};
 }
 const rJ = jid => '#/j/' + enc(jid);
@@ -832,6 +1704,7 @@ const rC = (jid, mark) => `#/j/${enc(jid)}/c/${enc(mark)}`;
 const rT = code => '#/t/' + enc(code);
 
 function render() {
+  view.classList.remove('locked');
   const key = location.hash || '#/';
   if (S.ui.route && S.ui.route !== key) S.ui.scroll[S.ui.route] = window.scrollY;
   const isNew = S.ui.route !== key; S.ui.route = key;
@@ -843,6 +1716,8 @@ function render() {
     else if (r.v === 'tray') { if (r.jid && S.journals[r.jid]) S.ui.lastJid = r.jid; viewTray(r.code); }
     else if (r.v === 'settings') viewSettings();
     else if (r.v === 'help') viewHelp();
+    else if (r.v === 'folder') viewFolder(r.b);
+    else if (r.v === 'res') viewResFiles();
     else { S.ui.lastJid = null; viewHome(); }
   } catch (e) { console.error(e); view.innerHTML = `<div class="errbox">${T('Something went wrong: ')}${esc(e.message)}</div><button class="btn" onclick="location.hash='#/'">${T('Home')}</button>`; }
   if (isNew) window.scrollTo(0, S.ui.scroll[key] || 0);
@@ -854,13 +1729,30 @@ function journalCard(id) {
   const j = S.journals[id], r = S.results[id], s = journalStats(id);
   const secs = (j.sections || []).map(x => x.id).join(' + ');
   return `<button class="card" data-act="openJ" data-j="${esc(id)}">
-    <div class="item-top"><span class="jid">${esc(j.id)}</span>${s.done === s.cables && s.cables ? `<span class="chip ok">${T('All done')}</span>` : ''}</div>
+    <div class="item-top"><span class="jid">${esc(j.id)}</span>${s.done === s.cables && s.cables ? `<span class="chip closed">${T('All handed over')}</span>` : ''}</div>
     <div class="small muted">${plural(j.cables.length, 'cable')}${secs ? ' · ' + esc(secs) : ''}${tx(j, 'title') ? ' · ' + esc(tx(j, 'title')) : ''}</div>
     ${bar(s.checked, s.total)}
-    <div class="small">${T('{a}/{b} trays checked · {c}/{d} cables done', {a: s.checked, b: s.total, c: s.done, d: s.cables})}${s.changes ? ` · <span class="blue">${T('<b>{n}</b> changes', {n: s.changes})}</span>` : ''}</div>
+    <div class="small">${T('{a}/{b} trays checked · {c}/{d} cables handed over', {a: s.checked, b: s.total, c: s.done, d: s.cables})}${s.changes ? ` · <span class="blue">${T('<b>{n}</b> changes', {n: s.changes})}</span>` : ''}</div>
     <div class="small muted">${T('Length: {d} m by design · confirmed {c}/{n} cables', {d: fmtLen(s.lenDesign), c: s.lenConf, n: s.cables})}</div>
     ${r.unsent ? `<div class="unsent">${T('Not sent yet: {n}', {n: plural(r.unsent, 'edit')})}</div>` : (r.lastSent ? `<div class="tiny muted" style="margin-top:6px">${T('Last sent {t}', {t: fmtTime(r.lastSent)})}</div>` : '')}
   </button>`;
+}
+function folderCard(b, ids) {
+  const t = {checked: 0, total: 0, done: 0, cables: 0, changes: 0}; let unsent = 0;
+  for (const id of ids) { const s = journalStats(id); t.checked += s.checked; t.total += s.total; t.done += s.done; t.cables += s.cables; t.changes += s.changes; unsent += S.results[id].unsent || 0; }
+  return `<button class="card fold" data-act="openB" data-b="${esc(b)}">
+    <div class="fhead"><span class="fname">📁 ${esc(b || T('Other'))}</span>${t.done === t.cables && t.cables ? `<span class="chip closed">${T('All handed over')}</span>` : ''}</div>
+    <div class="small muted">${plural(ids.length, 'journal')} · ${plural(t.cables, 'cable')}</div>
+    ${bar(t.checked, t.total)}
+    <div class="small">${T('{a}/{b} trays checked · {c}/{d} cables handed over', {a: t.checked, b: t.total, c: t.done, d: t.cables})}${t.changes ? ` · <span class="blue">${T('<b>{n}</b> changes', {n: t.changes})}</span>` : ''}</div>
+    ${unsent ? `<div class="unsent">${T('Not sent yet: {n}', {n: plural(unsent, 'edit')})}</div>` : ''}
+  </button>`;
+}
+function viewFolder(b) {
+  const list = buildings().get(b) || [];
+  if (!list.length) { S.ui.lastJid = null; viewHome(); return; }
+  setHeader({title: b || T('Other'), sub: plural(list.length, 'journal'), back: '#/'});
+  view.innerHTML = list.map(journalCard).join('');
 }
 function viewHome() {
   setHeader({title: 'IKJ Field', sub: T('Cable route check — as-built journal')});
@@ -873,13 +1765,18 @@ function viewHome() {
      ${T('2. In Telegram tap <b>⋮</b> on the file → <b>Save to Downloads</b>.')}<br>
      ${T('3. Tap <b>Load journal files</b> below and pick them in Downloads (you can select several at once).')}</p></div>`;
   else h += `<input class="search mono" type="search" id="gq" value="${esc(S.ui.gq)}" placeholder="${T('Find cable No., mark or tray')}" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false"><div id="glist"></div>`;
-  let lastB = null;
-  for (const id of ids) {
-    const b = S.journals[id].building || '';
-    if (ids.length > 1 && b !== lastB) { lastB = b; h += `<h3>${esc(b || T('Other'))}</h3>`; }
-    h += journalCard(id);
+  if (S.ui.resFiles.length) h += `<button class="card rescard" data-act="openR"><b>📄 ${T('Walk files: {n}', {n: S.ui.resFiles.length})}</b><div class="small muted">${T('IKJ to Excel from the files of electricians')}</div></button>`;
+  if (useFolders()) { for (const [b, list] of buildings()) h += folderCard(b, list); }
+  else {
+    let lastB = null;
+    for (const id of ids) {
+      const b = S.journals[id].building || '';
+      if (ids.length > 1 && b !== lastB) { lastB = b; h += `<h3>${esc(b || T('Other'))}</h3>`; }
+      h += journalCard(id);
+    }
   }
-  h += `<button class="btn primary big" data-act="loadJ">${T('Load journal files')}</button>`;
+  h += `<button class="btn primary big" data-act="loadJ">${isDesktop() ? T('Open journals or walk files') : T('Load journal files')}</button>`;
+  if (isDesktop()) h += `<div class="small muted dhint">${T('On a computer: drag journal files (.ikj.json) or walk files (IKJ_….txt) into this window.')}</div>`;
   h += `<button class="btn" data-act="help">${T('How to use')}</button>`;
   h += langRow();
   view.innerHTML = h;
@@ -895,9 +1792,9 @@ function renderGlobal(q) {
     if (!(squash(c.no).includes(qs) || squash(c.mark).includes(qs))) continue;
     if (n++ >= 40) continue;
     const rc = S.results[id].cables[c.mark];
-    h += `<button class="card" data-act="openGC" data-j="${esc(id)}" data-m="${esc(c.mark)}">
+    h += `<button class="card ${rc && rc.closed ? 'closed' : ''}" data-act="openGC" data-j="${esc(id)}" data-m="${esc(c.mark)}">
       <div class="item-top"><span><span class="cno">${esc(c.no)}</span><span class="mark">${esc(c.mark)}</span></span>
-      <span>${multi ? `<span class="jchip">${esc(shortId(id))}</span> ` : ''}${c.section ? `<span class="jchip">${esc(c.section)}</span> ` : ''}${rc && rc.finished ? `<span class="chip ok">${T('Done')}</span>` : ''}</span></div>
+      <span>${multi ? `<span class="jchip">${esc(shortId(id))}</span> ` : ''}${c.section ? `<span class="jchip">${esc(c.section)}</span> ` : ''}${rc && rc.closed ? `<span class="chip closed">${T('✓ Handed over')}</span>` : ''}</span></div>
       <div class="tiny muted ft">${esc(tx(c, 'from'))} → ${esc(tx(c, 'to'))}</div></button>`;
   }
   const all = trayMapAll(), codes = matchCodes([...all.keys()].sort(natCmp), q).slice(0, 20);
@@ -918,11 +1815,12 @@ function isStandalone() { return (window.matchMedia && matchMedia('(display-mode
 
 function viewJournal(jid) {
   const j = S.journals[jid], tab = S.ui.tab[jid] || 'cable', q = S.ui.q[jid + ':' + tab] || '';
-  setHeader({title: j.id, sub: tx(j, 'title'), back: '#/', send: jid, onTitle: openJournalSwitcher});
+  setHeader({title: j.id, sub: tx(j, 'title'), back: backOf(jid), send: jid, onTitle: openJournalSwitcher});
   const s = journalStats(jid);
   view.innerHTML = `
-    <div class="small muted" style="margin:0 2px 2px">${T('{a}/{b} trays checked · {c}/{d} cables done', {a: s.checked, b: s.total, c: s.done, d: s.cables})}${s.changes ? ` · <span class="blue">${T('{n} changes', {n: s.changes})}</span>` : ''}</div>${bar(s.checked, s.total)}
+    <div class="small muted" style="margin:0 2px 2px">${T('{a}/{b} trays checked · {c}/{d} cables handed over', {a: s.checked, b: s.total, c: s.done, d: s.cables})}${s.changes ? ` · <span class="blue">${T('{n} changes', {n: s.changes})}</span>` : ''}</div>${bar(s.checked, s.total)}
     <div class="small muted" style="margin:2px 2px 0">${T('Length by design <b>{d} m</b> · confirmed <b>{c}/{n}</b> cables', {d: fmtLen(s.lenDesign), c: s.lenConf, n: s.cables})}${s.lenConf ? T(' · actual <b>{f} m</b>', {f: fmtLen(s.lenFact)}) : ''}</div>
+    <button class="btn xls" data-act="xls">📊 ${T('IKJ to Excel')}</button>
     <div class="tabs" style="margin-top:10px"><button data-act="tab" data-tab="cable" class="${tab === 'cable' ? 'on' : ''}">${T('By cable')}</button><button data-act="tab" data-tab="tray" class="${tab === 'tray' ? 'on' : ''}">${T('By tray')}</button></div>
     <input class="search mono" type="search" id="jq" value="${esc(q)}" placeholder="${tab === 'cable' ? T('Cable No. or mark, e.g. 4.0012') : T('Find tray, e.g. 109')}" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false">
     <div id="jlist"></div>
@@ -938,8 +1836,8 @@ function lenTag(c, rc) {
 }
 function cableCard(jid, c) {
   const rc = S.results[jid].cables[c.mark], s = cableStats(rc);
-  const chip = rc.finished ? `<span class="chip ok">${T('Done')}</span>` : (s.checked || s.add ? `<span class="chip prog">${T('In progress')}</span>` : `<span class="chip">${T('Not started')}</span>`);
-  return `<button class="card" data-act="openC" data-j="${esc(jid)}" data-m="${esc(c.mark)}">
+  const chip = rc.closed ? `<span class="chip closed">${T('✓ Handed over')}</span>` : (s.checked || s.add ? `<span class="chip prog">${T('In progress')}</span>` : `<span class="chip">${T('Not started')}</span>`);
+  return `<button class="card ${rc.closed ? 'closed' : ''}" data-act="openC" data-j="${esc(jid)}" data-m="${esc(c.mark)}">
     <div class="item-top"><span><span class="cno">${esc(c.no)}</span><span class="mark">${esc(c.mark)}</span></span>${chip}</div>
     <div class="small muted">${esc(tx(c, 'type'))} ${esc(c.size || '')} · ${lenTag(c, rc)}${c.sheet ? T(' · sheet ') + esc(c.sheet) : ''}</div>
     <div class="small ft"><span class="muted">${T('From')}</span> ${esc(tx(c, 'from'))}<br><span class="muted">${T('To')}</span> ${esc(tx(c, 'to'))}</div>
@@ -989,7 +1887,7 @@ function navRow(jid, mark) {
   return `<div class="navrow">${b(p, -1)}${b(n, 1)}</div>`;
 }
 function viewCable(jid, mark) {
-  const j = S.journals[jid], c = S.idx[jid].byMark.get(mark), rc = S.results[jid].cables[mark], s = cableStats(rc);
+  const j = S.journals[jid], c = S.idx[jid].byMark.get(mark), rc = S.results[jid].cables[mark], s = cableStats(rc), locked = !!rc.closed;
   setHeader({title: mark, sub: `${T('No.')} ${c.no}${c.section ? ' · ' + c.section : ''}${c.sheet ? ' · ' + T('sh.') + ' ' + c.sheet : ''}`,
              back: rJ(jid), send: jid, onTitle: () => openCableSwitcher(jid, mark)});
   ensureSegs(c, rc);
@@ -1005,12 +1903,20 @@ function viewCable(jid, mark) {
     for (const sg of sd) {
       const list = rc.entries.filter(e => e.sg === sg.i);
       body += segHeader(c, rc, sg) + (list.length ? `<ol class="route">${rowsOf(list)}</ol>` : '');
-      if (sg.i < sd.length - 1) body += `<button class="btn add seg" data-act="addSeg" data-i="${sg.i}">${T('＋ Add a tray to segment {n}', {n: sg.n})}</button>`;
+      if (sg.i < sd.length - 1 && !locked) body += `<button class="btn add seg" data-act="addSeg" data-i="${sg.i}">${T('＋ Add a tray to segment {n}', {n: sg.n})}</button>`;
     }
   } else body += empty ? (noDesign && c.routeNote ? '' : `<div class="card small muted">${T('The design gives no tray route for this cable. If it runs on trays, add them.')}</div>`) : `<ol class="route">${rowsOf(rc.entries)}</ol>`;
+  const stBlock = locked
+    ? `<div class="card stcard closed"><div class="lbl">${T('Cable status')}</div><div class="stval okc">✓ ${T('Handed over')}</div>
+        <div class="small muted" style="margin:2px 2px 0">${esc(fmtTime(rc.closedAt))} · ${T('changes in this journal are closed')}</div>
+        <button class="btn" data-act="reopen" style="margin-top:10px">${T('Return to work…')}</button></div>`
+    : `<div class="card stcard"><div class="lbl">${T('Cable status')}</div><div class="stval">${T('In work')}</div>
+        <button class="btn primary big" data-act="close" style="margin-top:10px">${T('Cable handed over…')}</button></div>`;
+  view.classList.toggle('locked', locked);
   view.innerHTML = `
     ${navRow(jid, mark)}
-    <div class="card small">
+    <div class="card small ${locked ? 'closed' : ''}">
+      ${locked ? `<div class="closedbar">✓ ${T('Handed over')} ${esc(fmtTime(rc.closedAt))} · ${T('changes are closed')}</div>` : ''}
       <div class="tiny muted mono jline">${esc(j.id)}</div>
       <div><span class="cno">${esc(c.no)}</span><b class="mono">${esc(c.mark)}</b></div>
       <div style="margin-top:6px"><span class="muted">${T('Type')}</span> <b>${esc(tx(c, 'type'))} ${esc(c.size || '')}</b></div>
@@ -1021,24 +1927,25 @@ function viewCable(jid, mark) {
       ${s.total ? bar(s.checked, s.total) + `<div class="muted">${T('{a}/{b} trays checked', {a: s.checked, b: s.total})}${s.changes ? ` · <span class="blue">${plural(s.changes, 'change')}</span>` : ''}</div>` : ''}
     </div>
     <div class="legend tiny"><span>${T('<b>black</b> = as designed')}</span><span class="red">${T('<s><b>red</b></s> = design tray not used')}</span><span class="blue">${T('<b>blue</b> = actual tray')}</span></div>
-    ${noDesign && !sd ? note : `<div class="small muted" style="margin:0 2px 8px">${T('Walk along the route. Tap <b class="okc">✓</b> if the cable is on that tray. Tap the tray code for other options.')}</div>`}
+    ${noDesign && !sd ? note : (locked ? '' : `<div class="small muted" style="margin:0 2px 8px">${T('Walk along the route. Tap <b class="okc">✓</b> if the cable is on that tray. Tap the tray code for other options.')}</div>`)}
     ${!noDesign && noteFirst ? note : ''}
-    ${empty ? '' : `<button class="btn add" data-act="addStart">${T('＋ Add a tray at the start')}</button>`}
+    ${empty || locked ? '' : `<button class="btn add" data-act="addStart">${T('＋ Add a tray at the start')}</button>`}
     ${body}
     ${noDesign || noteFirst ? '' : note}
-    <button class="btn add" data-act="addEnd">${empty ? T('＋ Add a tray (actual route)') : T('＋ Add a tray at the end (route continues)')}</button>
-    <button class="btn" data-act="copyRoute">${T('⧉ Copy route from another cable…')}</button>
+    ${locked ? '' : `<button class="btn add" data-act="addEnd">${empty ? T('＋ Add a tray (actual route)') : T('＋ Add a tray at the end (route continues)')}</button>
+    <button class="btn" data-act="copyRoute">${T('⧉ Copy route from another cable…')}</button>`}
     <div class="card">
       <label class="lbl" for="fNote">${T('Note on this cable')}</label>
-      <textarea class="inp" id="fNote" rows="3" placeholder="${T('Anything unusual on this cable')}">${esc(rc.note || '')}</textarea>
+      <textarea class="inp" id="fNote" rows="3" placeholder="${T('Anything unusual on this cable')}" ${locked ? 'readonly' : ''}>${esc(rc.note || '')}</textarea>
       <div class="lbl">${T('Photos')}</div><div class="photos" id="photos"></div>
-      <button class="btn" data-act="addPhoto">${T('📷 Add photo')}</button>
+      ${locked ? '' : `<button class="btn" data-act="addPhoto">${T('📷 Add photo')}</button>`}
     </div>
-    ${rc.finished ? `<button class="btn ok big" data-act="finish">${T('✓ Cable done (tap to reopen)')}</button>` : `<button class="btn primary big" data-act="finish">${T('Mark cable as done')}</button>`}
+    ${stBlock}
     ${navRow(jid, mark)}`;
   const fNote = $('#fNote'); let noteTimer = null;
-  fNote.oninput = () => { rc.note = fNote.value; clearTimeout(noteTimer); noteTimer = setTimeout(() => saveResult(jid), 500); };
-  fNote.onchange = () => { rc.note = fNote.value; commit(jid, mark, T('Note saved')); };
+  fNote.oninput = () => { if (rc.closed) { fNote.value = rc.note || ''; return; } rc.note = fNote.value; clearTimeout(noteTimer); noteTimer = setTimeout(() => saveResult(jid), 500); };
+  fNote.onchange = () => { if (rc.closed) return; rc.note = fNote.value; commit(jid, mark, T('Note saved')); };
+  if (locked) fNote.onfocus = () => lockedToast();
   renderPhotos(jid, mark);
 }
 /* length + cable tags of one segment (sg = {i, len}); for a plain cable sg.i = 0 and the design length is c.len */
@@ -1116,7 +2023,9 @@ function trayRow(jid, d) {
   else if (e.st === ST.NO) { st = `<span class="small red"><b>${T('✗ not here')}</b></span>`; cls = 'no'; }
   else if (e.st === ST.CHG) { st = `<span class="small blue"><b>${T('actually on {c}', {c: esc(e.fact)})}</b></span>`; cls = 'chg'; }
   const a = `data-j="${esc(jid)}" data-m="${esc(d.mark)}" data-k="${d.k}"`;
-  return `<div class="trow ${cls}">
+  const closed = isClosed(jid, d.mark);
+  if (closed) st = `<span class="chip closed">${T('✓ Handed over')}</span> ` + st;
+  return `<div class="trow ${cls} ${closed ? 'closed' : ''}">
     <div class="item-top"><button class="cbtn" data-act="openC" data-j="${esc(jid)}" data-m="${esc(d.mark)}"><span class="cno">${esc(c.no)}</span><span class="mark">${esc(d.mark)}</span></button>${st}</div>
     <div class="tiny muted ft">${secTag(jid, c)}${esc(tx(c, 'from'))} → ${esc(tx(c, 'to'))}</div>
     ${d.rng ? `<div class="tiny blue" style="margin-top:4px">${T('design: the whole range')} <span class="mono">${esc(rangeShort(d.rng))}</span> · ${T('the mark applies to the range; split it in the cable card')}</div>` : ''}
@@ -1128,8 +2037,8 @@ function trayRow(jid, d) {
 }
 function fieldRow(jid, f) {
   const c = S.idx[jid].byMark.get(f.mark);
-  return `<div class="trow chg"><div class="item-top"><button class="cbtn" data-act="openC" data-j="${esc(jid)}" data-m="${esc(f.mark)}"><span class="cno">${esc(c.no)}</span><span class="mark">${esc(f.mark)}</span></button>
-    <span class="small blue">${f.st === ST.ADD ? T('added here') : T('moved here from ') + '<s class="red">' + esc(f.from) + '</s>'}</span></div>
+  return `<div class="trow chg ${isClosed(jid, f.mark) ? 'closed' : ''}"><div class="item-top"><button class="cbtn" data-act="openC" data-j="${esc(jid)}" data-m="${esc(f.mark)}"><span class="cno">${esc(c.no)}</span><span class="mark">${esc(f.mark)}</span></button>
+    <span class="small blue">${isClosed(jid, f.mark) ? `<span class="chip closed">${T('✓ Handed over')}</span> ` : ''}${f.st === ST.ADD ? T('added here') : T('moved here from ') + '<s class="red">' + esc(f.from) + '</s>'}</span></div>
     ${secName(jid, c) ? `<div class="tiny muted"><b>${esc(secName(jid, c))}</b></div>` : ''}
     <div class="tb" style="grid-template-columns:1fr"><button class="o" data-act="tOther" data-j="${esc(jid)}" data-m="${esc(f.mark)}" data-k="${f.k}">${T('Edit…')}</button></div></div>`;
 }
@@ -1183,14 +2092,18 @@ function viewHelp() {
     <li><b>Penetration:</b> tap the tray code → <b>Penetration letter A–Z…</b> → the letter goes instead of the shelf (…109/A) or at the end (…109/3A).</li>
     <li><b>Note for a tray:</b> tap the tray code → <b>In a box / In metal hose / In a pipe / Other text…</b>. After <b>✗ Not here</b> the app asks if the cable runs along this tray.</li>
   </ul>
-  <p><b>Length.</b> At the top of the cable card: <b>✓ … m as design</b> if the length matches the design, or <b>Other length…</b> to enter the measured length. A cable without a confirmed length is not finished.</p>
+  <p><b>Length.</b> At the top of the cable card: <b>✓ … m as design</b> if the length matches the design, or <b>Other length…</b> to enter the measured length. Confirm it before the cable is handed over.</p>
   <p><b>Cable tags.</b> Under the length: <b>Present</b> / <b>None</b> / <b>Add…</b> (how many tags are missing). Mark it for every cable.</p>
   <p><b>Segments.</b> Some cables are printed in the design in several parts with their own lengths (inside the building — along the site — in another building). Each part has a numbered header in the cable card: confirm <b>its</b> length and tags, then tick the trays under it. The total length is calculated automatically. A part without trays in the design has a <b>＋ Add a tray to segment</b> button.</p>
   <p><b>Range of trays</b> <span class="mono">00USY24.176.01/10 – 00USY24.176.05/10</span> means the cable runs along all sections 01…05 of the trestle. Tap <b class="okc">✓</b> if it does. Tap the code → <b>Trays one by one</b> to split the range and mark every section separately.</p>
+  <p><b>Cable status.</b> Every cable is <b>In work</b> until it is handed over. At the bottom of the cable card: <b>Cable handed over…</b> → the app asks to confirm (and warns if trays, length or tags are not marked yet). A handed-over cable is highlighted green and cannot be changed in this journal. Handed over by mistake? <b>Return to work…</b> at the bottom of the card.</p>
+  <p><b>IKJ to Excel.</b> In a journal tap <b>📊 IKJ to Excel</b> → <b>Handed-over cables</b>, <b>Cables in work</b> or <b>All cables</b>. The phone makes the as-built cable journal in Excel — the same form as in the office: the actual route in black / red / blue, actual lengths, totals; the second sheet «Обход» lists what is left on every cable. The file is saved to Downloads: open it in Excel, WPS or Google Sheets, or send it from there. Works without internet. The app says the journal file is old? Ask your supervisor for the new journal file and load it — your marks are kept.</p>
   <p><b>4. Check by tray.</b> Standing at one tray? Open <b>By tray</b> (or search the tray code on the first screen) — you see the cables of <b>all</b> loaded journals on this tray and mark them at once.</p>
   <p><b>5. Colours</b> are the same as in the journal: black = as designed, <span class="red"><s>red crossed</s></span> = design tray not used, <span class="blue">blue</span> = actual tray.</p>
   <p><b>6. Mistake?</b> Tap <b>Undo</b> in the message at the bottom, or tap the tray code → <b>Clear mark</b>.</p>
   <p><b>7. Send.</b> Tap <b>Send</b> (top right) → Telegram/WhatsApp → your supervisor. Each journal is a separate file. No signal? Telegram sends it automatically when the signal is back. Each file contains <b>all</b> your work so far — always send the newest one.</p>
+  <p><b>Folders.</b> With many journals the first screen shows folders by building (11URB, 11URF…). Tap a folder to see its journals. The search on the first screen looks through all journals.</p>
+  <p><b>On a computer (Windows).</b> Open the site in Edge or Chrome → <b>Install IKJ Field</b> (the icon in the address bar, or menu ⋯ → Apps). Load the journals, then open — or drag into the window — the walk files IKJ_….txt that electricians sent: for every file <b>Handed-over / In work / All</b> → Excel.</p>
   <p><b>Important:</b> the app works without internet. Your marks are kept only on this phone until you send them — do not uninstall the app or clear Chrome data. Send at least once a day.</p>
   </div>`;
 }
@@ -1211,11 +2124,15 @@ const HELP_RU = `<div class="card help">
   <p><b>Бирки.</b> Под длиной: <b>Есть</b> / <b>Нет</b> / <b>Довесить…</b> (сколько бирок не хватает). Отмечайте у каждого кабеля.</p>
   <p><b>Отрезки.</b> Некоторые кабели в РД разбиты на части со своими длинами (по зданию — по территории — по другому зданию). У каждой части в карточке кабеля свой нумерованный заголовок: подтвердите <b>её</b> длину и бирки, затем отмечайте полки под ним. Общая длина считается сама. У части без полок в РД есть кнопка <b>＋ Добавить полку в отрезок</b>.</p>
   <p><b>Диапазон полок</b> <span class="mono">00USY24.176.01/10 – 00USY24.176.05/10</span> означает, что кабель идёт по всем секциям эстакады 01…05. Нажмите <b class="okc">✓</b>, если это так. Код → <b>Полки по одной</b> — раскрыть диапазон и отметить каждую секцию отдельно.</p>
-  <p><b>Длина.</b> Вверху карточки кабеля: <b>✓ … м как по РД</b>, если длина совпадает, или <b>Другая длина…</b> — ввести измеренную. Кабель без подтверждённой длины не считается готовым.</p>
+  <p><b>Длина.</b> Вверху карточки кабеля: <b>✓ … м как по РД</b>, если длина совпадает, или <b>Другая длина…</b> — ввести измеренную. Подтвердите её до того, как сдать кабель.</p>
+  <p><b>Статус кабеля.</b> Каждый кабель — <b>В работе</b>, пока он не сдан. Внизу карточки кабеля: <b>Кабель сдан…</b> → приложение переспросит (и предупредит, если ещё не отмечены полки, длина или бирки). Сданный кабель подсвечен зелёным, изменить его в этом журнале нельзя. Сдали по ошибке — <b>Вернуть в работу…</b> внизу карточки.</p>
+  <p><b>ИКЖ в Excel.</b> В журнале нажмите <b>📊 ИКЖ в Excel</b> → <b>Сданные</b>, <b>В работе</b> или <b>Все</b>. Телефон сам сделает исполнительный кабельный журнал в Excel — та же форма, что в офисе: трасса по факту чёрным / красным / синим, длины по факту, ИТОГО; на втором листе «Обход» — что осталось сделать по каждому кабелю. Файл сохраняется в «Загрузки»: откройте его в Excel, WPS или Google Таблицах или отправьте оттуда. Работает без интернета. Приложение пишет, что файл журнала старый? Попросите у руководителя новый файл журнала и загрузите его — отметки сохранятся.</p>
   <p><b>4. Проверка у полки.</b> Стоите у одной полки? Откройте <b>По полкам</b> (или наберите код полки на главном экране) — видны кабели <b>всех</b> загруженных журналов на этой полке, их можно отметить разом.</p>
   <p><b>5. Цвета</b> как в журнале: чёрный — по проекту, <span class="red"><s>красный зачёркнутый</s></span> — проектная полка не использована, <span class="blue">синий</span> — фактическая полка.</p>
   <p><b>6. Ошибка?</b> Нажмите <b>Отменить</b> в сообщении внизу или код полки → <b>Снять отметку</b>.</p>
   <p><b>7. Отправка.</b> Нажмите <b>Отправить</b> (вверху справа) → Telegram → руководителю. Каждый журнал — отдельный файл. Нет связи — Telegram отправит, когда связь появится. В каждом файле <b>вся</b> работа на момент отправки — отправляйте самый свежий.</p>
+  <p><b>Папки.</b> Когда журналов много, на главном экране они собраны в папки по зданиям (11URB, 11URF…). Нажмите на папку — откроются её журналы. Поиск на главном экране ищет по всем журналам.</p>
+  <p><b>На компьютере (Windows).</b> Откройте сайт в Edge или Chrome → <b>Установить IKJ Field</b> (значок в адресной строке или меню ⋯ → Приложения). Загрузите журналы, затем откройте — или перетащите в окно — файлы обхода IKJ_….txt, которые прислали электрики: у каждого файла <b>Сданные / В работе / Все</b> → Excel.</p>
   <p><b>Важно:</b> приложение работает без интернета. Отметки хранятся только в этом телефоне, пока вы их не отправите — не удаляйте приложение и не очищайте данные Chrome. Отправляйте хотя бы раз в день.</p>
   <p class="small muted">Язык: ⚙ → Язык / Language.</p>
   </div>`;
@@ -1223,11 +2140,13 @@ const HELP_RU = `<div class="card help">
 /* ---------------------------------------------------------------- switchers */
 function openJournalSwitcher() {
   const ids = journalIds();
-  let h = `<div class="sh-title"><div class="big">${T('Journals')}</div></div>`;
+  let h = `<div class="sh-title"><div class="big">${T('Journals')}</div></div>`, lastB = null;
+  const multiB = new Set(ids.map(bldOf)).size > 1;
   for (const id of ids) {
-    const s = journalStats(id), r = S.results[id];
+    const s = journalStats(id), r = S.results[id], b = bldOf(id);
+    if (multiB && b !== lastB) { lastB = b; h += `<h3>${esc(b || T('Other'))}</h3>`; }
     h += `<button class="card" data-sact="pickJ" data-j="${esc(id)}"><div class="item-top"><span class="jid">${esc(id)}</span></div>
-      <div class="tiny muted">${esc(tx(S.journals[id], 'title'))}</div>${bar(s.checked, s.total)}<div class="tiny">${T('{a}/{b} trays · {c}/{d} cables done', {a: s.checked, b: s.total, c: s.done, d: s.cables})}${r.unsent ? ` · <span class="red">${T('{n} not sent', {n: r.unsent})}</span>` : ''}</div></button>`;
+      <div class="tiny muted">${esc(tx(S.journals[id], 'title'))}</div>${bar(s.checked, s.total)}<div class="tiny">${T('{a}/{b} trays · {c}/{d} handed over', {a: s.checked, b: s.total, c: s.done, d: s.cables})}${r.unsent ? ` · <span class="red">${T('{n} not sent', {n: r.unsent})}</span>` : ''}</div></button>`;
   }
   h += `<button class="btn" data-sact="home">${T('First screen (search all)')}</button><button class="btn ghost" data-sact="close">${T('Cancel')}</button>`;
   openSheet(h, (act, ds) => { if (act === 'pickJ') go(rJ(ds.j)); else if (act === 'home') go('#/'); });
@@ -1246,7 +2165,7 @@ function openCableSwitcher(jid, mark) {
       if (qs && !(squash(c.no).includes(qs) || squash(c.mark).includes(qs))) continue;
       if (secs && c.section !== last) { last = c.section; h += `<div class="sec-h">${esc(c.section || '')}</div>`; }
       const rc = S.results[jid].cables[c.mark], s = cableStats(rc);
-      const chip = rc.finished ? ` <span class="chip ok">${T('Done')}</span>` : (s.checked || s.add ? ' <span class="chip prog">…</span>' : '');
+      const chip = rc.closed ? ` <span class="chip closed">${T('✓ Handed over')}</span>` : (s.checked || s.add ? ' <span class="chip prog">…</span>' : '');
       h += `<button class="pos ${c.mark === mark ? 'cur' : ''}" data-sact="pickC" data-m="${esc(c.mark)}"><span class="cno">${esc(c.no)}</span><b class="mono">${esc(c.mark)}</b>${chip}</button>`;
     }
     $('#swl').innerHTML = h || `<div class="small muted" style="padding:6px 2px">${T('No match.')}</div>`;
@@ -1390,11 +2309,12 @@ async function trayAddCable(code) {
     function upd() {
       const qs = squash($('#mQ').value);
       $('#mList').innerHTML = j.cables.filter(c => !listed.has(c.mark) && (!qs || squash(c.no).includes(qs) || squash(c.mark).includes(qs)))
-        .map(c => `<button data-sact="pick" data-m="${esc(c.mark)}"><span class="cno">${esc(c.no)}</span>${esc(c.mark)}</button>`).join('') || `<div class="small muted">${T('No cable matches.')}</div>`;
+        .map(c => `<button data-sact="pick" data-m="${esc(c.mark)}"><span class="cno">${esc(c.no)}</span>${esc(c.mark)}${isClosed(jid, c.mark) ? ` <span class="chip closed">${T('✓ Handed over')}</span>` : ''}</button>`).join('') || `<div class="small muted">${T('No cable matches.')}</div>`;
     }
     upd();
   });
   if (!mark) return;
+  if (isClosed(jid, mark)) { lockedToast(); return; }
   const rc = S.results[jid].cables[mark];
   const after = await new Promise(resolve => {
     let done = false; const fin = v => { if (done) return; done = true; resolve(v); };
@@ -1453,9 +2373,11 @@ function openSendHub() {
   const ids = journalIds();
   if (!ids.length) return;
   if (ids.length === 1) return openSend(ids[0]);
-  let h = `<div class="sh-title"><div class="big">${T('Send results')}</div><div class="small muted">${T('Each journal is a separate file.')}</div></div>`;
+  let h = `<div class="sh-title"><div class="big">${T('Send results')}</div><div class="small muted">${T('Each journal is a separate file.')}</div></div>`, lastB = null;
+  const multiB = new Set(ids.map(bldOf)).size > 1;
   for (const id of ids) {
-    const r = S.results[id];
+    const r = S.results[id], b = bldOf(id);
+    if (multiB && b !== lastB) { lastB = b; h += `<h3>${esc(b || T('Other'))}</h3>`; }
     h += `<button class="card" data-sact="pick" data-j="${esc(id)}"><div class="item-top"><span class="jid">${esc(shortId(id))}</span>${r.unsent ? `<span class="chip red">${T('{n} not sent', {n: r.unsent})}</span>` : `<span class="chip ok">${r.lastSent ? T('sent {t}', {t: fmtTime(r.lastSent)}) : T('nothing new')}</span>`}</div><div class="tiny muted">${esc(tx(S.journals[id], 'title'))}</div></button>`;
   }
   h += `<button class="btn ghost" data-sact="close">${T('Cancel')}</button>`;
@@ -1468,7 +2390,7 @@ async function openSend(jid) {
   }
   const j = S.journals[jid], r = S.results[jid], s = journalStats(jid);
   const html = `<div class="sh-title"><div class="big">${T('Send results')}</div><div class="small muted mono">${esc(j.id)}</div></div>
-    <div class="card small">${T('Trays checked: ')}<b>${s.checked}/${s.total}</b><br>${T('Cables done: ')}<b>${s.done}/${s.cables}</b><br>${T('Changes: ')}<b>${s.changes}</b><br>${T('Photos: ')}<b>${s.photos}</b><br>
+    <div class="card small">${T('Trays checked: ')}<b>${s.checked}/${s.total}</b><br>${T('Cables handed over: ')}<b>${s.done}/${s.cables}</b><br>${T('Changes: ')}<b>${s.changes}</b><br>${T('Photos: ')}<b>${s.photos}</b><br>
       ${T('Inspector: ')}<b>${esc(S.settings.inspector)}</b> <button class="link" data-sact="rename">${T('change')}</button>
       ${r.lastSent ? `<br><span class="muted">${T('Last sent ')}${fmtTime(r.lastSent)}</span>` : ''}</div>
     <p class="small muted" style="margin:0 2px 12px">${T('The file contains <b>all</b> your work on this journal so far. Send it to your supervisor. No signal? Telegram will send it when the signal is back.')}</p>
@@ -1532,7 +2454,7 @@ async function downscale(file, max = 1600, q = 0.72) {
 }
 $('#filePhoto').addEventListener('change', async ev => {
   const f = ev.target.files && ev.target.files[0]; ev.target.value = ''; if (!f || !photoTarget) return;
-  const {jid, mark} = photoTarget; busy(true);
+  const {jid, mark} = photoTarget; if (isClosed(jid, mark)) { lockedToast(); return; } busy(true);
   try {
     const blob = await downscale(f); const rc = S.results[jid].cables[mark];
     const n = (rc.photos || []).length + 1, safe = mark.replace(/[^A-Za-z0-9-]/g, '_');
@@ -1545,36 +2467,60 @@ async function openPhoto(jid, mark, pid) {
   const p = await Store.getPhoto(pid); if (!p) return; const u = URL.createObjectURL(p.blob);
   const handler = async act => {
     if (act === 'delp') {
+      if (isClosed(jid, mark)) { lockedToast(); return; }
       const rc = S.results[jid].cables[mark]; rc.photos = rc.photos.filter(x => x !== pid); await Store.delPhoto(pid);
       commit(jid, mark, T('Photo deleted')); closeSheet(); render();
     }
   };
   handler.onClose = () => URL.revokeObjectURL(u);
   openSheet(`<img src="${u}" alt="photo" style="width:100%;border-radius:12px;margin-bottom:10px"><div class="tiny muted" style="margin:0 2px 10px">${esc(p.name)} · ${fmtTime(p.takenAt)}</div>
-    <button class="btn danger-outline" data-sact="delp">${T('Delete photo')}</button><button class="btn ghost" data-sact="close">${T('Close')}</button>`, handler);
+    ${isClosed(jid, mark) ? '' : `<button class="btn danger-outline" data-sact="delp">${T('Delete photo')}</button>`}<button class="btn ghost" data-sact="close">${T('Close')}</button>`, handler);
 }
 
 /* ---------------------------------------------------------------- events */
-async function toggleFinish(jid, mark) {
-  const rc = S.results[jid].cables[mark], snap = snapshotCable(jid, mark);
-  if (rc.finished) { rc.finished = false; commit(jid, mark, T('Cable reopened'), snap); render(); return; }
+/* «Кабель сдан…»: confirm (with what is still not marked), then the cable is locked in this journal */
+async function closeCable(jid, mark) {
+  const rc = S.results[jid].cables[mark]; if (rc.closed) return;
   const c = S.idx[jid].byMark.get(mark); ensureSegs(c, rc);
   const s = cableStats(rc), left = s.total - s.checked, multi = rc.segs.length > 1;
   const noLen = rc.segs.map((x, i) => (x.fact === null || x.fact === undefined ? i + 1 : 0)).filter(Boolean);
   const noTags = rc.segs.map((x, i) => (!x.tags ? i + 1 : 0)).filter(Boolean);
-  if (left > 0 || noLen.length || noTags.length) {
-    const why = [left > 0 ? T('<b>{n}</b> not checked yet', {n: plural(left, 'tray')}) : '',
-      noLen.length ? (multi ? T('<b>length not confirmed</b> on segments {n}', {n: noLen.join(', ')}) : T('<b>length not confirmed</b>')) : '',
-      noTags.length ? (multi ? T('<b>cable tags not marked</b> on segments {n}', {n: noTags.join(', ')}) : T('<b>cable tags not marked</b>')) : ''].filter(Boolean).join('<br>');
-    const ok = await confirmSheet(T('This cable:<br>{w}.<br><br>Mark the cable as done anyway?', {w: why}), T('Mark done anyway'), T('Go back')); if (!ok) return;
-  }
-  rc.finished = true; commit(jid, mark, T('Cable marked as done'), snap); render();
+  const why = [left > 0 ? T('<b>{n}</b> not checked yet', {n: plural(left, 'tray')}) : '',
+    noLen.length ? (multi ? T('<b>length not confirmed</b> on segments {n}', {n: noLen.join(', ')}) : T('<b>length not confirmed</b>')) : '',
+    noTags.length ? (multi ? T('<b>cable tags not marked</b> on segments {n}', {n: noTags.join(', ')}) : T('<b>cable tags not marked</b>')) : ''].filter(Boolean).join('<br>');
+  const ok = await confirmSheet(T('Cable <b>{m}</b> is handed over?<br><br>After that its trays, length and tags cannot be changed in this journal.', {m: esc(mark)}) +
+    (why ? `<br><br><span class="red">${T('Not marked yet:')}<br>${why}</span>` : ''), T('Yes, the cable is handed over'), T('Cancel'));
+  if (!ok) return;
+  rc.closed = true; rc.closedAt = nowIso(); rc.finished = true; undo = null;
+  commit(jid, mark, T('Cable handed over ✓')); render();
 }
+async function reopenCable(jid, mark) {
+  const rc = S.results[jid].cables[mark]; if (!rc.closed) return;
+  const ok = await confirmSheet(T('Return cable <b>{m}</b> to work?<br><br>The status «handed over» is removed and its marks can be changed again.', {m: esc(mark)}), T('Return to work'), T('Cancel'), true);
+  if (!ok) return;
+  rc.closed = false; rc.closedAt = null; rc.reopenedAt = nowIso(); rc.finished = false;
+  commit(jid, mark, T('Cable returned to work')); render();
+}
+/* actions that change a cable — refused for a handed-over cable (the card / tray row explains why) */
+const EDIT_ACTS = new Set(['tick', 'entry', 'addStart', 'addEnd', 'copyRoute', 'addPhoto', 'lenOk', 'lenOther', 'tagYes', 'tagNo', 'tagAdd', 'addSeg', 'tYes', 'tNo', 'tOther']);
 view.addEventListener('click', async ev => {
   const el = ev.target.closest('[data-act]'); if (!el || el.disabled) return;
   const a = el.dataset.act, r = parseRoute(), jid = el.dataset.j || r.jid;
+  if (EDIT_ACTS.has(a)) { const m = el.dataset.m || r.mark; if (m && isClosed(jid, m)) { lockedToast(); return; } }
   switch (a) {
     case 'openJ': nav(rJ(el.dataset.j)); break;
+    case 'openB': nav(rB(el.dataset.b)); break;
+    case 'openR': nav('#/r'); break;
+    case 'xls': openXls(jid); break;
+    case 'resX': {
+      const rf = S.ui.resFiles[+el.dataset.i]; if (!rf) break;
+      busy(true);
+      try { await saveXls(S.journals[rf.o.journal.id], rf.o, el.dataset.g, rf.name); }
+      catch (e) { console.error(e); toast(T('Could not build the file: ') + xlsErr(e)); }
+      finally { busy(false); }
+      break;
+    }
+    case 'resDel': S.ui.resFiles.splice(+el.dataset.i, 1); render(); break;
     case 'loadJ': $('#fileJournal').click(); break;
     case 'help': nav('#/help'); break;
     case 'install': if (S.installEvt) { S.installEvt.prompt(); try { await S.installEvt.userChoice; } catch (e) {} S.installEvt = null; render(); } break;
@@ -1599,7 +2545,8 @@ view.addEventListener('click', async ev => {
     case 'copyRoute': openCopy(jid, r.mark); break;
     case 'addPhoto': photoTarget = {jid, mark: r.mark}; $('#filePhoto').click(); break;
     case 'photo': openPhoto(jid, r.mark, el.dataset.p); break;
-    case 'finish': toggleFinish(jid, r.mark); break;
+    case 'close': closeCable(jid, r.mark); break;
+    case 'reopen': reopenCable(jid, r.mark); break;
     case 'lenOk': { const c = S.idx[jid].byMark.get(r.mark), rc = S.results[jid].cables[r.mark], i = +(el.dataset.i || 0); ensureSegs(c, rc);
       const d = lenNum(segDesignLen(c, i)), f = rc.segs[i].fact;
       if (f !== null && f !== undefined && Number(f) === d) { toast(T('Length already confirmed')); break; }
@@ -1618,20 +2565,7 @@ view.addEventListener('click', async ev => {
     case 'restore': $('#fileBackup').click(); break;
   }
 });
-$('#fileJournal').addEventListener('change', async ev => {
-  const files = [...(ev.target.files || [])]; ev.target.value = ''; if (!files.length) return;
-  const one = files.length === 1, ids = [], errs = [];
-  for (const f of files) {
-    let o;
-    try { o = JSON.parse(await readFileText(f)); }
-    catch (e) { errs.push((one ? '' : f.name + ': ') + T('Cannot read this file — is it the .ikj.json journal?')); continue; }
-    try { const id = await addJournal(o, {silent: !one}); if (id) ids.push(id); }
-    catch (e) { errs.push((one ? '' : f.name + ': ') + e.message); }
-  }
-  if (errs.length) toast(one ? errs[0] : T('Loaded {a} of {b}. {e}', {a: ids.length, b: files.length, e: errs[0]}));
-  else if (!one) toast(ids.length > 3 ? T('Loaded ✓ {n} journals', {n: ids.length}) : T('Loaded ✓ {list}', {list: ids.map(shortId).join(', ')}));
-  if (one && ids.length) nav(rJ(ids[0])); else if (ids.length) nav('#/'); else render();
-});
+$('#fileJournal').addEventListener('change', async ev => { const files = [...(ev.target.files || [])]; ev.target.value = ''; await loadFiles(files); });
 $('#fileBackup').addEventListener('change', async ev => { const f = ev.target.files && ev.target.files[0]; ev.target.value = ''; if (f) doRestore(f); });
 
 /* ---------------------------------------------------------------- install / service worker */
