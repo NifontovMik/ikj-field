@@ -194,6 +194,9 @@ ol.route{list-style:none;margin:0 0 10px;padding:0}
 .rescard .rname{font-family:var(--mono);font-weight:700;font-size:14px;word-break:break-all}
 .dhint{text-align:center;margin:-2px 4px 12px}
 body.drop main{outline:3px dashed var(--primary);outline-offset:-6px;border-radius:14px}
+/* 1.7.1: add a tray before / after the selected one */
+.grid2.addba{margin:0 0 10px}
+.grid2.addba .btn{min-height:56px;font-size:15px;line-height:1.25;padding:6px 8px}
 </style>
 </head>
 <body>
@@ -213,7 +216,7 @@ body.drop main{outline:3px dashed var(--primary);outline-offset:-6px;border-radi
 <input type="file" id="filePhoto" accept="image/*" class="hidden">
 <script>
 'use strict';
-const APP_VERSION = '1.7.0';
+const APP_VERSION = '1.7.2';
 const EMBEDDED_JOURNAL = null; /*EMBED*/
 const ST = {U:'unchecked', OK:'ok', CHG:'changed', NO:'absent', ADD:'added'};
 /* tray code: building (12.12URF10.109/3), site trestle (00USY24.195.02/3) or 07UBG structure (07UBG080P024.01/46);
@@ -278,7 +281,26 @@ function fmtTime(iso) {
 function stamp() { const d = new Date(), p = n => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}`; }
 /* ---------------------------------------------------------------- language (English / Русский) */
 let LANG = 'en';
-const RU = { "Offline": "Нет сети", "Working…": "Подождите…", "A new version of the app is ready.": "Готова новая версия приложения.", "Update": "Обновить", "Send": "Отправить", "Settings": "Настройки", "How to use": "Инструкция", "Language": "Язык", "Something went wrong: ": "Ошибка: ", "Home": "На главную", "Cancel": "Отмена", "Close": "Закрыть", "Saved": "Сохранено", "Undo": "Отменить", "Undone": "Отменено", "Could not save to phone storage! Send results now.": "Не удалось сохранить в память телефона! Срочно отправьте результаты.", "m": "м", "The file is empty or damaged.": "Файл пустой или повреждён.", "This is a RESULTS file (from “Send”), not a journal. Journals come from your supervisor.": "Это файл РЕЗУЛЬТАТОВ (из «Отправить»), а не журнал. Журналы присылает руководитель.", "This is a BACKUP file. Use Settings → Restore from backup.": "Это РЕЗЕРВНАЯ КОПИЯ. Используйте Настройки → Восстановить из резервной копии.", "This is not an IKJ journal file.": "Это не файл журнала ИКЖ.", "The journal file is damaged (cable without mark or route).": "Файл журнала повреждён (кабель без марки или трассы).", "This journal is already on the phone.": "Этот журнал уже есть в телефоне.", "Journal info updated: {id}. Your marks are kept.": "Данные журнала обновлены: {id}. Отметки сохранены.", "<b>{id}</b> is already on this phone, but this file is a different version (the design was updated).<br><br>Update it? Your marks are kept where the trays are the same.": "<b>{id}</b> уже есть в телефоне, но этот файл — другая версия (изменилась РД).<br><br>Обновить? Отметки сохранятся там, где полки совпадают.", "Update journal": "Обновить журнал", "Journal updated. Routes changed for {n}.": "Журнал обновлён. Трасса изменилась: {n}.", "Loaded: {id} ({n})": "Загружен: {id} ({n})", "Cannot read this file — is it the .ikj.json journal?": "Не удаётся прочитать файл — это журнал .ikj.json?", "Loaded {a} of {b}. {e}": "Загружено {a} из {b}. {e}", "Loaded ✓ {list}": "Загружено ✓ {list}", "Loaded ✓ {n} journals": "Загружено журналов: {n} ✓", "App installed ✓": "Приложение установлено ✓", "✗ Not here: ": "✗ Нет здесь: ", "Mark cleared": "Отметка снята", "Note: ": "Примечание: ", "Note removed": "Примечание удалено", "Length: not confirmed": "Длина: не подтверждена", "Length confirmed: {n} m": "Длина подтверждена: {n} м", "Actual length {n} m (design {d} m)": "Длина по факту {n} м (по РД {d} м)", "Added tray deleted": "Добавленная полка удалена", "Copied from {no}: +{a}, ✓{c}. Check them!": "Скопировано с {no}: +{a}, ✓{c}. Проверьте!", "Length already confirmed": "Длина уже подтверждена", "Note saved": "Примечание сохранено", "Type tray code or part of it, e.g. 109": "Код полки или его часть, например 109", "No known tray matches.": "Таких полок нет в журналах.", "Use new code: ": "Новый код: ", "Use anyway: ": "Всё равно использовать: ", "Unusual format. A full code looks like 12.12URF10.109/3 — check before using.": "Необычный формат. Полный код выглядит так: 12.12URF10.109/3 — проверьте.", "Pick from the list — or type the full code (like 12.12URF10.109/3) to add a new one. Penetration: a letter instead of the shelf (…109/A) or at the end (…109/3A).": "Выберите из списка или наберите код целиком (например, 12.12URF10.109/3), чтобы добавить новый. Проходка: буква вместо полки (…109/A) или в конце (…109/3A).", "Cable route check — as-built journal": "Проверка трасс кабелей — ИКЖ", "Phone storage is not available in this browser. Your marks will be LOST when the app is closed. Send results often.": "Память телефона недоступна в этом браузере. Отметки ПРОПАДУТ при закрытии приложения. Отправляйте результаты чаще.", "Install app on this phone": "Установить приложение на телефон", "No journal on this phone yet.": "В телефоне пока нет журналов.", "1. Your supervisor sends you a journal file (name ends with <b>.ikj.json</b>).": "1. Руководитель присылает файл журнала (имя заканчивается на <b>.ikj.json</b>).", "2. In Telegram tap <b>⋮</b> on the file → <b>Save to Downloads</b>.": "2. В Telegram нажмите <b>⋮</b> у файла → <b>Сохранить в загрузки</b>.", "3. Tap <b>Load journal files</b> below and pick them in Downloads (you can select several at once).": "3. Нажмите <b>Загрузить журналы</b> ниже и выберите файлы в «Загрузках» (можно несколько сразу).", "Find cable No., mark or tray": "Номер кабеля, марка или полка", "Other": "Другое", "Load journal files": "Загрузить журналы", "All done": "Всё готово", "{a}/{b} trays checked · {c}/{d} cables done": "Проверено полок {a}/{b} · готово кабелей {c}/{d}", "<b>{n}</b> changes": "изменений: <b>{n}</b>", "Length: {d} m by design · confirmed {c}/{n} cables": "Длина по РД {d} м · подтверждена у {c}/{n} кабелей", "Not sent yet: {n}": "Не отправлено: {n}", "Last sent {t}": "Отправлено {t}", "Done": "Готов", "tray": "полка", "Nothing found for “{q}”.": "По запросу «{q}» ничего не найдено.", "{n} more cables — type more digits.": "Ещё кабелей: {n} — уточните номер.", "{n} changes": "изменений: {n}", "Length by design <b>{d} m</b> · confirmed <b>{c}/{n}</b> cables": "Длина по РД <b>{d} м</b> · подтверждена у <b>{c}/{n}</b> кабелей", " · actual <b>{f} m</b>": " · по факту <b>{f} м</b>", "By cable": "По кабелям", "By tray": "По полкам", "Cable No. or mark, e.g. 4.0012": "Номер или марка кабеля, напр. 4.0012", "Find tray, e.g. 109": "Найти полку, напр. 109", "Remove this journal from the phone": "Удалить этот журнал из телефона", "In progress": "В работе", "Not started": "Не начат", " · sheet ": " · лист ", "From": "Откуда", "To": "Куда", "{a}/{b} trays checked": "проверено полок {a}/{b}", "Route in-situ": "Трасса по месту", "No trays in design route": "В РД нет полок", "+{n} added": "+{n} добавлено", "{n} changed": "изменено {n}", "sheets": "листы", "No cable matches “{q}”.": "Нет кабеля «{q}».", "Checked": "Проверена", "{n} by design · {c} checked": "{n} по РД · проверено {c}", "Not in design": "Нет в РД", "{n} not here/moved": "нет/перенесено {n}", "{n} found here": "найдено здесь {n}", "+{n} in {j}": "+{n} в {j}", "No tray matches “{q}”.": "Нет полки «{q}».", "‹ first": "‹ первый", "last ›": "последний ›", "No.": "№", "sh.": "л.", "Design:": "По РД:", "To be routed in-situ (no trays in design) — add the actual trays": "Прокладка по месту (в РД полок нет) — добавьте фактические полки", "After the listed trays: further to be routed in-situ — add the actual trays": "После перечисленных полок — далее по месту: добавьте фактические полки", "Type": "Тип", "Protection": "Защита", "<b>black</b> = as designed": "<b>чёрный</b> = по проекту", "<s><b>red</b></s> = design tray not used": "<s><b>красный</b></s> = проектная полка не использована", "<b>blue</b> = actual tray": "<b>синий</b> = фактическая полка", "Walk along the route. Tap <b class=\"okc\">✓</b> if the cable is on that tray. Tap the tray code for other options.": "Идите вдоль трассы. Нажмите <b class=\"okc\">✓</b>, если кабель на этой полке. Нажмите на код полки — другие варианты.", "＋ Add a tray at the start": "＋ Добавить полку в начало", "The design gives no tray route for this cable. If it runs on trays, add them.": "В РД нет трассы по полкам для этого кабеля. Если он идёт по лоткам — добавьте полки.", "＋ Add a tray (actual route)": "＋ Добавить полку (фактическая трасса)", "＋ Add a tray at the end (route continues)": "＋ Добавить полку в конец (трасса продолжается)", "⧉ Copy route from another cable…": "⧉ Скопировать трассу с другого кабеля…", "Note on this cable": "Примечание к кабелю", "Anything unusual on this cable": "Всё необычное по этому кабелю", "Photos": "Фото", "📷 Add photo": "📷 Добавить фото", "✓ Cable done (tap to reopen)": "✓ Кабель готов (нажмите, чтобы открыть снова)", "Mark cable as done": "Кабель готов", "not confirmed": "не подтверждена", "Length": "Длина", "design": "по РД", "actual": "по факту", "✓ {n} m as design": "✓ {n} м как по РД", "Actual {n} m…": "По факту {n} м…", "Other length…": "Другая длина…", "added in the field · tap to edit": "добавлена на месте · нажмите, чтобы изменить", "not checked": "не проверена", "✓ cable is here": "✓ кабель здесь", "actual tray differs": "фактическая полка другая", "✗ cable is not here": "✗ кабеля здесь нет", "No photos": "Нет фото", "✓ here": "✓ здесь", "✗ not here": "✗ нет", "actually on {c}": "на самом деле: {c}", "✓ Here": "✓ Здесь", "✗ Not here": "✗ Нет здесь", "Other…": "Другое…", "added here": "добавлен сюда", "moved here from ": "перенесён сюда с ", "Edit…": "Изменить…", "not in design": "нет в РД", "Stand at this tray. For each cable: is it here?": "Встаньте у этой полки. По каждому кабелю: он здесь?", " Cables of all loaded journals are shown.": " Показаны кабели всех загруженных журналов.", "No cable runs on this tray by design.": "По РД по этой полке кабели не идут.", "{n} by design": "{n} по РД", "Found here in the field": "Найдены здесь на месте", "＋ A cable is here that is not listed": "＋ Здесь есть кабель не из списка", "<b>NOT available</b> — marks are lost when the app closes": "<b>НЕДОСТУПНА</b> — отметки пропадут при закрытии приложения", "<b>protected</b> on this phone": "<b>защищена</b> в этом телефоне", "on this phone (install the app so the phone does not clean it up)": "в этом телефоне (установите приложение, чтобы телефон её не очистил)", "Your name (goes into the results file)": "Ваше имя (попадает в файл результатов)", "Name and surname": "Имя и фамилия", "Storage: ": "Память: ", "Backup all data to a file": "Резервная копия всех данных в файл", "Restore from a backup file": "Восстановить из резервной копии", "IKJ Field {v}. Works without internet. Your marks stay only on this phone until you send them.": "IKJ Field {v}. Работает без интернета. Отметки хранятся только в этом телефоне, пока вы их не отправите.", "Journals": "Журналы", "{a}/{b} trays · {c}/{d} cables done": "полок {a}/{b} · готово кабелей {c}/{d}", "{n} not sent": "не отправлено {n}", "First screen (search all)": "Главный экран (поиск по всем)", "{j} — cables": "{j} — кабели", "Cable No. or mark": "Номер или марка кабеля", "No match.": "Не найдено.", "Other journal…": "Другой журнал…", " · tray added in the field": " · полка добавлена на месте", " · design tray": " · полка по РД", "✓ Cable is here": "✓ Кабель здесь", "Same tray, other shelf:": "Тот же лоток, другая полка:", "Same tray, cable is on shelf:": "Тот же лоток, кабель на полке:", "no shelf": "без полки", "Penetration letter A–Z…": "Буква проходки A–Z…", "Change to another tray…": "Заменить на другую полку…", "Cable is on another tray…": "Кабель на другом лотке…", "＋ Add a tray after this one…": "＋ Добавить полку после этой…", "Note for this tray": "Примечание к полке", "Delete this added tray": "Удалить добавленную полку", "↺ Clear mark (not checked)": "↺ Снять отметку (не проверена)", "Change tray": "Заменить полку", "Where is the cable actually?": "Где кабель на самом деле?", " · instead of ": " · вместо ", "Add a tray after {c}": "Добавить полку после {c}", "in a box": "в коробе", "in metal hose": "в металлорукаве", "in a pipe": "в трубе", " along the tray": " вдоль полки", " along this tray": " вдоль этой полки", "Other text…": "Свой текст…", "Remove note": "Удалить примечание", "Note for {c}": "Примечание к {c}", "e.g. runs in a box under the tray": "например, идёт в коробе под полкой", "Save note": "Сохранить", "Not on": "Нет на", "Does the cable run along this tray in a box, metal hose or pipe? (optional)": "Кабель идёт вдоль этой полки в коробе, металлорукаве или трубе? (необязательно)", "No — skip": "Нет — пропустить", "Penetration letter": "Буква проходки", "Now: ": "Сейчас: ", "Instead of shelf": "Вместо полки", "At the end": "В конце", "Actual length": "Длина по факту", "Design length: ": "Длина по РД: ", "metres, e.g. {n}": "метры, например {n}", "Save length": "Сохранить длину", "Not confirmed (clear)": "Не подтверждена (очистить)", "Enter the length in metres, e.g. 32 or 31.5": "Введите длину в метрах, например 32 или 31,5", "Add a tray at the start": "Добавить полку в начало", "Add a tray at the end": "Добавить полку в конец", "Which journal is the cable from?": "Из какого журнала кабель?", "Which cable is here?": "Какой кабель здесь?", " · tray ": " · полка ", "No cable matches.": "Кабель не найден.", "Where in the route of {m}?": "Где в трассе {m}?", "Tray {c} goes after…": "Полка {c} идёт после…", "At the very start": "В самом начале", "after": "после", "Copy route from another cable": "Скопировать трассу с другого кабеля", "to {c}. Only trays already marked on the other cable are copied.": "на {c}. Копируются только полки, уже отмеченные на другом кабеле.", "No cable has marked trays yet. Mark the route of one cable first, then copy it to its neighbours.": "Ни у одного кабеля ещё нет отметок. Сначала отметьте трассу одного кабеля, потом копируйте её на соседние.", "Copy from {c}?": "Скопировать с {c}?", "Route of that cable ({n}):": "Трасса этого кабеля ({n}):", "To {c}:": "На {c}:", "✓ confirm design trays: ": "✓ подтвердить полки по РД: ", "＋ add at the end: ": "＋ добавить в конец: ", "nothing new — the route already contains these trays": "ничего нового — эти полки уже есть в трассе", "Check the result and correct what differs.": "Проверьте результат и исправьте отличия.", "Copy": "Скопировать", "‹ Choose another cable": "‹ Выбрать другой кабель", "Send results": "Отправка результатов", "Each journal is a separate file.": "Каждый журнал — отдельный файл.", "sent {t}": "отправлено {t}", "nothing new": "нет нового", "Your name": "Ваше имя", "Continue": "Продолжить", "Trays checked: ": "Проверено полок: ", "Cables done: ": "Готово кабелей: ", "Changes: ": "Изменений: ", "Photos: ": "Фото: ", "Inspector: ": "Электрик: ", "change": "изменить", "Last sent ": "Последняя отправка ", "The file contains <b>all</b> your work on this journal so far. Send it to your supervisor. No signal? Telegram will send it when the signal is back.": "В файле <b>вся</b> ваша работа по этому журналу. Отправьте его руководителю. Нет связи — Telegram отправит, когда связь появится.", "Include photos": "Приложить фото", "Send…": "Отправить…", "Save the file on this phone": "Сохранить файл в телефоне", "Save": "Сохранить", "Could not build the file: ": "Не удалось собрать файл: ", "Not sent": "Не отправлено", "Sent ✓": "Отправлено ✓", "Saved to Downloads: {n}": "Сохранено в «Загрузки»: {n}", "Backup not sent": "Копия не отправлена", "Backup sent ✓": "Копия отправлена ✓", "Backup saved to Downloads": "Копия сохранена в «Загрузки»", "Backup failed: ": "Ошибка резервной копии: ", "Cannot read this file.": "Не удаётся прочитать файл.", "This is not an IKJ backup file.": "Это не резервная копия IKJ.", "Restore <b>{n}</b> from the backup of {t}?<br><br>Data of the same journals on this phone will be <b>replaced</b>.": "Восстановить <b>{n}</b> из копии от {t}?<br><br>Данные этих журналов в телефоне будут <b>заменены</b>.", "Restore": "Восстановить", "Restored ✓": "Восстановлено ✓", "Restore failed: ": "Ошибка восстановления: ", "Photo added": "Фото добавлено", "Photo failed: ": "Ошибка фото: ", "Photo deleted": "Фото удалено", "Delete photo": "Удалить фото", "Cable reopened": "Кабель снова открыт", "<b>{n}</b> not checked yet": "не проверено: <b>{n}</b>", "<b>length not confirmed</b>": "<b>длина не подтверждена</b>", "This cable:<br>{w}.<br><br>Mark the cable as done anyway?": "У этого кабеля:<br>{w}.<br><br>Всё равно отметить кабель готовым?", "Mark done anyway": "Всё равно готов", "Go back": "Вернуться", "Cable marked as done": "Кабель отмечен готовым", "Remove <b>{j}</b> and all your marks for it from this phone?": "Удалить <b>{j}</b> и все отметки по нему из телефона?", "{n} not sent yet!": "Не отправлено: {n}!", "Remove": "Удалить", "Journal removed": "Журнал удалён",
+const RU = { "Offline": "Нет сети",
+  "to {c}. The whole cable line is copied: trays with all marks, added trays, notes, length and tags.": "на {c}. Копируется вся кабельная линия: полки со всеми отметками, добавленные полки, примечания, длина и бирки.",
+  "length / tags only": "только длина / бирки",
+  "Cable line of {c}:": "Кабельная линия {c}:",
+  "moved {n}": "перенесено {n}",
+  "not checked {n}": "не проверено {n}",
+  "Length: {v}": "Длина: {v}",
+  " (as design)": " (как по РД)",
+  "Length is not copied: the design length differs — confirm it separately.": "Длина не копируется: по РД у кабелей разная длина — подтвердите её отдельно.",
+  "Cable tags are not copied: they differ by segment.": "Бирки не копируются: на отрезках они разные.",
+  "Cable note: {t}": "Примечание к кабелю: {t}",
+  "That cable is routed from the other end: its trays are taken in reverse order.": "Тот кабель проложен с другого конца: его полки взяты в обратном порядке.",
+  "The route marks of this cable will be replaced. Undo is possible.": "Отметки трассы этого кабеля будут заменены. Можно отменить.",
+  "Photos and the status «handed over» are not copied. Check the result and correct what differs.": "Фото и статус «Сдан» не копируются. Проверьте результат и исправьте отличия.",
+  "Copied from {c}: ✓{ok} →{chg} ✗{no} +{add}. Check it!": "Скопировано с {c}: ✓{ok} →{chg} ✗{no} +{add}. Проверьте!",
+  "＋ Add a tray before this one…": "＋ Добавить полку перед этой…",
+  "Add a tray before {c}": "Добавить полку перед {c}",
+  "Choose the place for tray {c}": "Выберите место для полки {c}",
+  "Segment {n}": "Отрезок {n}",
+  "At the start of segment {n}": "В начале отрезка {n}", "Working…": "Подождите…", "A new version of the app is ready.": "Готова новая версия приложения.", "Update": "Обновить", "Send": "Отправить", "Settings": "Настройки", "How to use": "Инструкция", "Language": "Язык", "Something went wrong: ": "Ошибка: ", "Home": "На главную", "Cancel": "Отмена", "Close": "Закрыть", "Saved": "Сохранено", "Undo": "Отменить", "Undone": "Отменено", "Could not save to phone storage! Send results now.": "Не удалось сохранить в память телефона! Срочно отправьте результаты.", "m": "м", "The file is empty or damaged.": "Файл пустой или повреждён.", "This is a RESULTS file (from “Send”), not a journal. Journals come from your supervisor.": "Это файл РЕЗУЛЬТАТОВ (из «Отправить»), а не журнал. Журналы присылает руководитель.", "This is a BACKUP file. Use Settings → Restore from backup.": "Это РЕЗЕРВНАЯ КОПИЯ. Используйте Настройки → Восстановить из резервной копии.", "This is not an IKJ journal file.": "Это не файл журнала ИКЖ.", "The journal file is damaged (cable without mark or route).": "Файл журнала повреждён (кабель без марки или трассы).", "This journal is already on the phone.": "Этот журнал уже есть в телефоне.", "Journal info updated: {id}. Your marks are kept.": "Данные журнала обновлены: {id}. Отметки сохранены.", "<b>{id}</b> is already on this phone, but this file is a different version (the design was updated).<br><br>Update it? Your marks are kept where the trays are the same.": "<b>{id}</b> уже есть в телефоне, но этот файл — другая версия (изменилась РД).<br><br>Обновить? Отметки сохранятся там, где полки совпадают.", "Update journal": "Обновить журнал", "Journal updated. Routes changed for {n}.": "Журнал обновлён. Трасса изменилась: {n}.", "Loaded: {id} ({n})": "Загружен: {id} ({n})", "Cannot read this file — is it the .ikj.json journal?": "Не удаётся прочитать файл — это журнал .ikj.json?", "Loaded {a} of {b}. {e}": "Загружено {a} из {b}. {e}", "Loaded ✓ {list}": "Загружено ✓ {list}", "Loaded ✓ {n} journals": "Загружено журналов: {n} ✓", "App installed ✓": "Приложение установлено ✓", "✗ Not here: ": "✗ Нет здесь: ", "Mark cleared": "Отметка снята", "Note: ": "Примечание: ", "Note removed": "Примечание удалено", "Length: not confirmed": "Длина: не подтверждена", "Length confirmed: {n} m": "Длина подтверждена: {n} м", "Actual length {n} m (design {d} m)": "Длина по факту {n} м (по РД {d} м)", "Added tray deleted": "Добавленная полка удалена", "Copied from {no}: +{a}, ✓{c}. Check them!": "Скопировано с {no}: +{a}, ✓{c}. Проверьте!", "Length already confirmed": "Длина уже подтверждена", "Note saved": "Примечание сохранено", "Type tray code or part of it, e.g. 109": "Код полки или его часть, например 109", "No known tray matches.": "Таких полок нет в журналах.", "Use new code: ": "Новый код: ", "Use anyway: ": "Всё равно использовать: ", "Unusual format. A full code looks like 12.12URF10.109/3 — check before using.": "Необычный формат. Полный код выглядит так: 12.12URF10.109/3 — проверьте.", "Pick from the list — or type the full code (like 12.12URF10.109/3) to add a new one. Penetration: a letter instead of the shelf (…109/A) or at the end (…109/3A).": "Выберите из списка или наберите код целиком (например, 12.12URF10.109/3), чтобы добавить новый. Проходка: буква вместо полки (…109/A) или в конце (…109/3A).", "Cable route check — as-built journal": "Проверка трасс кабелей — ИКЖ", "Phone storage is not available in this browser. Your marks will be LOST when the app is closed. Send results often.": "Память телефона недоступна в этом браузере. Отметки ПРОПАДУТ при закрытии приложения. Отправляйте результаты чаще.", "Install app on this phone": "Установить приложение на телефон", "No journal on this phone yet.": "В телефоне пока нет журналов.", "1. Your supervisor sends you a journal file (name ends with <b>.ikj.json</b>).": "1. Руководитель присылает файл журнала (имя заканчивается на <b>.ikj.json</b>).", "2. In Telegram tap <b>⋮</b> on the file → <b>Save to Downloads</b>.": "2. В Telegram нажмите <b>⋮</b> у файла → <b>Сохранить в загрузки</b>.", "3. Tap <b>Load journal files</b> below and pick them in Downloads (you can select several at once).": "3. Нажмите <b>Загрузить журналы</b> ниже и выберите файлы в «Загрузках» (можно несколько сразу).", "Find cable No., mark or tray": "Номер кабеля, марка или полка", "Other": "Другое", "Load journal files": "Загрузить журналы", "All done": "Всё готово", "{a}/{b} trays checked · {c}/{d} cables done": "Проверено полок {a}/{b} · готово кабелей {c}/{d}", "<b>{n}</b> changes": "изменений: <b>{n}</b>", "Length: {d} m by design · confirmed {c}/{n} cables": "Длина по РД {d} м · подтверждена у {c}/{n} кабелей", "Not sent yet: {n}": "Не отправлено: {n}", "Last sent {t}": "Отправлено {t}", "Done": "Готов", "tray": "полка", "Nothing found for “{q}”.": "По запросу «{q}» ничего не найдено.", "{n} more cables — type more digits.": "Ещё кабелей: {n} — уточните номер.", "{n} changes": "изменений: {n}", "Length by design <b>{d} m</b> · confirmed <b>{c}/{n}</b> cables": "Длина по РД <b>{d} м</b> · подтверждена у <b>{c}/{n}</b> кабелей", " · actual <b>{f} m</b>": " · по факту <b>{f} м</b>", "By cable": "По кабелям", "By tray": "По полкам", "Cable No. or mark, e.g. 4.0012": "Номер или марка кабеля, напр. 4.0012", "Find tray, e.g. 109": "Найти полку, напр. 109", "Remove this journal from the phone": "Удалить этот журнал из телефона", "In progress": "В работе", "Not started": "Не начат", " · sheet ": " · лист ", "From": "Откуда", "To": "Куда", "{a}/{b} trays checked": "проверено полок {a}/{b}", "Route in-situ": "Трасса по месту", "No trays in design route": "В РД нет полок", "+{n} added": "+{n} добавлено", "{n} changed": "изменено {n}", "sheets": "листы", "No cable matches “{q}”.": "Нет кабеля «{q}».", "Checked": "Проверена", "{n} by design · {c} checked": "{n} по РД · проверено {c}", "Not in design": "Нет в РД", "{n} not here/moved": "нет/перенесено {n}", "{n} found here": "найдено здесь {n}", "+{n} in {j}": "+{n} в {j}", "No tray matches “{q}”.": "Нет полки «{q}».", "‹ first": "‹ первый", "last ›": "последний ›", "No.": "№", "sh.": "л.", "Design:": "По РД:", "To be routed in-situ (no trays in design) — add the actual trays": "Прокладка по месту (в РД полок нет) — добавьте фактические полки", "After the listed trays: further to be routed in-situ — add the actual trays": "После перечисленных полок — далее по месту: добавьте фактические полки", "Type": "Тип", "Protection": "Защита", "<b>black</b> = as designed": "<b>чёрный</b> = по проекту", "<s><b>red</b></s> = design tray not used": "<s><b>красный</b></s> = проектная полка не использована", "<b>blue</b> = actual tray": "<b>синий</b> = фактическая полка", "Walk along the route. Tap <b class=\"okc\">✓</b> if the cable is on that tray. Tap the tray code for other options.": "Идите вдоль трассы. Нажмите <b class=\"okc\">✓</b>, если кабель на этой полке. Нажмите на код полки — другие варианты.", "＋ Add a tray at the start": "＋ Добавить полку в начало", "The design gives no tray route for this cable. If it runs on trays, add them.": "В РД нет трассы по полкам для этого кабеля. Если он идёт по лоткам — добавьте полки.", "＋ Add a tray (actual route)": "＋ Добавить полку (фактическая трасса)", "＋ Add a tray at the end (route continues)": "＋ Добавить полку в конец (трасса продолжается)", "⧉ Copy route from another cable…": "⧉ Скопировать трассу с другого кабеля…", "Note on this cable": "Примечание к кабелю", "Anything unusual on this cable": "Всё необычное по этому кабелю", "Photos": "Фото", "📷 Add photo": "📷 Добавить фото", "✓ Cable done (tap to reopen)": "✓ Кабель готов (нажмите, чтобы открыть снова)", "Mark cable as done": "Кабель готов", "not confirmed": "не подтверждена", "Length": "Длина", "design": "по РД", "actual": "по факту", "✓ {n} m as design": "✓ {n} м как по РД", "Actual {n} m…": "По факту {n} м…", "Other length…": "Другая длина…", "added in the field · tap to edit": "добавлена на месте · нажмите, чтобы изменить", "not checked": "не проверена", "✓ cable is here": "✓ кабель здесь", "actual tray differs": "фактическая полка другая", "✗ cable is not here": "✗ кабеля здесь нет", "No photos": "Нет фото", "✓ here": "✓ здесь", "✗ not here": "✗ нет", "actually on {c}": "на самом деле: {c}", "✓ Here": "✓ Здесь", "✗ Not here": "✗ Нет здесь", "Other…": "Другое…", "added here": "добавлен сюда", "moved here from ": "перенесён сюда с ", "Edit…": "Изменить…", "not in design": "нет в РД", "Stand at this tray. For each cable: is it here?": "Встаньте у этой полки. По каждому кабелю: он здесь?", " Cables of all loaded journals are shown.": " Показаны кабели всех загруженных журналов.", "No cable runs on this tray by design.": "По РД по этой полке кабели не идут.", "{n} by design": "{n} по РД", "Found here in the field": "Найдены здесь на месте", "＋ A cable is here that is not listed": "＋ Здесь есть кабель не из списка", "<b>NOT available</b> — marks are lost when the app closes": "<b>НЕДОСТУПНА</b> — отметки пропадут при закрытии приложения", "<b>protected</b> on this phone": "<b>защищена</b> в этом телефоне", "on this phone (install the app so the phone does not clean it up)": "в этом телефоне (установите приложение, чтобы телефон её не очистил)", "Your name (goes into the results file)": "Ваше имя (попадает в файл результатов)", "Name and surname": "Имя и фамилия", "Storage: ": "Память: ", "Backup all data to a file": "Резервная копия всех данных в файл", "Restore from a backup file": "Восстановить из резервной копии", "IKJ Field {v}. Works without internet. Your marks stay only on this phone until you send them.": "IKJ Field {v}. Работает без интернета. Отметки хранятся только в этом телефоне, пока вы их не отправите.", "Journals": "Журналы", "{a}/{b} trays · {c}/{d} cables done": "полок {a}/{b} · готово кабелей {c}/{d}", "{n} not sent": "не отправлено {n}", "First screen (search all)": "Главный экран (поиск по всем)", "{j} — cables": "{j} — кабели", "Cable No. or mark": "Номер или марка кабеля", "No match.": "Не найдено.", "Other journal…": "Другой журнал…", " · tray added in the field": " · полка добавлена на месте", " · design tray": " · полка по РД", "✓ Cable is here": "✓ Кабель здесь", "Same tray, other shelf:": "Тот же лоток, другая полка:", "Same tray, cable is on shelf:": "Тот же лоток, кабель на полке:", "no shelf": "без полки", "Penetration letter A–Z…": "Буква проходки A–Z…", "Change to another tray…": "Заменить на другую полку…", "Cable is on another tray…": "Кабель на другом лотке…", "＋ Add a tray after this one…": "＋ Добавить полку после этой…", "Note for this tray": "Примечание к полке", "Delete this added tray": "Удалить добавленную полку", "↺ Clear mark (not checked)": "↺ Снять отметку (не проверена)", "Change tray": "Заменить полку", "Where is the cable actually?": "Где кабель на самом деле?", " · instead of ": " · вместо ", "Add a tray after {c}": "Добавить полку после {c}", "in a box": "в коробе", "in metal hose": "в металлорукаве", "in a pipe": "в трубе", " along the tray": " вдоль полки", " along this tray": " вдоль этой полки", "Other text…": "Свой текст…", "Remove note": "Удалить примечание", "Note for {c}": "Примечание к {c}", "e.g. runs in a box under the tray": "например, идёт в коробе под полкой", "Save note": "Сохранить", "Not on": "Нет на", "Does the cable run along this tray in a box, metal hose or pipe? (optional)": "Кабель идёт вдоль этой полки в коробе, металлорукаве или трубе? (необязательно)", "No — skip": "Нет — пропустить", "Penetration letter": "Буква проходки", "Now: ": "Сейчас: ", "Instead of shelf": "Вместо полки", "At the end": "В конце", "Actual length": "Длина по факту", "Design length: ": "Длина по РД: ", "metres, e.g. {n}": "метры, например {n}", "Save length": "Сохранить длину", "Not confirmed (clear)": "Не подтверждена (очистить)", "Enter the length in metres, e.g. 32 or 31.5": "Введите длину в метрах, например 32 или 31,5", "Add a tray at the start": "Добавить полку в начало", "Add a tray at the end": "Добавить полку в конец", "Which journal is the cable from?": "Из какого журнала кабель?", "Which cable is here?": "Какой кабель здесь?", " · tray ": " · полка ", "No cable matches.": "Кабель не найден.", "Where in the route of {m}?": "Где в трассе {m}?", "Tray {c} goes after…": "Полка {c} идёт после…", "At the very start": "В самом начале", "after": "после", "Copy route from another cable": "Скопировать трассу с другого кабеля", "to {c}. Only trays already marked on the other cable are copied.": "на {c}. Копируются только полки, уже отмеченные на другом кабеле.", "No cable has marked trays yet. Mark the route of one cable first, then copy it to its neighbours.": "Ни у одного кабеля ещё нет отметок. Сначала отметьте трассу одного кабеля, потом копируйте её на соседние.", "Copy from {c}?": "Скопировать с {c}?", "Route of that cable ({n}):": "Трасса этого кабеля ({n}):", "To {c}:": "На {c}:", "✓ confirm design trays: ": "✓ подтвердить полки по РД: ", "＋ add at the end: ": "＋ добавить в конец: ", "nothing new — the route already contains these trays": "ничего нового — эти полки уже есть в трассе", "Check the result and correct what differs.": "Проверьте результат и исправьте отличия.", "Copy": "Скопировать", "‹ Choose another cable": "‹ Выбрать другой кабель", "Send results": "Отправка результатов", "Each journal is a separate file.": "Каждый журнал — отдельный файл.", "sent {t}": "отправлено {t}", "nothing new": "нет нового", "Your name": "Ваше имя", "Continue": "Продолжить", "Trays checked: ": "Проверено полок: ", "Cables done: ": "Готово кабелей: ", "Changes: ": "Изменений: ", "Photos: ": "Фото: ", "Inspector: ": "Электрик: ", "change": "изменить", "Last sent ": "Последняя отправка ", "The file contains <b>all</b> your work on this journal so far. Send it to your supervisor. No signal? Telegram will send it when the signal is back.": "В файле <b>вся</b> ваша работа по этому журналу. Отправьте его руководителю. Нет связи — Telegram отправит, когда связь появится.", "Include photos": "Приложить фото", "Send…": "Отправить…", "Save the file on this phone": "Сохранить файл в телефоне", "Save": "Сохранить", "Could not build the file: ": "Не удалось собрать файл: ", "Not sent": "Не отправлено", "Sent ✓": "Отправлено ✓", "Saved to Downloads: {n}": "Сохранено в «Загрузки»: {n}", "Backup not sent": "Копия не отправлена", "Backup sent ✓": "Копия отправлена ✓", "Backup saved to Downloads": "Копия сохранена в «Загрузки»", "Backup failed: ": "Ошибка резервной копии: ", "Cannot read this file.": "Не удаётся прочитать файл.", "This is not an IKJ backup file.": "Это не резервная копия IKJ.", "Restore <b>{n}</b> from the backup of {t}?<br><br>Data of the same journals on this phone will be <b>replaced</b>.": "Восстановить <b>{n}</b> из копии от {t}?<br><br>Данные этих журналов в телефоне будут <b>заменены</b>.", "Restore": "Восстановить", "Restored ✓": "Восстановлено ✓", "Restore failed: ": "Ошибка восстановления: ", "Photo added": "Фото добавлено", "Photo failed: ": "Ошибка фото: ", "Photo deleted": "Фото удалено", "Delete photo": "Удалить фото", "Cable reopened": "Кабель снова открыт", "<b>{n}</b> not checked yet": "не проверено: <b>{n}</b>", "<b>length not confirmed</b>": "<b>длина не подтверждена</b>", "This cable:<br>{w}.<br><br>Mark the cable as done anyway?": "У этого кабеля:<br>{w}.<br><br>Всё равно отметить кабель готовым?", "Mark done anyway": "Всё равно готов", "Go back": "Вернуться", "Cable marked as done": "Кабель отмечен готовым", "Remove <b>{j}</b> and all your marks for it from this phone?": "Удалить <b>{j}</b> и все отметки по нему из телефона?", "{n} not sent yet!": "Не отправлено: {n}!", "Remove": "Удалить", "Journal removed": "Журнал удалён",
   "This cable is handed over — changes are closed. To change it: «Return to work…» at the bottom of the cable card.": "Кабель сдан — изменения закрыты. Чтобы изменить: «Вернуть в работу…» внизу карточки кабеля.",
   "{a}/{b} trays checked · {c}/{d} cables handed over": "Проверено полок {a}/{b} · сдано кабелей {c}/{d}",
   "{a}/{b} trays · {c}/{d} handed over": "полок {a}/{b} · сдано {c}/{d}",
@@ -449,23 +471,42 @@ function mergeResult(old, j) {
     Object.assign(nc, {finished: oc.finished, closed: !!oc.closed, closedAt: oc.closedAt || null, reopenedAt: oc.reopenedAt || null,
       factLength: oc.factLength, note: oc.note, photos: oc.photos || [], updated: oc.updated, segs: oc.segs || []});
     if (JSON.stringify(designItems(oc.entries)) === JSON.stringify(c.route || [])) { nc.entries = oc.entries; ensureSegs(c, nc); continue; }
-    /* design changed: keep marks where the trays are the same (an expanded range = one group of entries) */
-    const pool = new Map(), addsAfter = new Map(); let anchor = '', group = null, gkey = null;
+    /* design changed: keep marks where the trays are the same (an expanded range = one group of entries).
+       A tray added in the field stays next to its neighbour design tray that is still in the route: after the tray
+       before it — or before the tray after it, when it was the first tray of its segment (of the route) or when the
+       tray before it is gone. Its segment: as the neighbour's, or the old one when it sat in a segment of its own. */
+    const sameSegs = (oc.segs || []).length === nSegs(c);
+    const pool = new Map(), adds = []; let prev = null, group = null, gkey = null, open = [];
     for (const e of oc.entries) {
-      delete e.sg;
-      if (e.seg === null) { if (!addsAfter.has(anchor)) addsAfter.set(anchor, []); addsAfter.get(anchor).push(e); continue; }
+      const osg = e.sg; delete e.sg;
+      if (e.seg === null) { const a = {e, osg, prev, next: null}; adds.push(a); open.push(a); continue; }
       const key = e.rg || e.seg;
       if (e.rg && group && gkey === key) { group.push(e); continue; }
-      group = [e]; gkey = key; if (!pool.has(key)) pool.set(key, []); pool.get(key).push(group); anchor = key;
+      group = [e]; gkey = key; if (!pool.has(key)) pool.set(key, []); pool.get(key).push(group);
+      prev = {group, osg}; open.forEach(a => { a.next = prev; }); open = [];
     }
-    const out = []; (addsAfter.get('') || []).forEach(e => out.push(e)); addsAfter.delete('');
+    const used = new Set(), left = new Map([...pool].map(([key, l]) => [key, l.slice()]));
+    for (const seg of (c.route || [])) { const l = left.get(seg); if (l && l.length) used.add(l.shift()); }
+    const before = new Map(), after = new Map(), lead = [], tail = [];
+    const put = (m, g, a) => { if (!m.has(g)) m.set(g, []); m.get(g).push(a); };
+    for (const a of adds) {
+      const p = !!a.prev && used.has(a.prev.group), nx = !!a.next && used.has(a.next.group);
+      const first = !a.prev || a.osg !== a.prev.osg;
+      if (nx && (first || !p)) { put(before, a.next.group, a); a.pol = a.osg === a.next.osg ? 'next' : 'keep'; }
+      else if (p) { put(after, a.prev.group, a); a.pol = a.osg === a.prev.osg ? 'last' : 'keep'; }
+      else { (a.prev ? tail : lead).push(a); a.pol = 'keep'; }
+    }
+    const out = lead.map(a => a.e);
     for (const seg of (c.route || [])) {
-      const lst = pool.get(seg); const prev = lst && lst.length ? lst.shift() : null;
-      if (prev) prev.forEach(e => out.push(e)); else out.push({k: uid(), seg, st: ST.U, t: null});
-      if (addsAfter.has(seg)) { addsAfter.get(seg).forEach(e => out.push(e)); addsAfter.delete(seg); }
+      const lst = pool.get(seg), g = lst && lst.length ? lst.shift() : null;
+      if (!g) { out.push({k: uid(), seg, st: ST.U, t: null}); continue; }
+      (before.get(g) || []).forEach(a => out.push(a.e)); g.forEach(e => out.push(e)); (after.get(g) || []).forEach(a => out.push(a.e));
     }
-    for (const lst of addsAfter.values()) lst.forEach(e => out.push(e));
-    nc.entries = out; ensureSegs(c, nc); changed.push(c.mark);
+    tail.forEach(a => out.push(a.e));
+    adds.forEach(a => { if (a.pol === 'keep' && sameSegs && typeof a.osg === 'number') a.e.sg = a.osg; });
+    nc.entries = out; ensureSegs(c, nc);
+    adds.forEach(a => { if (a.pol === 'next') a.e.sg = a.next.group[0].sg; });
+    changed.push(c.mark);
   }
   const orphans = Object.assign({}, old.orphans || {});
   for (const m in old.cables) if (!j.cables.some(c => c.mark === m)) orphans[m] = old.cables[m];
@@ -1499,6 +1540,21 @@ function insertAt(jid, mark, afterK, code, sg) {
   else { const i = E.findIndex(e => e.k === afterK); ne.sg = sg ?? (i >= 0 ? E[i].sg : 0); E.splice(i < 0 ? E.length : i + 1, 0, ne); }
   commit(jid, mark, '+ ' + code, snap); return ne.k;
 }
+/* a tray added in the field right BEFORE entry k (the route starts earlier than in the design, or an extra tray between
+   two design trays): it belongs to the segment of entry k */
+function insertBefore(jid, mark, beforeK, code) {
+  const snap = snapshotCable(jid, mark); const E = S.results[jid].cables[mark].entries, i = E.findIndex(e => e.k === beforeK);
+  const ne = {k: uid(), seg: null, st: ST.ADD, fact: code, t: nowIso(), sg: i >= 0 ? E[i].sg : (E[0] ? E[0].sg : 0)};
+  E.splice(i < 0 ? 0 : i, 0, ne);
+  commit(jid, mark, '+ ' + code, snap); return ne.k;
+}
+/* a tray at the start of segment i (before its first tray; in an empty segment — its only tray) */
+function insertAtSegStart(jid, mark, i, code) {
+  const snap = snapshotCable(jid, mark); const E = S.results[jid].cables[mark].entries, p = E.findIndex(e => e.sg >= i);
+  const ne = {k: uid(), seg: null, st: ST.ADD, fact: code, t: nowIso(), sg: i};
+  E.splice(p < 0 ? E.length : p, 0, ne);
+  commit(jid, mark, '+ ' + code, snap); return ne.k;
+}
 /* add a tray at the end of segment i (also when the segment has no trays yet) */
 async function addInSeg(jid, mark, i) {
   const c = S.idx[jid].byMark.get(mark), sd = segsOf(c);
@@ -1508,21 +1564,123 @@ async function addInSeg(jid, mark, i) {
   for (const e of E) { if (e.sg <= i) after = e.k; else break; }
   insertAt(jid, mark, after, code, i); render();
 }
-function planCopy(jid, mark, sj, sm) {
-  const rc = S.results[jid].cables[mark], src = actualRoute(S.results[sj].cables[sm]);
-  const srcSet = new Set(src), have = new Set(actualRoute(rc)), confirm = [], add = [];
-  for (const e of rc.entries) if (e.seg !== null && e.st === ST.U && srcSet.has(e.seg)) { confirm.push(e.seg); have.add(e.seg); }
-  for (const code of src) if (!have.has(code)) { add.push(code); have.add(code); }
-  return {src, confirm, add};
+/* copy a cable line (1.7.2: the full image). The route of the other cable with all its marks — ✓, another shelf / tray /
+   penetration letter, ✗ not here, tray notes, split ranges, segments — and the trays added in the field in their places.
+   This cable's route marks are replaced; its design trays that the other cable does not have stay «not checked»; the
+   other cable's design trays that this one does not have: ✓ / another tray -> added here, ✗ / not checked -> left out.
+   A cable routed from the other end (matching trays in reverse order) is taken in reverse. Length: as design -> this
+   cable's design length, a measured one only when both have the same design length; cable tags and the cable note —
+   when the other cable has them. Photos and the status «handed over» are not copied. */
+function copyPlan(jid, mark, sj, sm) {
+  const c = S.idx[jid].byMark.get(mark), sc = S.idx[sj].byMark.get(sm);
+  const rc = S.results[jid].cables[mark], src = S.results[sj].cables[sm];
+  ensureSegs(c, rc); ensureSegs(sc, src);
+  const route = c.route || [], now = nowIso(), nT = nSegs(c), nS = nSegs(sc), cs = segsOf(c), ss = segsOf(sc);
+  const cp = (e, sg) => {
+    const n = {k: uid(), seg: e.seg, st: e.seg === null ? ST.ADD : e.st, t: e.seg === null || e.st !== ST.U ? now : null};
+    if (e.fact) n.fact = e.fact; if (e.rg) n.rg = e.rg; if (e.noteKey) n.noteKey = e.noteKey; if (e.note) n.note = e.note;
+    if (sg !== undefined && sg !== null) n.sg = sg;
+    return n;
+  };
+  const field = e => (e.seg === null ? (e.fact ? [cp(e)] : [])
+    : e.st === ST.OK ? [cp({seg: null, fact: e.seg, noteKey: e.noteKey, note: e.note})]
+    : e.st === ST.CHG && e.fact ? [cp({seg: null, fact: e.fact, noteKey: e.noteKey, note: e.note})] : []);
+  let entries, rev = false;
+  const same = JSON.stringify(designItems(src.entries)) === JSON.stringify(route)
+    && JSON.stringify((ss || []).map(x => x.trays)) === JSON.stringify((cs || []).map(x => x.trays));
+  if (same) entries = src.entries.map(e => cp(e, e.sg));
+  else {
+    /* the other cable as a sequence of design groups (an expanded range = one group; trays added inside it stay in it),
+       each matched to a design tray of this cable, and field trays */
+    const occ = new Map(); route.forEach((key, i) => { if (!occ.has(key)) occ.set(key, []); occ.get(key).push(i); });
+    const take = key => { const l = occ.get(key); return l && l.length ? l.shift() : -1; };
+    const groups = []; let g = null, pend = [];
+    const flush = () => { pend.forEach(e => groups.push({add: e})); pend = []; };
+    for (const e of src.entries) {
+      if (e.seg === null) { pend.push(e); continue; }
+      const key = e.rg || e.seg;
+      if (e.rg && g && g.key === key) { g.ents.push(...pend, e); pend = []; continue; }
+      flush(); g = {key, ents: [e], sg: e.sg}; groups.push(g);
+    }
+    flush();
+    const seq = [], fieldItems = (e, sg) => field(e).forEach(n => seq.push({f: n, sg}));
+    for (const it of groups) {
+      if (it.add) { fieldItems(it.add, it.add.sg); continue; }
+      const ti = take(it.key);
+      if (ti >= 0) { seq.push({ti, ents: it.ents, sg: it.sg}); continue; }
+      for (const e of it.ents) {             // not in this cable's design as a whole: tray by tray
+        if (e.seg === null) { fieldItems(e, e.sg); continue; }
+        const t2 = e.rg ? take(e.seg) : -1;
+        if (t2 >= 0) seq.push({ti: t2, ents: [Object.assign({}, e, {rg: null})], sg: e.sg});
+        else fieldItems(e, e.sg);
+      }
+    }
+    const tis = seq.filter(x => !x.f).map(x => x.ti);
+    let inc = 0, dec = 0;
+    for (let i = 1; i < tis.length; i++) { if (tis[i] > tis[i - 1]) inc++; else dec++; }
+    rev = dec > inc;
+    if (rev) seq.reverse();
+    /* a field tray stays next to its neighbour: after the matched tray before it, or before the one after it when it is
+       the first tray of its segment (or of the route) */
+    let prev = null, open = [];
+    for (const x of seq) { if (x.f) { x.prev = prev; open.push(x); } else { open.forEach(a => { a.next = x; }); open = []; prev = x; } }
+    const before = new Map(), after = new Map(), tail = [];
+    const put = (m, key, a) => { if (!m.has(key)) m.set(key, []); m.get(key).push(a); };
+    for (const x of seq) {
+      if (!x.f) continue;
+      const own = !rev && x.next && x.sg === x.next.sg && (!x.prev || x.sg !== x.prev.sg);
+      if (x.prev && !own) { put(after, x.prev, x); x.pol = !rev && x.sg !== x.prev.sg ? 'keep' : 'last'; }
+      else if (x.next) { put(before, x.next, x); x.pol = !rev && x.sg === x.next.sg ? 'next' : 'keep'; }
+      else { tail.push(x); x.pol = 'keep'; }
+    }
+    const at = new Map(), outs = [];
+    seq.forEach(x => { if (!x.f) at.set(x.ti, x); });
+    for (let ti = 0; ti < route.length; ti++) {
+      const x = at.get(ti);
+      if (!x) { outs.push({e: {k: uid(), seg: route[ti], st: ST.U, t: null}}); continue; }
+      (before.get(x) || []).forEach(a => outs.push({e: a.f, a}));
+      x.ents.forEach((e, i) => { const n = cp(e); if (i === 0) x.first = n; outs.push({e: n}); });
+      (after.get(x) || []).forEach(a => outs.push({e: a.f, a}));
+    }
+    tail.forEach(a => outs.push({e: a.f, a}));
+    const keepSg = nT === nS && !rev;
+    outs.forEach(o => { if (o.a && o.a.pol === 'keep' && keepSg && typeof o.a.sg === 'number') o.e.sg = o.a.sg; });
+    entries = outs.map(o => o.e);
+    ensureSegs(c, {entries, segs: [], factLength: null});
+    outs.forEach(o => { if (o.a && o.a.pol === 'next') o.e.sg = o.a.next.first.sg; });
+  }
+  /* length and cable tags of every segment of this cable */
+  const segs = JSON.parse(JSON.stringify(rc.segs)), info = {}, sf = src.segs || [];
+  const dT = i => lenNum(cs ? cs[i].len : c.len), dS = i => lenNum(ss ? ss[i].len : sc.len);
+  const eq = (a, b) => a !== null && b !== null && Math.abs(a - b) < 1e-6;
+  if (sf.some(x => lenNum(x.fact) !== null)) {
+    if (nT === nS) {
+      sf.forEach((x, i) => {
+        const f = lenNum(x.fact); if (f === null) return;
+        if (eq(f, dS(i)) && dT(i) !== null) segs[i].fact = dT(i);
+        else if (eq(dT(i), dS(i))) segs[i].fact = f;
+        else info.lenSkip = true;
+      });
+    } else if (sf.every((x, i) => eq(lenNum(x.fact), dS(i))) && segs.every((x, i) => dT(i) !== null)) segs.forEach((x, i) => { x.fact = dT(i); });
+    else if (nT === 1 && lenNum(src.factLength) !== null && eq(lenNum(c.len), lenNum(sc.len))) segs[0].fact = lenNum(src.factLength);
+    else info.lenSkip = true;
+  }
+  if (sf.some(x => x.tags)) {
+    if (nT === nS) sf.forEach((x, i) => { if (x.tags) { segs[i].tags = x.tags; segs[i].tagsN = x.tags === 'add' ? x.tagsN : null; } });
+    else if (new Set(sf.map(x => (x.tags || '') + ':' + (x.tags === 'add' ? x.tagsN : ''))).size === 1) segs.forEach(x => { x.tags = sf[0].tags; x.tagsN = sf[0].tags === 'add' ? sf[0].tagsN : null; });
+    else info.tagsSkip = true;
+  }
+  const note = String(src.note || '').trim() ? src.note : null;
+  const st = {ok: 0, chg: 0, no: 0, add: 0, u: 0};
+  for (const e of entries) { if (e.seg === null) st.add++; else if (e.st === ST.OK) st.ok++; else if (e.st === ST.CHG) st.chg++; else if (e.st === ST.NO) st.no++; else st.u++; }
+  return {entries, segs, note, st, rev, same, info, had: rc.entries.some(e => e.seg === null || e.st !== ST.U)};
 }
 function copyRoute(jid, mark, sj, sm) {
-  const snap = snapshotCable(jid, mark), rc = S.results[jid].cables[mark], p = planCopy(jid, mark, sj, sm), now = nowIso();
-  const conf = new Set(p.confirm);
-  for (const e of rc.entries) if (e.seg !== null && e.st === ST.U && conf.has(e.seg)) { e.st = ST.OK; e.t = now; }
-  const lastSg = Math.max(0, (rc.segs || []).length - 1);
-  for (const code of p.add) rc.entries.push({k: uid(), seg: null, st: ST.ADD, fact: code, t: now, sg: lastSg});
-  const sc = S.idx[sj].byMark.get(sm);
-  commit(jid, mark, T('Copied from {no}: +{a}, ✓{c}. Check them!', {no: sc ? sc.no : sm, a: p.add.length, c: p.confirm.length}), snap);
+  const snap = snapshotCable(jid, mark), rc = S.results[jid].cables[mark], p = copyPlan(jid, mark, sj, sm);
+  rc.entries = p.entries; rc.segs = p.segs; if (p.note !== null) rc.note = p.note; syncLen(rc);
+  const sc = S.idx[sj].byMark.get(sm), s = p.st;
+  commit(jid, mark, T('Copied from {c}: ✓{ok} →{chg} ✗{no} +{add}. Check it!', {c: sc ? sc.no : sm, ok: s.ok, chg: s.chg, no: s.no, add: s.add}), snap);
+  return p;
 }
 
 /* ---------------------------------------------------------------- UI basics */
@@ -2087,8 +2245,8 @@ function viewHelp() {
     <li><b class="okc">✓</b> — the cable is on this tray (as designed).</li>
     <li>Tap the tray code → <b>other shelf</b> (number buttons) or <b>another tray</b> — the cable is somewhere else.</li>
     <li>Tap the tray code → <b>✗ Not here</b> — the cable does not pass this tray.</li>
-    <li><b>＋ Add a tray</b> — the cable passes a tray that is not in the design, or the route continues (“in-situ”).</li>
-    <li><b>⧉ Copy route</b> — neighbour cables often run together: enter the trays for one cable, then copy them to the next and correct.</li>
+    <li><b>＋ Add a tray</b> — the cable passes a tray that is not in the design, the route starts earlier or continues (“in-situ”). Tap a tray code → <b>＋ Add a tray before this one…</b> or <b>after this one…</b>; the buttons above and below the route add a tray at the start or at the end.</li>
+    <li><b>⧉ Copy route</b> — neighbour cables often run together: check one cable, then copy its whole line to the next — every tray with its mark (✓, other shelf or tray, ✗), added trays in their places, notes, length and tags — and correct what differs. The source cable can be handed over or in work.</li>
     <li><b>Penetration:</b> tap the tray code → <b>Penetration letter A–Z…</b> → the letter goes instead of the shelf (…109/A) or at the end (…109/3A).</li>
     <li><b>Note for a tray:</b> tap the tray code → <b>In a box / In metal hose / In a pipe / Other text…</b>. After <b>✗ Not here</b> the app asks if the cable runs along this tray.</li>
   </ul>
@@ -2116,10 +2274,10 @@ const HELP_RU = `<div class="card help">
     <li><b class="okc">✓</b> — кабель на этой полке (как по РД).</li>
     <li>Нажмите на код полки → <b>другая полка</b> (кнопки с номерами) или <b>Кабель на другом лотке…</b>.</li>
     <li>Нажмите на код полки → <b>✗ Нет здесь</b> — кабель не проходит по этой полке. Приложение спросит, не идёт ли он вдоль полки в коробе, металлорукаве или трубе.</li>
-    <li><b>＋ Добавить полку</b> — кабель идёт по полке, которой нет в РД, или трасса продолжается («по месту»).</li>
+    <li><b>＋ Добавить полку</b> — кабель идёт по полке, которой нет в РД, трасса начинается раньше или продолжается («по месту»). Нажмите на код полки → <b>＋ Добавить полку перед этой…</b> или <b>после этой…</b>; кнопки над трассой и под ней добавляют полку в начало и в конец.</li>
     <li><b>Проходка:</b> код полки → <b>Буква проходки A–Z…</b> → буква вместо полки (…109/A) или в конце (…109/3A).</li>
     <li><b>Примечание к полке:</b> код полки → <b>В коробе / В металлорукаве / В трубе / Свой текст…</b>.</li>
-    <li><b>⧉ Скопировать трассу</b> — соседние кабели часто идут вместе: внесите полки одного кабеля, скопируйте на следующий и поправьте.</li>
+    <li><b>⧉ Скопировать трассу</b> — соседние кабели часто идут вместе: проверьте один кабель и скопируйте всю его линию на следующий — полки с отметками (✓, другая полка или лоток, ✗), добавленные полки на своих местах, примечания, длину и бирки, — затем исправьте отличия. Кабель-образец может быть сданным или в работе.</li>
   </ul>
   <p><b>Бирки.</b> Под длиной: <b>Есть</b> / <b>Нет</b> / <b>Довесить…</b> (сколько бирок не хватает). Отмечайте у каждого кабеля.</p>
   <p><b>Отрезки.</b> Некоторые кабели в РД разбиты на части со своими длинами (по зданию — по территории — по другому зданию). У каждой части в карточке кабеля свой нумерованный заголовок: подтвердите <b>её</b> длину и бирки, затем отмечайте полки под ним. Общая длина считается сама. У части без полок в РД есть кнопка <b>＋ Добавить полку в отрезок</b>.</p>
@@ -2190,7 +2348,7 @@ function openEntrySheet(jid, mark, k) {
     <div class="shelves">${shelvesList().map(s => `<button class="sbtn ${s === shelfOf ? 'cur' : ''}" data-sact="shelf" data-s="${s}">${s}</button>`).join('')}<button class="sbtn wide ${shelfOf === null ? 'cur' : ''}" data-sact="shelf" data-s="">${T('no shelf')}</button></div>
     ${rng ? '' : `<button class="btn" data-sact="letters">${T('Penetration letter A–Z…')}</button>`}
     <button class="btn" data-sact="other">${isAdd ? T('Change to another tray…') : T('Cable is on another tray…')}</button>
-    <button class="btn add" data-sact="after">${T('＋ Add a tray after this one…')}</button>
+    <div class="grid2 addba"><button class="btn add" data-sact="before">${T('＋ Add a tray before this one…')}</button><button class="btn add" data-sact="after">${T('＋ Add a tray after this one…')}</button></div>
     <div class="lbl">${T('Note for this tray')}</div><div class="notes">${noteChips(e)}</div>`;
   if (isAdd) h += `<button class="btn danger-outline" data-sact="del">${T('Delete this added tray')}</button>`;
   else if (e.st !== ST.U) h += `<button class="btn" data-sact="clear">${T('↺ Clear mark (not checked)')}</button>`;
@@ -2206,6 +2364,7 @@ function openEntrySheet(jid, mark, k) {
     else if (act === 'expand') { expandEntry(jid, mark, k); }
     else if (act === 'other') { const code = await pickCode({title: isAdd ? T('Change tray') : T('Where is the cable actually?'), base: cur, sub: `${esc(mark)}${T(' · instead of ')}<span class="mono">${esc(cur)}</span>`}); if (!code) return; apply(code); render(); return; }
     else if (act === 'after') { const code = await pickCode({title: T('Add a tray after {c}', {c: rng ? rangeShort(cur) : cur}), sub: esc(mark)}); if (!code) return; insertAt(jid, mark, k, code); render(); return; }
+    else if (act === 'before') { const code = await pickCode({title: T('Add a tray before {c}', {c: rng ? rangeShort(cur) : cur}), sub: esc(mark)}); if (!code) return; insertBefore(jid, mark, k, code); render(); return; }
     else if (act === 'del') deleteAdded(jid, mark, k);
     else return;
     closeSheet(); render();
@@ -2315,22 +2474,38 @@ async function trayAddCable(code) {
   });
   if (!mark) return;
   if (isClosed(jid, mark)) { lockedToast(); return; }
-  const rc = S.results[jid].cables[mark];
-  const after = await new Promise(resolve => {
+  const rc = S.results[jid].cables[mark], cc = S.idx[jid].byMark.get(mark), sd = segsOf(cc); ensureSegs(cc, rc);
+  const pos = await new Promise(resolve => {
     let done = false; const fin = v => { if (done) return; done = true; resolve(v); };
-    const handler = (act, ds) => { if (act === 'pos') { fin(ds.k === '' ? null : ds.k); closeSheet(); } else if (act === 'cancel') { fin(undefined); closeSheet(); } };
+    const handler = (act, ds) => {
+      if (act === 'pos') { fin({after: ds.k === '' ? null : ds.k}); closeSheet(); }
+      else if (act === 'segStart') { fin({seg: +ds.i}); closeSheet(); }
+      else if (act === 'cancel') { fin(undefined); closeSheet(); }
+    };
     handler.onClose = () => fin(undefined);
-    let h = `<div class="sh-title"><div class="big">${T('Where in the route of {m}?', {m: esc(mark)})}</div><div class="small muted">${T('Tray {c} goes after…', {c: `<span class="mono">${esc(code)}</span>`})}</div></div><div class="clist" style="max-height:56vh">
-      <button class="pos" data-sact="pos" data-k="">${T('At the very start')}</button>`;
-    for (const e of rc.entries) {
+    const row = e => {
       const lbl = e.seg === null ? `<span class="blue">+ ${esc(e.fact)}</span>` : (e.st === ST.CHG ? `<s class="red">${esc(e.seg)}</s> <span class="blue">${esc(e.fact)}</span>` : (e.st === ST.NO ? `<s class="red">${esc(e.seg)}</s>` : esc(e.seg)));
-      h += `<button class="pos" data-sact="pos" data-k="${e.k}">${T('after')} <span class="mono"><b>${lbl}</b></span></button>`;
+      return `<button class="pos" data-sact="pos" data-k="${e.k}">${T('after')} <span class="mono"><b>${lbl}</b></span></button>`;
+    };
+    const cs = `<span class="mono">${esc(code)}</span>`;
+    let h = `<div class="sh-title"><div class="big">${T('Where in the route of {m}?', {m: esc(mark)})}</div><div class="small muted">${sd ? T('Choose the place for tray {c}', {c: cs}) : T('Tray {c} goes after…', {c: cs})}</div></div><div class="clist" style="max-height:56vh">`;
+    if (sd) {
+      /* a cable in segments: the start of every segment is a place of its own (also a segment without trays) */
+      for (const sg of sd) {
+        h += `<div class="sec-h">${T('Segment {n}', {n: sg.n})}${segText(sg) ? ' · ' + esc(segText(sg)) : ''}</div>
+          <button class="pos" data-sact="segStart" data-i="${sg.i}">${T('At the start of segment {n}', {n: sg.n})}</button>`;
+        for (const e of rc.entries.filter(x => x.sg === sg.i)) h += row(e);
+      }
+    } else {
+      h += `<button class="pos" data-sact="pos" data-k="">${T('At the very start')}</button>`;
+      for (const e of rc.entries) h += row(e);
     }
     h += `</div><button class="btn ghost" data-sact="cancel">${T('Cancel')}</button>`;
     openSheet(h, handler);
   });
-  if (after === undefined) return;
-  insertAt(jid, mark, after, code); render();
+  if (pos === undefined) return;
+  if (pos.seg !== undefined) insertAtSegStart(jid, mark, pos.seg, code); else insertAt(jid, mark, pos.after, code);
+  render();
 }
 function openCopy(jid, mark) {
   const c = S.idx[jid].byMark.get(mark);
@@ -2339,16 +2514,18 @@ function openCopy(jid, mark) {
     else if (act === 'do') { copyRoute(jid, mark, ds.j, ds.m); closeSheet(); render(); }
     else if (act === 'back') showList();
   };
+  const marked = r => r.entries.some(e => e.seg === null || e.st !== ST.U) || (r.segs || []).some(x => lenNum(x.fact) !== null || x.tags);
   function showList() {
     const ids = [jid, ...journalIds().filter(x => x !== jid)];
-    let h = `<div class="sh-title"><div class="big">${T('Copy route from another cable')}</div><div class="small muted">${T('to {c}. Only trays already marked on the other cable are copied.', {c: `<span class="cno">${esc(c.no)}</span><span class="mono">${esc(mark)}</span>`})}</div></div><div class="clist" style="max-height:60vh">`;
+    let h = `<div class="sh-title"><div class="big">${T('Copy route from another cable')}</div><div class="small muted">${T('to {c}. The whole cable line is copied: trays with all marks, added trays, notes, length and tags.', {c: `<span class="cno">${esc(c.no)}</span><span class="mono">${esc(mark)}</span>`})}</div></div><div class="clist" style="max-height:60vh">`;
     let n = 0;
     for (const id of ids) {
       const rows = [];
       for (const c2 of S.journals[id].cables) {
         if (id === jid && c2.mark === mark) continue;
-        const ar = actualRoute(S.results[id].cables[c2.mark]); if (!ar.length) continue;
-        rows.push(`<button class="pos" data-sact="src" data-j="${esc(id)}" data-m="${esc(c2.mark)}"><span class="cno">${esc(c2.no)}</span><b class="mono">${esc(c2.mark)}</b><br><span class="small muted">${plural(ar.length, 'tray')}: ${esc(ar.slice(0, 3).join(', '))}${ar.length > 3 ? ' …' : ''}</span></button>`);
+        const r2 = S.results[id].cables[c2.mark]; if (!r2 || !marked(r2)) continue;
+        const ar = actualRoute(r2);
+        rows.push(`<button class="pos" data-sact="src" data-j="${esc(id)}" data-m="${esc(c2.mark)}"><span class="cno">${esc(c2.no)}</span><b class="mono">${esc(c2.mark)}</b>${r2.closed ? ` <span class="chip closed">${T('✓ Handed over')}</span>` : ''}<br><span class="small muted">${ar.length ? `${plural(ar.length, 'tray')}: ${esc(ar.slice(0, 3).join(', '))}${ar.length > 3 ? ' …' : ''}` : T('length / tags only')}</span></button>`);
       }
       if (rows.length) { if (ids.length > 1) h += `<div class="sec-h">${esc(shortId(id))}</div>`; h += rows.join(''); n += rows.length; }
     }
@@ -2357,11 +2534,32 @@ function openCopy(jid, mark) {
     openSheet(h, handler);
   }
   function showConfirm(sj, sm) {
-    const sc = S.idx[sj].byMark.get(sm), p = planCopy(jid, mark, sj, sm);
-    let h = `<div class="sh-title"><div class="big">${T('Copy from {c}?', {c: `<span style="white-space:nowrap"><span class="cno">${esc(sc.no)}</span>${esc(sm)}</span>`})}</div><div class="small muted">${T('Route of that cable ({n}):', {n: plural(p.src.length, 'tray')})}</div></div>
-      <div class="card small mono" style="max-height:32vh;overflow:auto">${p.src.map(esc).join('<br>')}</div>
-      <div class="card small">${T('To {c}:', {c: `<b>${esc(c.no)} ${esc(mark)}</b>`})}${p.confirm.length ? `<br>${T('✓ confirm design trays: ')}<b>${p.confirm.length}</b>` : ''}${p.add.length ? `<br><span class="blue">${T('＋ add at the end: ')}<b>${p.add.length}</b></span>` : ''}${!p.confirm.length && !p.add.length ? '<br>' + T('nothing new — the route already contains these trays') : ''}<br><span class="muted">${T('Check the result and correct what differs.')}</span></div>
-      <button class="btn primary big" data-sact="do" data-j="${esc(sj)}" data-m="${esc(sm)}" ${p.confirm.length || p.add.length ? '' : 'disabled'}>${T('Copy')}</button>
+    const sc = S.idx[sj].byMark.get(sm), src = S.results[sj].cables[sm], p = copyPlan(jid, mark, sj, sm), s = p.st;
+    const ssd = segsOf(sc), csd = segsOf(c);
+    const row = e => {
+      const nl = noteLabel(e), nt = nl ? ` <span class="blue">(${esc(nl)})</span>` : '';
+      if (e.seg === null) return `<div class="blue">+ ${esc(e.fact || '')}${nt}</div>`;
+      if (e.st === ST.OK) return `<div><span class="okc">✓</span> ${esc(e.seg)}${nt}</div>`;
+      if (e.st === ST.CHG) return `<div><s class="red">${esc(e.seg)}</s> <span class="blue">→ ${esc(e.fact || '')}</span>${nt}</div>`;
+      if (e.st === ST.NO) return `<div class="red">✗ <s>${esc(e.seg)}</s>${nt}</div>`;
+      return `<div class="muted">· ${esc(e.seg)}</div>`;
+    };
+    let rows = '';
+    if (ssd) for (const sg of ssd) rows += `<div class="tiny muted" style="margin-top:4px">${T('Segment {n}', {n: sg.n})}</div>` + src.entries.filter(e => e.sg === sg.i).map(row).join('');
+    else rows = src.entries.map(row).join('');
+    const sum = [`✓ ${s.ok}`, s.chg ? T('moved {n}', {n: s.chg}) : '', s.no ? `✗ ${s.no}` : '', s.add ? `＋ ${s.add}` : '', s.u ? T('not checked {n}', {n: s.u}) : ''].filter(Boolean).join(' · ');
+    const dl = i => lenNum(csd ? csd[i].len : c.len), pre = i => (csd ? `${i + 1}) ` : '');
+    const lens = !src.segs.some(x => lenNum(x.fact) !== null) ? ''
+      : p.info.lenSkip ? `<br><span class="red">${T('Length is not copied: the design length differs — confirm it separately.')}</span>`
+      : '<br>' + T('Length: {v}', {v: p.segs.map((x, i) => pre(i) + (lenNum(x.fact) === null ? '—' : `${fmtLen(lenNum(x.fact))} ${T('m')}${dl(i) !== null && Math.abs(lenNum(x.fact) - dl(i)) < 1e-6 ? T(' (as design)') : ''}`)).join('; ')});
+    const tags = !src.segs.some(x => x.tags) ? ''
+      : p.info.tagsSkip ? `<br><span class="red">${T('Cable tags are not copied: they differ by segment.')}</span>`
+      : '<br>' + p.segs.map((x, i) => pre(i) + tagsLabel(x)).join('; ');
+    const note = p.note ? '<br>' + T('Cable note: {t}', {t: `«${esc(p.note)}»`}) : '';
+    const h = `<div class="sh-title"><div class="big">${T('Copy from {c}?', {c: `<span style="white-space:nowrap"><span class="cno">${esc(sc.no)}</span>${esc(sm)}</span>`})}</div><div class="small muted">${T('Cable line of {c}:', {c: esc(sc.no)})}${src.closed ? ` <span class="chip closed">${T('✓ Handed over')}</span>` : ''}</div></div>
+      <div class="card small mono cprev" style="max-height:30vh;overflow:auto">${rows || '—'}</div>
+      <div class="card small ccopy">${T('To {c}:', {c: `<b>${esc(c.no)} ${esc(mark)}</b>`})}<br>${sum}${lens}${tags}${note}${p.rev ? `<br><span class="blue">${T('That cable is routed from the other end: its trays are taken in reverse order.')}</span>` : ''}${p.had ? `<br><span class="red">${T('The route marks of this cable will be replaced. Undo is possible.')}</span>` : ''}<br><span class="muted">${T('Photos and the status «handed over» are not copied. Check the result and correct what differs.')}</span></div>
+      <button class="btn primary big" data-sact="do" data-j="${esc(sj)}" data-m="${esc(sm)}">${T('Copy')}</button>
       <button class="btn" data-sact="back">${T('‹ Choose another cable')}</button><button class="btn ghost" data-sact="close">${T('Cancel')}</button>`;
     openSheet(h, handler);
   }
