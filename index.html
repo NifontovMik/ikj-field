@@ -216,7 +216,7 @@ body.drop main{outline:3px dashed var(--primary);outline-offset:-6px;border-radi
 <input type="file" id="filePhoto" accept="image/*" class="hidden">
 <script>
 'use strict';
-const APP_VERSION = '1.7.2';
+const APP_VERSION = '1.8.0';
 const EMBEDDED_JOURNAL = null; /*EMBED*/
 const ST = {U:'unchecked', OK:'ok', CHG:'changed', NO:'absent', ADD:'added'};
 /* tray code: building (12.12URF10.109/3), site trestle (00USY24.195.02/3) or 07UBG structure (07UBG080P024.01/46);
@@ -701,7 +701,10 @@ async function shareOrSave(file, mode) {
    signatures, styles, column widths, print settings) and `xr` for every cable (its row of the template).
    IKJX.build(journal, results, group) makes the same workbook as the office converter
    (tools/ikj_tool.py apply / apply-split): sheet «ИКЖ» with the marked route and sheet «Обход».
-   group: 'all' | 'сдан' | 'в_работе'.  Everything is done on the device, no internet. */
+   group: 'all' | 'сдан' | 'в_работе'.  Everything is done on the device, no internet.
+   1.8: a journal may also carry `formSeg` (lay 'seg') and `xb` for every cable — the form «по участкам» like the cable
+   journal of the RD: every segment of a cable is a block of rows («From» / «To» with X, Y, Z, design length, actual
+   length, routing). Then the ИКЖ is made in that form (buildSeg), the same as the converter for such a template. */
 const IKJX = (() => {
   'use strict';
   /* character widths of Arial 9 (Liberation Sans, 48 px, 1/64 px) — the same table as tools/char_widths.json */
@@ -720,6 +723,8 @@ const IKJX = (() => {
     }
     return n;
   }
+  /* the same with line breaks in the text (ikj_tool._lines_nl): every paragraph starts on a new line */
+  const nLinesNL = (text, wc) => String(text).split('\n').reduce((s, p) => s + nLines(p, wc), 0);
 
   /* ---------------------------------------------------------------- Python-like helpers */
   const RED = 'FFC00000', BLUE = 'FF0066CC', BLACK = 'FF000000';
@@ -865,11 +870,11 @@ const IKJX = (() => {
     });
     return [parts, plain.join(', ')];
   }
-  function richRoute(entries, prefix, suffix) {
+  function richRoute(entries, prefix, suffix, sep = '; ') {
     const [parts, plain] = itemBlocks(entries);
     if (!parts.length && !(prefix || suffix)) return [null, ''];
     let pre = prefix.replace(/\s+$/, '');
-    if (parts.length && pre) pre = pre.replace(/;+$/, '').replace(/\s+$/, '') + '; ';
+    if (parts.length && pre) pre = pre.replace(/;+$/, '').replace(/\s+$/, '') + sep;
     if (pre) parts.unshift([pre, F_BLACK]);
     if (suffix && parts.length) parts.push([suffix, F_BLACK]);
     const text = (pre || '') + plain + (parts.length ? suffix : '');
@@ -932,168 +937,50 @@ const IKJX = (() => {
   /* ---------------------------------------------------------------- the workbook (ikj_tool.apply_results) */
   const C_AL = {h: 'center', v: 'center', w: 1}, L_AL = {h: 'left', v: 'center', w: 1};
   const THIN = ['thin', BLACK], BORDER = {l: THIN, r: THIN, t: THIN, b: THIN};
-  function build(J, res0, group, fileName) {
-    const F = J && J.form;
-    if (!F || !(F.v >= 1)) throw new Error('no-form');
-    const res = JSON.parse(JSON.stringify(res0));
-    if (res.format !== 'ikj-field-results') throw new Error('Это не файл результатов обхода IKJ Field.');
-    const jinfo = res.journal || {};
-    const rows = J.cables.map((c, i) => {
-      const cells = new Map(); for (const [col, v, s] of c.xr[1]) cells.set(col, {v, s});
-      const lv = cells.get(12), pr = parseRoute(lv && typeof lv.v === 'string' ? lv.v : null);
-      const av = cells.get(1), jv = cells.get(10);
-      return {key: c.mark, trow: isNone(c.row) ? F.first + i : c.row, h: c.xr[0], cells, doc: pyStrip(String(av && !isNone(av.v) ? av.v : '')),
-              len: jv ? (isNone(jv.v) ? null : jv.v) : null, route: pr.codes, lPrefix: pr.prefix, lSuffix: pr.suffix, segs: pr.segs};
-    }).sort((a, b) => a.trow - b.trow);
-    rows.forEach((x, i) => { if (x.trow !== F.first + i) throw new Error('form-rows'); });
-    const tplId = rows.length ? rows[0].doc : '';
-    if (jinfo.id && jinfo.id !== tplId) throw new Error(`Файл обхода относится к журналу ${jinfo.id}, а шаблон — к ${tplId}.`);
-    const notes = [];
-    if (jinfo.hash && jinfo.hash !== J.hash) notes.push('Версия журнала в телефоне отличается от шаблона (после выдачи журнала менялась РД). Расхождения по кабелям — в графе «Замечания конвертера».');
-    const byMark = new Map(); for (const c of res.cables || []) byMark.set(normMark(c.mark), c);
-    const used = new Set();
-    const styles = F.styles;
-    const colW = c => { const d = (F.cols || []).find(x => x[0] <= c && c <= x[1]); return d && d[2] ? d[2] : 13; };
-    const widthL = colW(12) || 9.0;
-    const report = [];
-    rows.forEach((x, i) => {
-      const r = F.first + i;
-      x.row = r;
-      const rc = byMark.get(normMark(x.key));
-      const multi = !!(x.segs && x.segs.length);
-      const item = {row: r, mark: x.key, design: x.route.length, len: x.len, conv: [], multi};
-      if (!rc) { item.status = 'нет в файле обхода'; report.push(item); return; }
-      used.add(normMark(x.key));
-      const entries = rc.entries || [];
-      const di = designItems(entries);
-      if (di.length !== x.route.length || di.some((v, k) => v !== x.route[k])) item.conv.push('трасса по РД в телефоне отличается от шаблона — применено по телефону');
-      const cnt = {ok: 0, chg: 0, no: 0, add: 0, u: 0}, unchecked = [];
-      for (const e of entries) {
-        const st = e.status;
-        if (isNone(e.seg)) cnt.add++;
-        else if (st === ST_OK) cnt.ok++;
-        else if (st === ST_CHG) cnt.chg++;
-        else if (st === ST_NO) cnt.no++;
-        else { cnt.u++; unchecked.push(e.seg); }
-      }
-      let rcSegs = rc.segs || [], rich, plain;
-      if (multi) {
-        assignSg(entries, x.segs);
-        if (rcSegs.length !== x.segs.length) {
-          if (rcSegs.length) item.conv.push(`в телефоне ${rcSegs.length} отрезков, в шаблоне ${x.segs.length} — длины по отрезкам не применены`);
-          rcSegs = [];
-        }
-        [rich, plain] = richSegmented(x.segs, entries, rcSegs);
-      } else [rich, plain] = richRoute(entries, x.lPrefix || '', x.lSuffix || '');
-      const L = x.cells.get(12) || {v: null, s: null};
-      x.cells.set(12, {v: rich, s: L.s});
-      const K = x.cells.get(11) || {v: null, s: null};
-      const kfont = (K.s !== null && styles[K.s] && styles[K.s].font) || {};
-      const kf = differs => Object.assign({}, K.s !== null ? styles[K.s] : {}, {font: {n: kfont.n || 'Arial', s: kfont.s || 8, c: differs ? BLUE : BLACK}});
-      const setK = (v, st) => x.cells.set(11, {v, s: K.s, st});
-      let lenOk = false, lenWhy = '', fl = rc.factLength;
-      let kStyle = null;
-      if (multi && rcSegs.length) {
-        const facts = rcSegs.map(rs => rs.factLength);
-        const miss = []; rcSegs.forEach((rs, k) => { if (isNone(rs.factLength) || rs.factLength === '') miss.push(String(isNone(rs.n) ? k + 1 : rs.n)); });
-        if (!miss.length) {
-          try {
-            const fv = facts.map(pyFloat);
-            const kv = fv.map(fmtLen).join('+');
-            let s = 0; for (const v of fv) s += v;
-            fl = isInt(s) ? s : round2(s);
-            lenOk = true;
-            kStyle = kf(!isNone(x.len) && pyFloat(x.len) !== pyFloat(fl));
-            setK({f: kv}, kStyle);
-          } catch (e) {
-            if (!(e instanceof PyErr)) throw e;
-            setK(null, kStyle); item.conv.push(`длина отрезков не число: [${facts.map(pyRepr).join(', ')}]`);
-          }
-        } else { setK(null, kStyle); lenWhy = 'не подтверждена длина отрезков ' + miss.join(', '); }
-      } else if (!isNone(fl) && fl !== '') {
-        try {
-          const flv = pyFloat(fl);
-          fl = flv; lenOk = true;
-          kStyle = kf(!isNone(x.len) && pyFloat(x.len) !== flv);
-          setK(flv, kStyle);
-        } catch (e) {
-          if (!(e instanceof PyErr)) throw e;
-          setK(null, null); item.conv.push(`длина по факту не число: ${pyRepr(fl)}`);
-        }
-      } else setK(null, null);
-      const trayNotes = [];
-      for (const e of entries) {
-        const nt = noteRu(e);
-        if (nt) { const where = (isNone(e.seg) || e.status === ST_CHG) ? e.fact : e.seg; trayNotes.push(`${pyStr(where)} — ${nt}`); }
-      }
-      const need = nLines(plain, widthL) * 12.0 + 6, cur = x.h || 15;
-      if (need > cur) x.h = Math.round(need * 100) / 100;
-      const pnames = (rc.photos || []).map((p, k) => (p && p.name) || `${String(x.key).replace(/[^A-Za-z0-9-]/g, '_')}_${k + 1}.jpg`);
-      const finished = !!rc.finished, closed = isNone(rc.closed) ? null : !!rc.closed;
-      let status;
-      const touched = cnt.ok + cnt.chg + cnt.no + cnt.add;
-      if (closed !== null) {
-        if (closed) {
-          const why = []; if (cnt.u) why.push('есть непроверенные полки'); if (!lenOk) why.push(lenWhy || 'длина не подтверждена');
-          status = 'сдан' + (why.length ? ', но ' + why.join(' и ') : '');
-        } else if (touched === 0) status = 'не начат';
-        else if (cnt.u === 0 && lenOk) status = 'проверен, не сдан';
-        else status = 'в работе';
-      } else if (finished && cnt.u === 0 && lenOk) status = 'проверен';
-      else if (finished) {
-        const why = []; if (cnt.u) why.push('есть непроверенные полки'); if (!lenOk) why.push(lenWhy || 'длина не подтверждена');
-        status = 'отмечен «done», но ' + why.join(' и ');
-      } else if (touched === 0) status = 'не начат';
-      else if (cnt.u === 0 && lenOk) status = 'проверен, «готов» не нажат';
-      else status = 'в работе';
-      Object.assign(item, {status, closed: !!closed, closed_at: closed ? rc.closedAt : null, ...cnt, unchecked,
-        fact_len: lenOk ? fl : null, note: rc.note || '', tray_notes: trayNotes, photos: pnames, updated: rc.updated,
-        seg_lens: multi ? segLensRu(rcSegs) : '', tags: tagsRu(rcSegs, multi)});
-      report.push(item);
-    });
-    /* which cables go into this file */
-    let only = null;
-    if (group === 'сдан' || group === 'в_работе') only = splitMarks(res, rows.map(x => x.key))[group];
-    const keep = only ? rows.filter(x => only.has(normMark(x.key))) : rows;
-    if (!keep.length) throw new Error('empty');
-    const rep = only ? report.filter(it => only.has(normMark(it.mark))) : report;
-    const extra = (res.cables || []).filter(c => !used.has(normMark(c.mark))).map(c => c.mark);
-    if (extra.length) notes.push('В файле обхода есть кабели, которых нет в шаблоне: ' + extra.join(', '));
-
-    /* ---------- sheet «ИКЖ» */
-    const sh = {name: F.sheet || 'ИКЖ', rows: new Map(), cols: F.cols, fmt: F.fmt, page: F.page, mar: F.mar, po: F.po, view: F.view,
-                tabSelected: true, merges: [], area: F.area, titles: F.titles};
-    const put = (r, h, cells) => { const row = {h: isNone(h) ? null : h, cells: new Map()}; for (const [c, v, s] of cells) row.cells.set(c, {v, s}); sh.rows.set(r, row); return row; };
-    for (const [r, h, cells] of F.head) put(r, h, cells);
-    for (const m of F.mh || []) sh.merges.push(m);
-    const first = F.first, newpos = new Map();
-    keep.forEach((x, i) => {
-      const r = first + i, row = {h: x.h, cells: new Map()};
-      for (const [c, cell] of x.cells) {
-        let v = cell.v;
-        if (only && c === 11 && v && typeof v === 'object' && v.f && /^J\d+$/.test(v.f)) v = {f: `J${r}`};
-        row.cells.set(c, {v, s: cell.s, st: cell.st});
-      }
-      sh.rows.set(r, row); newpos.set(x.row, r);
-    });
-    const lastData = first + keep.length - 1;
-    if (!only || F.tot) {
-      const t0 = only ? lastData + 1 : first + rows.length;
-      F.tail.forEach(([o, h, cells], i) => {
-        const row = put(t0 + o, h, cells);
-        if (only && o === 0 && i === 0) for (const [c, cell] of row.cells) {
-          if (cell.v && typeof cell.v === 'object' && typeof cell.v.f === 'string' && /^SUM\(/i.test(cell.v.f)) {
-            const col = colLetter(c); cell.v = {f: `SUM(${col}${first}:${col}${Math.max(first, lastData)})`};
-          }
-        }
-      });
-      for (const [o1, c1, o2, c2] of F.mt || []) sh.merges.push([t0 + o1, c1, t0 + o2, c2]);
+  /* tray notes, photos, status of a cable (ikj_tool.apply_results) -> item of the report */
+  function finishItem(item, x, rc, entries, cnt, unchecked, rcSegs, multi, lenOk, lenWhy, fl) {
+    const trayNotes = [];
+    for (const e of entries) {
+      const nt = noteRu(e);
+      if (nt) { const where = (isNone(e.seg) || e.status === ST_CHG) ? e.fact : e.seg; trayNotes.push(`${pyStr(where)} — ${nt}`); }
     }
-    if (only) { const lastRow = Math.max(...sh.rows.keys()); sh.area = `A1:L${lastRow}`; }
-    for (const it of rep) it.row = newpos.get(it.row) ?? it.row;
-    computeCache(sh);
-
-    /* ---------- sheet «Обход» */
+    const pnames = (rc.photos || []).map((p, k) => (p && p.name) || `${String(x.key).replace(/[^A-Za-z0-9-]/g, '_')}_${k + 1}.jpg`);
+    const finished = !!rc.finished, closed = isNone(rc.closed) ? null : !!rc.closed;
+    let status;
+    const touched = cnt.ok + cnt.chg + cnt.no + cnt.add;
+    if (closed !== null) {
+      if (closed) {
+        const why = []; if (cnt.u) why.push('есть непроверенные полки'); if (!lenOk) why.push(lenWhy || 'длина не подтверждена');
+        status = 'сдан' + (why.length ? ', но ' + why.join(' и ') : '');
+      } else if (touched === 0) status = 'не начат';
+      else if (cnt.u === 0 && lenOk) status = 'проверен, не сдан';
+      else status = 'в работе';
+    } else if (finished && cnt.u === 0 && lenOk) status = 'проверен';
+    else if (finished) {
+      const why = []; if (cnt.u) why.push('есть непроверенные полки'); if (!lenOk) why.push(lenWhy || 'длина не подтверждена');
+      status = 'отмечен «done», но ' + why.join(' и ');
+    } else if (touched === 0) status = 'не начат';
+    else if (cnt.u === 0 && lenOk) status = 'проверен, «готов» не нажат';
+    else status = 'в работе';
+    Object.assign(item, {status, closed: !!closed, closed_at: closed ? rc.closedAt : null, ...cnt, unchecked,
+      fact_len: lenOk ? fl : null, note: rc.note || '', tray_notes: trayNotes, photos: pnames, updated: rc.updated,
+      seg_lens: multi ? segLensRu(rcSegs) : '', tags: tagsRu(rcSegs, multi)});
+  }
+  /* counters of the marks of a cable */
+  function countMarks(entries) {
+    const cnt = {ok: 0, chg: 0, no: 0, add: 0, u: 0}, unchecked = [];
+    for (const e of entries) {
+      const st = e.status;
+      if (isNone(e.seg)) cnt.add++;
+      else if (st === ST_OK) cnt.ok++;
+      else if (st === ST_CHG) cnt.chg++;
+      else if (st === ST_NO) cnt.no++;
+      else { cnt.u++; unchecked.push(e.seg); }
+    }
+    return [cnt, unchecked];
+  }
+  /* sheet «Обход» (ikj_tool.apply_results) */
+  function obhodSheet(rep, notes, res, jinfo, tplId, fileName) {
     const F9 = {n: 'Arial', s: 9}, F9B = {n: 'Arial', s: 9, b: 1}, F12B = {n: 'Arial', s: 12, b: 1};
     const HF = {t: 'solid', fg: 'FFD9D9D9'};
     const FILL = {'проверен': 'FFE2EFDA', 'проверен, «готов» не нажат': 'FFE2EFDA', 'в работе': 'FFFFF2CC', 'не начат': 'FFF8CBAD',
@@ -1141,6 +1028,294 @@ const IKJX = (() => {
       ob.rows.get(rr).h = Math.max(15, h * 12 + 4);
     });
     ob.freeze = {col: 4, row: hdrRow + 1};
+    return ob;
+  }
+  const groupCounts = (res, rows) => { const s = splitMarks(res, rows.map(x => x.key)); return {all: rows.length, 'сдан': rows.filter(x => s['сдан'].has(normMark(x.key))).length, 'в_работе': rows.filter(x => s['в_работе'].has(normMark(x.key))).length}; };
+  const RPR_RE = /RPR\.\d{4}\.[0-9A-Z]+(?:\.[0-9A-Z]+)+/;
+  const cellText = v => (isNone(v) ? '' : (typeof v === 'object' && v.rt ? v.rt.map(r => r[0]).join('') : String(v)));
+
+  /* ---------------------------------------------------------------- the form «по участкам» (1.8) */
+  function buildSeg(J, F, res0, group, fileName) {
+    const res = JSON.parse(JSON.stringify(res0));
+    if (res.format !== 'ikj-field-results') throw new Error('Это не файл результатов обхода IKJ Field.');
+    const jinfo = res.journal || {};
+    const cm = F.cm || {len: 9, fact: 10, route: 11};
+    const h1 = (F.head.find(h => h[0] === 1) || [1, null, []])[2].find(c => c[0] === 2);
+    const dm = h1 ? cellText(h1[1]).match(RPR_RE) : null;
+    const tplId = dm ? dm[0] : '';
+    const rows = J.cables.map(c => {
+      const [brows, bm, bsegs, trow] = c.xb;
+      const blk = brows.map(([h, cells]) => { const m = new Map(); for (const [col, v, st] of cells) m.set(col, {v, s: st}); return {h, cells: m}; });
+      const segs = bsegs.map(([a, b], i) => {
+        const kc = blk[a].cells.get(cm.route), ic = blk[a].cells.get(cm.len);
+        const pr = parseRoute(kc && typeof kc.v === 'string' ? kc.v : null);
+        const ln = ic && !isNone(ic.v) ? ic.v : null;
+        return {n: i + 1, len: ln, text: pyStrip(pr.prefix), items: pr.codes, prefix: pr.prefix, suffix: pr.suffix, a, b};
+      });
+      const route = []; for (const sg of segs) route.push(...sg.items);
+      let len = null;
+      try { let t = 0; for (const sg of segs) t += pyFloat(sg.len); len = isInt(t) ? t : round2(t); } catch (e) { if (!(e instanceof PyErr)) throw e; }
+      return {key: c.mark, trow, blk, merges: bm, segs, route, len};
+    }).sort((a, b) => a.trow - b.trow);
+    if (jinfo.id && jinfo.id !== tplId) throw new Error(`Файл обхода относится к журналу ${jinfo.id}, а шаблон — к ${tplId}.`);
+    const notes = [];
+    if (jinfo.hash && jinfo.hash !== J.hash) notes.push('Версия журнала в телефоне отличается от шаблона (после выдачи журнала менялась РД). Расхождения по кабелям — в графе «Замечания конвертера».');
+    const byMark = new Map(); for (const c of res.cables || []) byMark.set(normMark(c.mark), c);
+    const used = new Set();
+    const styles = F.styles;
+    const colW = c => { const d = (F.cols || []).find(x => x[0] <= c && c <= x[1]); return d && d[2] ? d[2] : 13; };
+    const widthK = colW(cm.route) || 9.0;
+    const report = [];
+    rows.forEach(x => {
+      const rc = byMark.get(normMark(x.key));
+      const multi = !!x.segs.length;
+      const item = {row: x.trow, mark: x.key, design: x.route.length, len: x.len, conv: [], multi};
+      if (!rc) { item.status = 'нет в файле обхода'; report.push(item); return; }
+      used.add(normMark(x.key));
+      const entries = rc.entries || [];
+      const di = designItems(entries);
+      if (di.length !== x.route.length || di.some((v, k) => v !== x.route[k])) item.conv.push('трасса по РД в телефоне отличается от шаблона — применено по телефону');
+      const [cnt, unchecked] = countMarks(entries);
+      let rcSegs = rc.segs || [];
+      if (multi) {
+        assignSg(entries, x.segs);
+        if (rcSegs.length !== x.segs.length) {
+          if (rcSegs.length) item.conv.push(`в телефоне ${rcSegs.length} отрезков, в шаблоне ${x.segs.length} — длины по отрезкам не применены`);
+          rcSegs = [];
+        }
+        /* every segment: its routing (K: the text of the segment, the codes on a new line) and actual length (J) */
+        x.segs.forEach((sg, i) => {
+          const ents = entries.filter(e => e.sg === i);
+          const [rich, plain] = richRoute(ents, sg.prefix || '', sg.suffix || '', '\n');
+          const row = x.blk[sg.a];
+          const K = row.cells.get(cm.route) || {v: null, s: null};
+          row.cells.set(cm.route, {v: rich, s: K.s});
+          const Jc = row.cells.get(cm.fact) || {v: null, s: null};
+          const jfont = (Jc.s !== null && styles[Jc.s] && styles[Jc.s].font) || {};
+          const rs = i < rcSegs.length ? rcSegs[i] : null, fv = rs ? rs.factLength : null;
+          if (isNone(fv) || fv === '') row.cells.set(cm.fact, {v: null, s: Jc.s});
+          else {
+            try {
+              const f = pyFloat(fv);
+              const differs = !isNone(sg.len) && pyFloat(sg.len) !== f;
+              row.cells.set(cm.fact, {v: f, s: Jc.s, st: Object.assign({}, Jc.s !== null ? styles[Jc.s] : {}, {font: {n: jfont.n || 'Arial', s: jfont.s || 8, c: differs ? BLUE : BLACK}})});
+            } catch (e) {
+              if (!(e instanceof PyErr)) throw e;
+              row.cells.set(cm.fact, {v: null, s: Jc.s}); item.conv.push(`длина отрезка ${sg.n} не число: ${pyRepr(fv)}`);
+            }
+          }
+          const need = nLinesNL(plain, widthK) * 12.0 + 6;
+          let cur = 0; for (let q = sg.a; q <= sg.b; q++) cur += x.blk[q].h || 15;
+          if (need > cur) { const last = x.blk[sg.b]; last.h = round2((last.h || 15) + (need - cur)); }
+        });
+      }
+      let lenOk = false, lenWhy = '', fl = rc.factLength;
+      if (multi && rcSegs.length) {
+        const facts = rcSegs.map(rs => rs.factLength);
+        const miss = []; rcSegs.forEach((rs, k) => { if (isNone(rs.factLength) || rs.factLength === '') miss.push(String(isNone(rs.n) ? k + 1 : rs.n)); });
+        if (!miss.length) {
+          try {
+            const fv = facts.map(pyFloat);
+            let t = 0; for (const v of fv) t += v;
+            fl = isInt(t) ? t : round2(t);
+            lenOk = true;
+          } catch (e) {
+            if (!(e instanceof PyErr)) throw e;
+            item.conv.push(`длина отрезков не число: [${facts.map(pyRepr).join(', ')}]`);
+          }
+        } else lenWhy = 'не подтверждена длина отрезков ' + miss.join(', ');
+      } else if (!isNone(fl) && fl !== '') {
+        try { const flv = pyFloat(fl); fl = flv; lenOk = true; }
+        catch (e) { if (!(e instanceof PyErr)) throw e; item.conv.push(`длина по факту не число: ${pyRepr(fl)}`); }
+      }
+      finishItem(item, x, rc, entries, cnt, unchecked, rcSegs, multi, lenOk, lenWhy, fl);
+      report.push(item);
+    });
+    let only = null;
+    if (group === 'сдан' || group === 'в_работе') only = splitMarks(res, rows.map(x => x.key))[group];
+    const keep = only ? rows.filter(x => only.has(normMark(x.key))) : rows;
+    if (!keep.length) throw new Error('empty');
+    const rep = only ? report.filter(it => only.has(normMark(it.mark))) : report;
+    const extra = (res.cables || []).filter(c => !used.has(normMark(c.mark))).map(c => c.mark);
+    if (extra.length) notes.push('В файле обхода есть кабели, которых нет в шаблоне: ' + extra.join(', '));
+
+    /* ---------- sheet «ИКЖ»: header, the blocks of the cables, ОБЩИЙ and the signatures */
+    const sh = {name: F.sheet || 'ИКЖ', rows: new Map(), cols: F.cols, fmt: F.fmt, page: F.page, mar: F.mar, po: F.po, view: F.view,
+                tabSelected: true, merges: [], area: F.area, titles: F.titles};
+    const put = (r, h, cells) => { const row = {h: isNone(h) ? null : h, cells: new Map()}; for (const [c, v, st] of cells) row.cells.set(c, {v, s: st}); sh.rows.set(r, row); return row; };
+    for (const [r, h, cells] of F.head) put(r, h, cells);
+    for (const m of F.mh || []) sh.merges.push(m);
+    const first = F.first, newpos = new Map();
+    let r = first;
+    for (const x of keep) {
+      const r0 = only ? r : x.trow, d = r0 - x.trow;
+      x.blk.forEach((br, i) => {
+        const row = {h: br.h, cells: new Map()};
+        for (const [c, cell] of br.cells) {
+          let v = cell.v;
+          if (only && v && typeof v === 'object' && typeof v.f === 'string') { const m = v.f.match(/^I(\d+)$/); if (m) v = {f: `I${Number(m[1]) + d}`}; }
+          row.cells.set(c, {v, s: cell.s, st: cell.st});
+        }
+        sh.rows.set(r0 + i, row);
+      });
+      for (const [a1, c1, a2, c2] of x.merges) sh.merges.push([r0 + a1, c1, r0 + a2, c2]);
+      newpos.set(x.trow, r0);
+      r = r0 + x.blk.length;
+    }
+    const lastData = r - 1;
+    if (!only || F.tot) {
+      const t0 = only ? lastData + 1 : (rows.length ? rows[rows.length - 1].trow + rows[rows.length - 1].blk.length : first);
+      F.tail.forEach(([o, h, cells], i) => {
+        const row = put(t0 + o, h, cells);
+        if (only && o === 0 && i === 0) for (const [c, cell] of row.cells) {
+          if (cell.v && typeof cell.v === 'object' && typeof cell.v.f === 'string' && /^SUM\(/i.test(cell.v.f)) {
+            const col = colLetter(c); cell.v = {f: `SUM(${col}${first}:${col}${Math.max(first, lastData)})`};
+          }
+        }
+      });
+      for (const [o1, c1, o2, c2] of F.mt || []) sh.merges.push([t0 + o1, c1, t0 + o2, c2]);
+    }
+    if (only) {
+      const lastRow = Math.max(...sh.rows.keys());
+      const col = String(F.area || '').split(':').pop().replace(/[\d$]/g, '') || colLetter(cm.route);
+      sh.area = `A1:${col}${lastRow}`;
+    }
+    for (const it of rep) it.row = newpos.get(it.row) ?? it.row;
+    computeCache(sh);
+    const ob = obhodSheet(rep, notes, res, jinfo, tplId, fileName);
+    return {sheets: [sh, ob], styles, dfont: F.dfont, calcId: 124519, cables: keep.length, counts: groupCounts(res, rows)};
+  }
+
+  function build(J, res0, group, fileName) {
+    if (J && J.formSeg && J.formSeg.lay === 'seg') return buildSeg(J, J.formSeg, res0, group, fileName);
+    const F = J && J.form;
+    if (!F || !(F.v >= 1)) throw new Error('no-form');
+    const res = JSON.parse(JSON.stringify(res0));
+    if (res.format !== 'ikj-field-results') throw new Error('Это не файл результатов обхода IKJ Field.');
+    const jinfo = res.journal || {};
+    const rows = J.cables.map((c, i) => {
+      const cells = new Map(); for (const [col, v, s] of c.xr[1]) cells.set(col, {v, s});
+      const lv = cells.get(12), pr = parseRoute(lv && typeof lv.v === 'string' ? lv.v : null);
+      const av = cells.get(1), jv = cells.get(10);
+      return {key: c.mark, trow: isNone(c.row) ? F.first + i : c.row, h: c.xr[0], cells, doc: pyStrip(String(av && !isNone(av.v) ? av.v : '')),
+              len: jv ? (isNone(jv.v) ? null : jv.v) : null, route: pr.codes, lPrefix: pr.prefix, lSuffix: pr.suffix, segs: pr.segs};
+    }).sort((a, b) => a.trow - b.trow);
+    rows.forEach((x, i) => { if (x.trow !== F.first + i) throw new Error('form-rows'); });
+    const tplId = rows.length ? rows[0].doc : '';
+    if (jinfo.id && jinfo.id !== tplId) throw new Error(`Файл обхода относится к журналу ${jinfo.id}, а шаблон — к ${tplId}.`);
+    const notes = [];
+    if (jinfo.hash && jinfo.hash !== J.hash) notes.push('Версия журнала в телефоне отличается от шаблона (после выдачи журнала менялась РД). Расхождения по кабелям — в графе «Замечания конвертера».');
+    const byMark = new Map(); for (const c of res.cables || []) byMark.set(normMark(c.mark), c);
+    const used = new Set();
+    const styles = F.styles;
+    const colW = c => { const d = (F.cols || []).find(x => x[0] <= c && c <= x[1]); return d && d[2] ? d[2] : 13; };
+    const widthL = colW(12) || 9.0;
+    const report = [];
+    rows.forEach((x, i) => {
+      const r = F.first + i;
+      x.row = r;
+      const rc = byMark.get(normMark(x.key));
+      const multi = !!(x.segs && x.segs.length);
+      const item = {row: r, mark: x.key, design: x.route.length, len: x.len, conv: [], multi};
+      if (!rc) { item.status = 'нет в файле обхода'; report.push(item); return; }
+      used.add(normMark(x.key));
+      const entries = rc.entries || [];
+      const di = designItems(entries);
+      if (di.length !== x.route.length || di.some((v, k) => v !== x.route[k])) item.conv.push('трасса по РД в телефоне отличается от шаблона — применено по телефону');
+      const [cnt, unchecked] = countMarks(entries);
+      let rcSegs = rc.segs || [], rich, plain;
+      if (multi) {
+        assignSg(entries, x.segs);
+        if (rcSegs.length !== x.segs.length) {
+          if (rcSegs.length) item.conv.push(`в телефоне ${rcSegs.length} отрезков, в шаблоне ${x.segs.length} — длины по отрезкам не применены`);
+          rcSegs = [];
+        }
+        [rich, plain] = richSegmented(x.segs, entries, rcSegs);
+      } else [rich, plain] = richRoute(entries, x.lPrefix || '', x.lSuffix || '');
+      const L = x.cells.get(12) || {v: null, s: null};
+      x.cells.set(12, {v: rich, s: L.s});
+      const K = x.cells.get(11) || {v: null, s: null};
+      const kfont = (K.s !== null && styles[K.s] && styles[K.s].font) || {};
+      const kf = differs => Object.assign({}, K.s !== null ? styles[K.s] : {}, {font: {n: kfont.n || 'Arial', s: kfont.s || 8, c: differs ? BLUE : BLACK}});
+      const setK = (v, st) => x.cells.set(11, {v, s: K.s, st});
+      let lenOk = false, lenWhy = '', fl = rc.factLength;
+      let kStyle = null;
+      if (multi && rcSegs.length) {
+        const facts = rcSegs.map(rs => rs.factLength);
+        const miss = []; rcSegs.forEach((rs, k) => { if (isNone(rs.factLength) || rs.factLength === '') miss.push(String(isNone(rs.n) ? k + 1 : rs.n)); });
+        if (!miss.length) {
+          try {
+            const fv = facts.map(pyFloat);
+            const kv = fv.map(fmtLen).join('+');
+            let s = 0; for (const v of fv) s += v;
+            fl = isInt(s) ? s : round2(s);
+            lenOk = true;
+            kStyle = kf(!isNone(x.len) && pyFloat(x.len) !== pyFloat(fl));
+            setK({f: kv}, kStyle);
+          } catch (e) {
+            if (!(e instanceof PyErr)) throw e;
+            setK(null, kStyle); item.conv.push(`длина отрезков не число: [${facts.map(pyRepr).join(', ')}]`);
+          }
+        } else { setK(null, kStyle); lenWhy = 'не подтверждена длина отрезков ' + miss.join(', '); }
+      } else if (!isNone(fl) && fl !== '') {
+        try {
+          const flv = pyFloat(fl);
+          fl = flv; lenOk = true;
+          kStyle = kf(!isNone(x.len) && pyFloat(x.len) !== flv);
+          setK(flv, kStyle);
+        } catch (e) {
+          if (!(e instanceof PyErr)) throw e;
+          setK(null, null); item.conv.push(`длина по факту не число: ${pyRepr(fl)}`);
+        }
+      } else setK(null, null);
+      const need = nLines(plain, widthL) * 12.0 + 6, cur = x.h || 15;
+      if (need > cur) x.h = Math.round(need * 100) / 100;
+      finishItem(item, x, rc, entries, cnt, unchecked, rcSegs, multi, lenOk, lenWhy, fl);
+      report.push(item);
+    });
+    /* which cables go into this file */
+    let only = null;
+    if (group === 'сдан' || group === 'в_работе') only = splitMarks(res, rows.map(x => x.key))[group];
+    const keep = only ? rows.filter(x => only.has(normMark(x.key))) : rows;
+    if (!keep.length) throw new Error('empty');
+    const rep = only ? report.filter(it => only.has(normMark(it.mark))) : report;
+    const extra = (res.cables || []).filter(c => !used.has(normMark(c.mark))).map(c => c.mark);
+    if (extra.length) notes.push('В файле обхода есть кабели, которых нет в шаблоне: ' + extra.join(', '));
+
+    /* ---------- sheet «ИКЖ» */
+    const sh = {name: F.sheet || 'ИКЖ', rows: new Map(), cols: F.cols, fmt: F.fmt, page: F.page, mar: F.mar, po: F.po, view: F.view,
+                tabSelected: true, merges: [], area: F.area, titles: F.titles};
+    const put = (r, h, cells) => { const row = {h: isNone(h) ? null : h, cells: new Map()}; for (const [c, v, s] of cells) row.cells.set(c, {v, s}); sh.rows.set(r, row); return row; };
+    for (const [r, h, cells] of F.head) put(r, h, cells);
+    for (const m of F.mh || []) sh.merges.push(m);
+    const first = F.first, newpos = new Map();
+    keep.forEach((x, i) => {
+      const r = first + i, row = {h: x.h, cells: new Map()};
+      for (const [c, cell] of x.cells) {
+        let v = cell.v;
+        if (only && c === 11 && v && typeof v === 'object' && v.f && /^J\d+$/.test(v.f)) v = {f: `J${r}`};
+        row.cells.set(c, {v, s: cell.s, st: cell.st});
+      }
+      sh.rows.set(r, row); newpos.set(x.row, r);
+    });
+    const lastData = first + keep.length - 1;
+    if (!only || F.tot) {
+      const t0 = only ? lastData + 1 : first + rows.length;
+      F.tail.forEach(([o, h, cells], i) => {
+        const row = put(t0 + o, h, cells);
+        if (only && o === 0 && i === 0) for (const [c, cell] of row.cells) {
+          if (cell.v && typeof cell.v === 'object' && typeof cell.v.f === 'string' && /^SUM\(/i.test(cell.v.f)) {
+            const col = colLetter(c); cell.v = {f: `SUM(${col}${first}:${col}${Math.max(first, lastData)})`};
+          }
+        }
+      });
+      for (const [o1, c1, o2, c2] of F.mt || []) sh.merges.push([t0 + o1, c1, t0 + o2, c2]);
+    }
+    if (only) { const lastRow = Math.max(...sh.rows.keys()); sh.area = `A1:L${lastRow}`; }
+    for (const it of rep) it.row = newpos.get(it.row) ?? it.row;
+    computeCache(sh);
+
+    const ob = obhodSheet(rep, notes, res, jinfo, tplId, fileName);
     return {sheets: [sh, ob], styles, dfont: F.dfont, calcId: 124519, cables: keep.length,
             counts: {all: rows.length, ...(() => { const s = splitMarks(res, rows.map(x => x.key)); return {'сдан': rows.filter(x => s['сдан'].has(normMark(x.key))).length, 'в_работе': rows.filter(x => s['в_работе'].has(normMark(x.key))).length}; })()}};
   }
@@ -1380,7 +1555,9 @@ const IKJX = (() => {
     const wbm = build(J, res, group, fileName);
     return {blob: await zip(workbookFiles(wbm, `ИКЖ ${J.id}`)), cables: wbm.cables};
   }
-  return {xlsx, build, counts, splitMarks, parseRoute, nLines, toLocal, fmtLen, round2, hasForm: J => !!(J && J.form && J.form.v >= 1 && J.cables.every(c => Array.isArray(c.xr)))};
+  const hasForm = J => !!(J && ((J.formSeg && J.formSeg.lay === 'seg' && J.cables.every(c => Array.isArray(c.xb)))
+                                 || (J.form && J.form.v >= 1 && J.cables.every(c => Array.isArray(c.xr)))));
+  return {xlsx, build, counts, splitMarks, parseRoute, nLines, toLocal, fmtLen, round2, hasForm};
 })();
 if (typeof module !== 'undefined' && module.exports) module.exports = IKJX;
 /*IKJX-END*/
