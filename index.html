@@ -127,6 +127,25 @@ ol.route{list-style:none;margin:0 0 10px;padding:0}
 .locked .rr{opacity:.92}
 
 /* photos */
+/* 2.0: tasks and operations of the cables */
+.ops{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin:10px 0 2px}
+.opchip{border:1px solid var(--line);border-radius:9px;background:#fff;min-height:54px;padding:4px 1px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--muted);font-size:9.5px;line-height:1.1;text-align:center;overflow:hidden}
+.opchip .n{font-weight:800;font-size:14px;color:var(--ink)}
+.opchip.done{background:var(--ok);border-color:var(--ok);color:#fff}.opchip.done .n{color:#fff}
+.opchip.wip{background:var(--warn-bg);border-color:#f0c36d;color:var(--warn)}
+.opchip.later{opacity:.45;border-style:dashed}
+.btn.wip{background:var(--warn-bg);border-color:#f0c36d}
+.btn.tasks{background:#eef4fb;border-color:#b8d3f3;color:#0b3a66;margin:10px 0 0}
+.btn.tasks .chip{margin-left:6px}
+.inp.sm{min-height:42px;font-size:15px;padding:6px 10px;margin:0}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;margin:0 0 10px}
+.fgrid label{font-size:13px;color:var(--muted);display:block;margin:0 0 3px}
+.fgrid .w2{grid-column:span 2}
+.trow.closed{background:#eef8f0}
+.chk.inl{margin:0 0 8px}
+.ntrow{display:grid;grid-template-columns:28px 1fr 1fr 1fr;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
+.ntrow .inp{margin:0}
+.ntrow.off .inp{display:none}
 .photos{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px}
 .photos img{width:84px;height:84px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
 
@@ -216,7 +235,7 @@ body.drop main{outline:3px dashed var(--primary);outline-offset:-6px;border-radi
 <input type="file" id="filePhoto" accept="image/*" class="hidden">
 <script>
 'use strict';
-const APP_VERSION = '1.8.0';
+const APP_VERSION = '2.0.1';
 const EMBEDDED_JOURNAL = null; /*EMBED*/
 const ST = {U:'unchecked', OK:'ok', CHG:'changed', NO:'absent', ADD:'added'};
 /* tray code: building (12.12URF10.109/3), site trestle (00USY24.195.02/3) or 07UBG structure (07UBG080P024.01/46);
@@ -340,13 +359,54 @@ Object.assign(RU, {
   "Open files…": "Открыть файлы…", "Open journals or walk files": "Открыть журналы или файлы обхода",
   "On a computer: drag journal files (.ikj.json) or walk files (IKJ_….txt) into this window.": "На компьютере файлы журналов (.ikj.json) и файлы обхода (IKJ_….txt) можно перетащить в это окно."
 });
+Object.assign(RU, {
+  "Tasks": "Задания", "{n} to do": "сделать: {n}", "Work orders for the cables": "Задания по кабелям", "Today": "Сегодня", "All": "Все",
+  "No tasks on this phone yet.": "В телефоне пока нет заданий.",
+  "Your supervisor sends a task file (name ends with <b>.ikjt.json</b>): cables, operations, due date, drum and materials. Save it from Telegram to Downloads and tap <b>Load</b> below.":
+    "Руководитель присылает файл задания (имя заканчивается на <b>.ikjt.json</b>): кабели, операции, срок, барабан и материалы. Сохраните его из Telegram в «Загрузки» и нажмите <b>Загрузить</b> ниже.",
+  "Nothing for today — all tasks are done.": "На сегодня ничего нет — все задания выполнены.", "Create a task…": "Создать задание…", "Load task files": "Загрузить задания",
+  "Done": "Выполнено", "Overdue": "Просрочено", "no date": "без даты", "journal not loaded": "журнал не загружен",
+  "{a}/{b} operations done": "выполнено операций {a}/{b}", "laid {a} of {b} m": "уложено {a} из {b} м", "Task {d}": "Задание {d}",
+  "Not done: <b>{n}</b> of {m} operations": "Не выполнено: <b>{n}</b> из {m} операций", "All done": "Всё выполнено", "issued by": "выдал", "Note": "Примечание",
+  "Journal <b>{j}</b> is not on this phone. Load its file (.ikj.json) — then the cables of the task appear.": "Журнала <b>{j}</b> нет в телефоне. Загрузите его файл (.ikj.json) — появятся кабели задания.",
+  "The task was made for another version of the journal (the design changed). Check the cables.": "Задание составлено по другой версии журнала (менялась РД). Проверьте кабели.",
+  "To do": "Сделать", "Remove this task from the phone": "Удалить это задание из телефона", "not in the journal on this phone": "нет в журнале на этом телефоне",
+  "in 2.1": "в 2.1", "in work": "в работе", "drum": "барабан", "Materials": "Материалы", "available": "есть", "available?": "есть?",
+  "Route ready": "Готовность трассы", "Laying": "Укладка", "Penetrations": "Проходки", "Terminations": "Заделки", "Cable tags": "Бирки", "Route check": "Проверка трассы", "Measurements": "Измерения", "Handed over": "Сдан",
+  "task": "задание", "outside a task": "вне задания", "Date": "Дата", "Drum No.": "№ барабана", "Length on the drum, m": "Длина на барабане, м", "Cut off, m": "Отрезано, м", "Laid, m": "Уложено, м",
+  "Joints, pcs": "Муфты, шт.", "Air temperature, °C": "Температура воздуха, °C", "Cable heating": "Подогрев кабеля", "no": "нет",
+  "the cable on the tray with its tag and the tray number (required)": "кабель на полке с биркой и номером полки (обязательно)",
+  "Tags received": "Бирки получены", "Tags hung on the cable": "Бирки нацеплены на кабель", "tags are marked «present» on every segment": "бирки отмечены «есть» на всех отрезках",
+  "Add photo": "Добавить фото", "Clear this operation": "Снять отметку операции", "Clear the operation «{o}» of cable <b>{m}</b> (its marks and photos)?": "Снять операцию «{o}» у кабеля <b>{m}</b> (отметки и фото)?", "Clear": "Снять",
+  "Enter the laid length in metres.": "Введите уложенную длину в метрах.", "Add a photo: the cable on the tray with its tag and the tray number.": "Добавьте фото: кабель на полке с биркой и номером полки.",
+  "«Done» = the tags are hung on the cable. Tick it, or save «In work».": "«Выполнено» = бирки нацеплены на кабель. Отметьте это или сохраните «В работе».",
+  "{o}: done ✓": "{o}: выполнено ✓", "{o}: in work": "{o}: в работе", "{o}: cleared": "{o}: отметка снята", "Materials: available ✓": "Материалы: есть ✓", "Materials: not available": "Материалы: нет",
+  "received": "получены", "hung": "нацеплены",
+  "{j} · {d}: laid {n} cables ({m} m), tags on {k}, trays checked on {c}; handed over {a}/{b}": "{j} · {d}: уложено кабелей {n} ({m} м), бирки нацеплены на {k}, трасса проверена у {c}; сдано {a}/{b}",
+  "Laid: ": "Уложено: ", "tags on": "бирки на", "Photos of operations: ": "Фото операций: ", "(a separate archive)": "(отдельным архивом)",
+  "This is not an IKJ task file.": "Это не файл задания IKJ.", "The task file is damaged (an item without the cable mark).": "Файл задания повреждён (строка без марки кабеля).",
+  "This is a TASK file — open it with «Load».": "Это файл ЗАДАНИЯ — откройте его кнопкой «Загрузить».",
+  "Task {id}: journal {j} is not on this phone — load its file.": "Задание {id}: журнала {j} нет в телефоне — загрузите его файл.",
+  "Task {id}: the journal on this phone is another version (the design changed). Check the cables of the task.": "Задание {id}: журнал в телефоне другой версии (менялась РД). Проверьте кабели задания.",
+  "Task loaded: {id} ({n})": "Задание загружено: {id} ({n})", "Loaded ✓ {n} tasks": "Загружено заданий: {n} ✓",
+  "Remove task <b>{id}</b> from this phone? The marks of the cables stay.": "Удалить задание <b>{id}</b> из телефона? Отметки по кабелям останутся.",
+  "The cable is handed over ✓": "Кабель сдан ✓", "Route check: tick the trays below.": "Проверка трассы: отмечайте полки ниже.", "Operation {n} «{o}» comes in version 2.1.": "Операция {n} «{o}» появится в версии 2.1.",
+  "IKJ to Excel and the summary from the files of electricians": "ИКЖ в Excel и сводка по файлам электриков", "Work summary (Excel)": "Сводка выполнения (Excel)", "Summary": "Сводка",
+  "Sheets «Сводка» (plan of the tasks / fact), «Операции», «Невыполненное», «Журнал прокладки» (F-31A, draft) — from all opened walk files of the journal and the loaded tasks. Several files of one journal are merged: the later mark of a cable wins.":
+    "Листы «Сводка» (план заданий / факт), «Операции», «Невыполненное», «Журнал прокладки» (F-31A, черновик) — по всем открытым файлам обхода журнала и загруженным заданиям. Несколько файлов одного журнала сливаются: побеждает более поздняя отметка по кабелю.",
+  "no operations in the files yet": "в файлах пока нет операций", "laid {n}": "уложено {n}", "tags on {n}": "бирки на {n}",
+  "Create a task": "Создать задание", "for the phone of the responsible person": "для телефона ответственного", "Load a journal first (.ikj.json) — the task is made from its cables.": "Сначала загрузите журнал (.ikj.json) — задание собирается из его кабелей.",
+  "Journal": "Журнал", "Due date": "Срок", "Responsible (phone)": "Ответственный (телефон)", "Issued by": "Выдал", "Operations": "Операции", "Note for the task": "Примечание к заданию",
+  "Cables": "Кабели", "selected {n}": "выбрано {n}", "cable": "кабель", "length on it, m": "длина на нём, м", "Materials (comma-separated)": "Материалы (через запятую)", "tags 4 pcs, …": "бирки 4 шт, …",
+  "Download the task file": "Скачать файл задания", "Task file saved to Downloads — send it to the phone of {a}.": "Файл задания сохранён в «Загрузки» — отправьте его на телефон: {a}."
+});
 function T(s, p) {
   let r = LANG === 'ru' && RU[s] !== undefined ? RU[s] : s;
   if (p) r = r.replace(/\{(\w+)\}/g, (m, k) => (k in p ? p[k] : m));
   return r;
 }
 const RU_PL = {cable: ['кабель', 'кабеля', 'кабелей'], tray: ['полка', 'полки', 'полок'], edit: ['изменение', 'изменения', 'изменений'],
-               change: ['изменение', 'изменения', 'изменений'], journal: ['журнал', 'журнала', 'журналов']};
+               change: ['изменение', 'изменения', 'изменений'], journal: ['журнал', 'журнала', 'журналов'], task: ['задание', 'задания', 'заданий']};
 function ruForm(n, f) { const a = Math.abs(n) % 100, b = a % 10; return a > 10 && a < 20 ? f[2] : (b > 1 && b < 5 ? f[1] : (b === 1 ? f[0] : f[2])); }
 const plural = (n, w) => (LANG === 'ru' && RU_PL[w] ? `${n} ${ruForm(n, RU_PL[w])}` : `${n} ${w}${n === 1 ? '' : 's'}`);
 /* journal texts: Russian names when the journal has them (fromRu, toRu, typeRu, titleRu) */
@@ -406,8 +466,8 @@ const Store = (() => {
 })();
 
 /* ---------------------------------------------------------------- state */
-const S = {settings: {inspector: ''}, journals: {}, results: {}, idx: {}, persisted: null, installEvt: null, storageError: false,
-           ui: {tab: {}, q: {}, gq: '', scroll: {}, route: '', lastJid: null, resFiles: []}};
+const S = {settings: {inspector: ''}, journals: {}, results: {}, idx: {}, tasks: {}, persisted: null, installEvt: null, storageError: false,
+           ui: {tab: {}, q: {}, gq: '', scroll: {}, route: '', lastJid: null, resFiles: [], taskTab: 'today', newTask: null}};
 
 function buildIdx(jid) {
   const j = S.journals[jid];
@@ -558,11 +618,16 @@ function cableStats(rc) {
 }
 function journalStats(jid) {
   const j = S.journals[jid], r = S.results[jid];
-  const t = {total: 0, checked: 0, changes: 0, cables: j.cables.length, done: 0, closed: 0, photos: 0, lenDesign: 0, lenConf: 0, lenFact: 0};
+  const t = {total: 0, checked: 0, changes: 0, cables: j.cables.length, done: 0, closed: 0, photos: 0, lenDesign: 0, lenConf: 0, lenFact: 0,
+             ops: {laid: 0, laidM: 0, layWip: 0, tagsHung: 0, tagsReceived: 0, matOk: 0, photos: 0}};
   for (const c of j.cables) {
     const dl = lenNum(c.len); if (dl !== null) t.lenDesign += dl;
     const rc = r.cables[c.mark]; if (!rc) continue; const s = cableStats(rc);
     t.total += s.total; t.checked += s.checked; t.changes += s.changes; if (rc.closed) { t.done++; t.closed++; } t.photos += (rc.photos || []).length;
+    const o = rc.ops || {}, lay = o.lay || {}, tg = o.tags || {};
+    if (lay.st === 'done') { t.ops.laid++; t.ops.laidM += lenNum(lay.laidM) || 0; } else if (lay.st === 'wip') t.ops.layWip++;
+    if (tg.hung) t.ops.tagsHung++; if (tg.received) t.ops.tagsReceived++; if (o.mat && o.mat.ok) t.ops.matOk++;
+    for (const k in o) t.ops.photos += ((o[k] && o[k].photos) || []).length;
     if (rc.factLength !== null && rc.factLength !== undefined) { t.lenConf++; t.lenFact += Number(rc.factLength) || 0; }
   }
   return t;
@@ -622,6 +687,7 @@ function validateJournal(o) {
   if (!o || typeof o !== 'object') return T('The file is empty or damaged.');
   if (o.format === 'ikj-field-results') return T('This is a RESULTS file (from “Send”), not a journal. Journals come from your supervisor.');
   if (o.format === 'ikj-field-backup') return T('This is a BACKUP file. Use Settings → Restore from backup.');
+  if (o.format === 'ikj-task') return T('This is a TASK file — open it with «Load».');
   if (o.format !== 'ikj-journal' || !o.id || !Array.isArray(o.cables)) return T('This is not an IKJ journal file.');
   for (const c of o.cables) if (!c || !c.mark || !Array.isArray(c.route)) return T('The journal file is damaged (cable without mark or route).');
   for (const c of o.cables) if (c.segs && !(Array.isArray(c.segs) && c.segs.length > 1 && c.segs.reduce((n, x) => n + (+x.trays || 0), 0) === c.route.length)) delete c.segs;
@@ -654,7 +720,7 @@ function readFileText(file) { return new Promise((res, rej) => { const fr = new 
 function blobToDataURL(b) { return new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = () => rej(fr.error); fr.readAsDataURL(b); }); }
 async function dataURLToBlob(u) { const r = await fetch(u); return await r.blob(); }
 
-async function buildExport(jid, withPhotos) {
+async function buildExport(jid, withPhotos, photoZip) {
   const j = S.journals[jid], r = S.results[jid], cables = [];
   for (const c of j.cables) {
     const rc = r.cables[c.mark];
@@ -670,13 +736,17 @@ async function buildExport(jid, withPhotos) {
       const p = await Store.getPhoto(pid); if (!p) continue;
       const o = {name: p.name, takenAt: p.takenAt}; if (withPhotos) o.data = await blobToDataURL(p.blob); photos.push(o);
     }
-    cables.push({mark: c.mark, no: c.no, finished: !!rc.closed, closed: !!rc.closed, closedAt: rc.closedAt || null,
+    const row = {mark: c.mark, no: c.no, finished: !!rc.closed, closed: !!rc.closed, closedAt: rc.closedAt || null,
                  reopenedAt: rc.reopenedAt || null, designLength: c.len, factLength: rc.factLength ?? null,
-                 lengthConfirmed: rc.factLength !== null && rc.factLength !== undefined, note: rc.note || '', updated: rc.updated, segs, entries, photos});
+                 lengthConfirmed: rc.factLength !== null && rc.factLength !== undefined, note: rc.note || '', updated: rc.updated, segs, entries, photos};
+    const ops = await exportOps(rc); if (ops) row.ops = ops;
+    cables.push(row);
   }
-  const out = {format: 'ikj-field-results', version: 1, app: 'IKJ Field ' + APP_VERSION,
+  const out = {format: 'ikj-field-results', version: 2, app: 'IKJ Field ' + APP_VERSION,
     journal: {id: j.id, hash: j.hash, title: j.title || '', building: j.building || ''},
-    inspector: S.settings.inspector || '', exportedAt: nowIso(), summary: journalStats(jid), photosIncluded: !!withPhotos, cables};
+    inspector: S.settings.inspector || '', exportedAt: nowIso(), summary: journalStats(jid), photosIncluded: !!withPhotos,
+    photosArchive: photoZip || null, tasks: taskIds().filter(id => S.tasks[id].journal.id === jid).map(id => { const t = S.tasks[id], p = taskProgress(t); return {id, due: t.due || '', assignee: t.assignee || '', items: t.items.length, done: p.done, ops: p.ops}; }),
+    cables};
   if (r.orphans) out.orphans = r.orphans;
   return JSON.stringify(out, null, 1);
 }
@@ -684,15 +754,18 @@ function downloadBlob(blob, name) {
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
   document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 5000);
 }
-async function shareOrSave(file, mode) {
+async function shareOrSave(file, mode, text) { return shareFiles([file], mode, text); }
+/* 2.0: several files at once (the results file + the photo archive) and a short text of the message */
+async function shareFiles(files, mode, text) {
   if (mode === 'share' && navigator.canShare && navigator.share) {
-    let can = false; try { can = navigator.canShare({files: [file]}); } catch (e) {}
+    let can = false; try { can = navigator.canShare({files}); } catch (e) {}
     if (can) {
-      try { await navigator.share({files: [file], title: file.name}); return 'shared'; }
+      try { await navigator.share(Object.assign({files, title: files[0].name}, text ? {text} : {})); return 'shared'; }
       catch (e) { if (e && e.name === 'AbortError') return 'cancelled'; console.warn(e); }
     }
   }
-  downloadBlob(file, file.name); return 'saved';
+  for (let i = 0; i < files.length; i++) { if (i) await new Promise(r => setTimeout(r, 350)); downloadBlob(files[i], files[i].name); }
+  return 'saved';
 }
 
 /*IKJX-BEGIN*/
@@ -704,7 +777,9 @@ async function shareOrSave(file, mode) {
    group: 'all' | 'сдан' | 'в_работе'.  Everything is done on the device, no internet.
    1.8: a journal may also carry `formSeg` (lay 'seg') and `xb` for every cable — the form «по участкам» like the cable
    journal of the RD: every segment of a cable is a block of rows («From» / «To» with X, Y, Z, design length, actual
-   length, routing). Then the ИКЖ is made in that form (buildSeg), the same as the converter for such a template. */
+   length, routing). Then the ИКЖ is made in that form (buildSeg), the same as the converter for such a template.
+   2.0: summaryXlsx(journal, walk files, tasks) — «Сводка выполнения» from the operations of the cables (laying, tags):
+   the same workbook as tools/ikj_tool.py summary; zip(files, mime) also packs binary entries (the photo archive). */
 const IKJX = (() => {
   'use strict';
   /* character widths of Arial 9 (Liberation Sans, 48 px, 1/64 px) — the same table as tools/char_widths.json */
@@ -1345,6 +1420,166 @@ const IKJX = (() => {
   const colLetter = c => { let s = ''; while (c > 0) { const m = (c - 1) % 26; s = String.fromCharCode(65 + m) + s; c = Math.floor((c - 1) / 26); } return s; };
   const colIndex = L => { let n = 0; for (const ch of L) n = n * 26 + (ch.charCodeAt(0) - 64); return n; };
 
+  /* ---------------------------------------------------------------- 2.0: operations of the cables (laying, tags) -> «Сводка выполнения»
+     The same workbook as tools/ikj_tool.py summary: sheets «Сводка», «Операции», «Невыполненное»,
+     «Журнал прокладки» (F-31A, draft). reports: [{name, o}] (walk files with `ops`), tasks: [task objects]. */
+  const OP_RU = {lay: 'Укладка', tags: 'Бирки', mat: 'Материалы'};
+  const ST_RU = st => (st === 'done' ? 'выполнено' : (st === 'wip' ? 'в работе' : 'не начато'));
+  const strCmp = (a, b) => (a < b ? -1 : (a > b ? 1 : 0));
+  const NUM_RE = /^[+-]?(\d+\.?\d*|\.\d+)(e[+-]?\d+)?$/i;
+  const numOrText = v => { if (isNone(v) || v === '') return ''; if (typeof v === 'number') return v; if (typeof v === 'boolean') return v ? 'True' : 'False'; const s = String(v).replace(',', '.').trim(); return NUM_RE.test(s) ? Number(s) : String(v); };
+  const yesNo = v => (v ? 'да' : 'нет');
+  const dateRu = s => { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(s || '')); return m ? `${m[3]}.${m[2]}.${m[1]}` : String(s || ''); };
+  const drumText = o => { const d = isNone(o.drum) ? '' : String(o.drum); const l = numOrText(o.drumLen); return d + (l !== '' ? ` ${fmtLen(l)}м` : ''); };
+  const taskLabel = (o, tasks) => (isNone(o.task) || o.task === '' ? 'вне задания' : (tasks.some(t => t.id === o.task) ? String(o.task) : String(o.task) + ' (файл задания не загружен)'));
+  /* reports of one journal, oldest first; per (cable, operation) the later mark (t) wins */
+  function mergeOps(reports) {
+    const reps = reports.slice().sort((a, b) => strCmp(String(a.o.exportedAt || ''), String(b.o.exportedAt || '')) || strCmp(String(a.name), String(b.name)));
+    const m = new Map();
+    for (const rep of reps) {
+      for (const c of (rep.o.cables || [])) {
+        if (!m.has(c.mark)) m.set(c.mark, {closed: false, ops: {}});
+        const x = m.get(c.mark);
+        x.closed = !!c.closed;
+        for (const op of ['lay', 'tags', 'mat']) {
+          const o = c.ops && c.ops[op]; if (!o) continue;
+          const cur = x.ops[op];
+          if (!cur || String(o.t || '') >= String(cur.t || '')) x.ops[op] = Object.assign({}, o, {file: rep.name});
+        }
+      }
+    }
+    return {merged: m, reports: reps};
+  }
+  function summaryBuild(J, reports, tasks0) {
+    const tasks = tasks0.filter(t => t.journal && t.journal.id === J.id).sort((a, b) => strCmp(String(a.due || ''), String(b.due || '')) || strCmp(String(a.id), String(b.id)));
+    const {merged, reports: reps} = mergeOps(reports);
+    const F9 = {n: 'Arial', s: 9}, F9B = {n: 'Arial', s: 9, b: 1}, F12B = {n: 'Arial', s: 12, b: 1};
+    const HF = {t: 'solid', fg: 'FFD9D9D9'}, GREEN = {t: 'solid', fg: 'FFC6E0B4'}, YEL = {t: 'solid', fg: 'FFFFF2CC'}, RED_F = {t: 'solid', fg: 'FFF8CBAD'};
+    const cables = J.cables, pos = new Map(cables.map((c, i) => [c.mark, i]));
+    const cLen = c => { try { return pyFloat(c.len); } catch (e) { return 0; } };
+    const opOf = (mark, op) => { const x = merged.get(mark); return x && x.ops[op] ? x.ops[op] : null; };
+    const isDone = (mark, op) => { const o = opOf(mark, op); return !!(o && o.st === 'done'); };
+    const laidOf = mark => { const o = opOf(mark, 'lay'); const v = o ? numOrText(o.laidM) : ''; return typeof v === 'number' ? v : 0; };
+    /* a sheet: a table with the same conventions as «Обход» (header grey, Arial 9, thin borders, wrapped text) */
+    function mkSheet(name, cols, landscape) {
+      const sh = {name, rows: new Map(), cols: cols.map((c, i) => [i + 1, i + 1, c[1], 1, 0]), fmt: {dh: 15, bw: 8},
+                  page: {o: landscape ? 'landscape' : 'portrait', p: 9, fw: 1, fh: 0, fit: 1}, mar: [0.75, 0.75, 1, 1, 0.5, 0.5], view: {}, merges: []};
+      sh.cell = (r, c, v, st) => { if (!sh.rows.has(r)) sh.rows.set(r, {h: null, cells: new Map()}); sh.rows.get(r).cells.set(c, {v: v === '' ? null : v, s: null, st}); };
+      sh.header = r => { cols.forEach((c, i) => sh.cell(r, i + 1, c[0], {font: F9B, al: C_AL, border: BORDER, fill: HF})); sh.rows.get(r).h = 30; };
+      sh.line = (r, vals, fillBy) => {
+        let h = 1;
+        cols.forEach(([, w, al], i) => {
+          const v = vals[i];
+          sh.cell(r, i + 1, isNone(v) ? null : v, {font: F9, border: BORDER, al});
+          if (al === L_AL && !isNone(v) && v !== '') h = Math.max(h, nLines(pyStr(v), w));
+        });
+        if (fillBy) for (const [ci, f] of fillBy) sh.rows.get(r).cells.get(ci).st.fill = f;
+        sh.rows.get(r).h = Math.max(15, h * 12 + 4);
+      };
+      return sh;
+    }
+    const meta = [['Журнал', J.id], ['Файлы отчётов', reps.map(r => r.name).join('; ')], ['Электрики', [...new Set(reps.map(r => r.o.inspector || '—'))].join('; ')],
+                  ['Задания', tasks.map(t => t.id).join('; ')]];
+    const metaRows = (sh, title) => { sh.cell(1, 1, title, {font: F12B}); meta.forEach(([k, v], i) => { sh.cell(i + 2, 1, k, {font: F9B}); sh.cell(i + 2, 3, v, {font: F9}); }); return 2 + meta.length + 1; };
+    /* ---- «Сводка»: plan of every task against the fact of the operations */
+    const sv = mkSheet('Сводка', [['Задание', 16, L_AL], ['Срок', 11, C_AL], ['Исполнитель', 18, L_AL], ['Кабелей в задании', 9, C_AL], ['План, м', 9, C_AL],
+      ['Укладка выполнена, каб.', 11, C_AL], ['Уложено, м', 9, C_AL], ['Бирки нацеплены, каб.', 11, C_AL], ['Бирки получены, каб.', 11, C_AL],
+      ['Материалы есть, каб.', 11, C_AL], ['Не выполнено операций', 11, C_AL], ['Примечание', 30, L_AL]], true);
+    let r = metaRows(sv, `Сводка выполнения — ${J.id}`);
+    sv.header(r); const hdrSv = r;
+    const inTask = new Set();
+    const tot = {n: 0, plan: 0, laid: 0, laidM: 0, hung: 0, rec: 0, mat: 0, left: 0};
+    for (const t of tasks) {
+      const a = {n: 0, plan: 0, laid: 0, laidM: 0, hung: 0, rec: 0, mat: 0, left: 0};
+      for (const it of (t.items || [])) {
+        const c = cables.find(x => x.mark === it.mark); const ops = it.ops && it.ops.length ? it.ops : ['lay', 'tags'];
+        a.n++; if (c) a.plan += cLen(c);
+        for (const op of ops) { inTask.add(it.mark + '\u0001' + op); if (isDone(it.mark, op)) { if (op === 'lay') { a.laid++; a.laidM += laidOf(it.mark); } else if (op === 'tags') a.hung++; } else a.left++; }
+        const tg = opOf(it.mark, 'tags'); if (tg && tg.received) a.rec++;
+        const mt = opOf(it.mark, 'mat'); if (mt && mt.ok) a.mat++;
+      }
+      r++; sv.line(r, [t.id, dateRu(t.due), t.assignee || '', a.n, round2(a.plan), a.laid, round2(a.laidM), a.hung, a.rec, a.mat, a.left, t.note || ''],
+                   [[11, a.left ? (a.laid || a.hung ? YEL : RED_F) : GREEN]]);
+      for (const k in tot) tot[k] += a[k];
+    }
+    /* operations done outside the loaded tasks */
+    const out = {n: 0, laid: 0, laidM: 0, hung: 0, rec: 0, mat: 0, marks: new Set()};
+    for (const c of cables) for (const op of ['lay', 'tags']) {
+      if (inTask.has(c.mark + '\u0001' + op) || !isDone(c.mark, op)) continue;
+      out.marks.add(c.mark); if (op === 'lay') { out.laid++; out.laidM += laidOf(c.mark); } else out.hung++;
+    }
+    for (const mk of out.marks) { const tg = opOf(mk, 'tags'); if (tg && tg.received) out.rec++; const mt = opOf(mk, 'mat'); if (mt && mt.ok) out.mat++; }
+    out.n = out.marks.size;
+    if (out.n) { r++; sv.line(r, ['Вне задания', '', '', out.n, '', out.laid, round2(out.laidM), out.hung, out.rec, out.mat, '', 'операции, выполненные не по заданию (или файл задания не загружен)']); }
+    r++; sv.line(r, ['Итого', '', '', tot.n + out.n, round2(tot.plan), tot.laid + out.laid, round2(tot.laidM + out.laidM), tot.hung + out.hung, tot.rec + out.rec, tot.mat + out.mat, tot.left, '']);
+    sv.rows.get(r).cells.forEach(cl => { cl.st.font = F9B; });
+    sv.freeze = {col: 2, row: hdrSv + 1};
+    /* ---- «Операции»: every operation of every cable (the latest mark) */
+    const so = mkSheet('Операции', [['№', 5, C_AL], ['№ кабеля', 8, C_AL], ['Монтажная марка', 20, L_AL], ['Операция', 10, L_AL], ['Статус', 11, L_AL],
+      ['Дата', 11, C_AL], ['Исполнитель', 18, L_AL], ['Барабан', 14, L_AL], ['На барабане, м', 9, C_AL], ['Отрезано, м', 9, C_AL], ['Уложено, м', 9, C_AL],
+      ['Муфты', 7, C_AL], ['t°, °C', 7, C_AL], ['Подогрев', 10, L_AL], ['Бирки получены', 9, C_AL], ['Бирки нацеплены', 9, C_AL], ['Материалы', 10, L_AL],
+      ['Фото', 30, L_AL], ['Задание', 20, L_AL], ['Примечание', 30, L_AL], ['Отметка', 14, C_AL], ['Файл отчёта', 30, L_AL], ['Сдан', 7, C_AL]], true);
+    r = metaRows(so, `Операции по кабелям — ${J.id}`);
+    so.header(r); const hdrSo = r; let n = 0;
+    for (const c of cables) {
+      const x = merged.get(c.mark); if (!x) continue;
+      const mt = x.ops.mat, matTxt = mt ? (mt.ok ? 'есть' : 'нет') + (mt.note ? ` (${mt.note})` : '') : '';
+      for (const op of ['lay', 'tags']) {
+        const o = x.ops[op]; if (!o || (isNone(o.st) && !(o.photos || []).length && !o.received)) continue;
+        n++; r++;
+        const isLay = op === 'lay';
+        so.line(r, [n, c.no, c.mark, OP_RU[op], ST_RU(o.st), dateRu(o.date), o.by || '', isLay ? (isNone(o.drum) ? '' : String(o.drum)) : '',
+          isLay ? numOrText(o.drumLen) : '', isLay ? numOrText(o.cutM) : '', isLay ? numOrText(o.laidM) : '', isLay ? numOrText(o.joints) : '',
+          isLay ? numOrText(o.temp) : '', isLay ? (isNone(o.heat) ? '' : String(o.heat)) : '', isLay ? '' : yesNo(o.received), isLay ? '' : yesNo(o.hung),
+          matTxt, (o.photos || []).map(p => (typeof p === 'string' ? p : (p && p.name) || '')).join(', '), taskLabel(o, tasks), o.note || '', toLocal(o.t), o.file || '', x.closed ? 'да' : ''],
+          [[5, o.st === 'done' ? GREEN : (o.st === 'wip' ? YEL : RED_F)]]);
+      }
+    }
+    so.freeze = {col: 4, row: hdrSo + 1};
+    /* ---- «Невыполненное»: what is left in every task */
+    const sn = mkSheet('Невыполненное', [['Задание', 16, L_AL], ['Срок', 11, C_AL], ['Исполнитель', 18, L_AL], ['№ кабеля', 8, C_AL], ['Монтажная марка', 20, L_AL],
+      ['Операция', 10, L_AL], ['Состояние', 11, L_AL], ['Барабан по заданию', 14, L_AL], ['Материалы по заданию', 30, L_AL], ['Примечание задания', 30, L_AL], ['Примечание операции', 30, L_AL]], true);
+    r = metaRows(sn, `Невыполненное по заданиям — ${J.id}`);
+    sn.header(r); const hdrSn = r;
+    for (const t of tasks) for (const it of (t.items || [])) {
+      const c = cables.find(x => x.mark === it.mark); const ops = it.ops && it.ops.length ? it.ops : ['lay', 'tags'];
+      for (const op of ops) {
+        if (isDone(it.mark, op)) continue;
+        const o = opOf(it.mark, op); r++;
+        sn.line(r, [t.id, dateRu(t.due), t.assignee || '', c ? c.no : '', it.mark, OP_RU[op] || op, o && o.st === 'wip' ? 'в работе' : 'не начато', drumText(it),
+          (it.materials || []).map(m => `${m.name || ''}${isNone(m.qty) || m.qty === '' ? '' : ' ' + m.qty}${m.unit ? ' ' + m.unit : ''}`).join('; '), it.note || '', o && o.note ? o.note : ''],
+          [[7, o && o.st === 'wip' ? YEL : RED_F]]);
+      }
+    }
+    sn.freeze = {col: 1, row: hdrSn + 1};
+    /* ---- «Журнал прокладки»: F-31A columns 1–9 from the laying operations (draft for the office) */
+    const sf = mkSheet('Журнал прокладки', [['Дата прокладки', 11, C_AL], ['Наименование и номер кабеля по кабельному журналу', 26, L_AL],
+      ['Марка кабеля, напряжение, кВ, сечение, мм²', 24, L_AL], ['Общая длина линии, м', 9, C_AL], ['Номер барабана и длина кабеля на каждом, м', 20, L_AL],
+      ['Количество соединительных муфт на линии', 10, C_AL], ['Температура окружающего воздуха при прокладке, °C', 11, C_AL], ['Способ подогрева кабеля и продолжительность прокладки, ч', 14, L_AL],
+      ['Фамилия и подпись ответственного за прокладку', 22, L_AL]], true);
+    sf.cell(1, 1, `Журнал прокладки кабелей (форма F-31A) — черновик по отчётам приложения — ${J.id}`, {font: F12B});
+    sf.cell(2, 1, 'Графы 1–9 формы F-31A (ПП РУППУР-2.4-041-2023, прил. 45). Проверьте и перенесите в бланк формы.', {font: F9});
+    r = 4; sf.header(r); const hdrSf = r;
+    r++; for (let i = 1; i <= 9; i++) sf.cell(r, i, i, {font: F9, al: C_AL, border: BORDER}); sf.rows.get(r).h = 15;
+    const lays = [];
+    for (const c of cables) { const o = opOf(c.mark, 'lay'); if (o && o.st === 'done') lays.push([String(o.date || ''), pos.get(c.mark), c, o]); }
+    lays.sort((a, b) => strCmp(a[0], b[0]) || a[1] - b[1]);
+    let sum = 0;
+    for (const [, , c, o] of lays) {
+      r++; const laid = numOrText(o.laidM); if (typeof laid === 'number') sum += laid;
+      const joints = numOrText(o.joints);
+      sf.line(r, [dateRu(o.date), `${c.mark} ${c.no}`, `${c.type || ''} ${c.size || ''}`.replace(/\s+$/, ''), laid, drumText(o), joints === '' || joints === 0 ? 'нет' : joints,
+        numOrText(o.temp), isNone(o.heat) || o.heat === '' ? 'нет' : String(o.heat), o.by || '']);
+    }
+    r++; sf.cell(r, 2, 'ИТОГО', {font: F9B, al: L_AL, border: BORDER}); sf.cell(r, 4, round2(sum), {font: F9B, al: C_AL, border: BORDER});
+    sf.freeze = {col: 1, row: hdrSf + 2}; sf.titles = `${hdrSf}:${hdrSf + 1}`;
+    sv.tabSelected = true;
+    return {sheets: [sv, so, sn, sf], styles: [], dfont: null, calcId: 124519, rows: n, lays: lays.length, merged};
+  }
+  async function summaryXlsx(J, reports, tasks) {
+    const wbm = summaryBuild(J, reports, tasks);
+    return {blob: await zip(workbookFiles(wbm, `Сводка ${J.id}`)), rows: wbm.rows, lays: wbm.lays};
+  }
   /* ---------------------------------------------------------------- xlsx writer */
   const XML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n';
   const NS = 'http://schemas.openxmlformats.org/spreadsheetml/2006/main';
@@ -1524,14 +1759,14 @@ const IKJX = (() => {
     try { return new Uint8Array(await new Response(new Blob([b]).stream().pipeThrough(new CompressionStream('deflate-raw'))).arrayBuffer()); }
     catch (e) { return null; }
   }
-  async function zip(files) {
+  async function zip(files, mime) {
     const enc = new TextEncoder(), d = new Date();
     const tm = ((d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1)) & 0xFFFF;
     const dt = (((d.getFullYear() - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate()) & 0xFFFF;
     const parts = [], central = []; let off = 0;
     for (const [name, text] of files) {
-      const nb = enc.encode(name), data = enc.encode(text), crc = crc32(data);
-      let comp = await deflateRaw(data), method = 8;
+      const nb = enc.encode(name), data = text instanceof Uint8Array ? text : enc.encode(text), crc = crc32(data);
+      let comp = /\.(jpe?g|png|zip)$/i.test(name) ? null : await deflateRaw(data), method = 8;
       if (!comp || comp.length >= data.length) { comp = data; method = 0; }
       const h = new DataView(new ArrayBuffer(30));
       h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(6, 0, true); h.setUint16(8, method, true);
@@ -1548,7 +1783,7 @@ const IKJX = (() => {
     const size = central.reduce((n, a) => n + a.length, 0), e = new DataView(new ArrayBuffer(22));
     e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true);
     e.setUint32(12, size, true); e.setUint32(16, off, true);
-    return new Blob([...parts, ...central, new Uint8Array(e.buffer)], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+    return new Blob([...parts, ...central, new Uint8Array(e.buffer)], {type: mime || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
   }
   /* journal + results -> Blob of the xlsx */
   async function xlsx(J, res, group, fileName) {
@@ -1557,10 +1792,364 @@ const IKJX = (() => {
   }
   const hasForm = J => !!(J && ((J.formSeg && J.formSeg.lay === 'seg' && J.cables.every(c => Array.isArray(c.xb)))
                                  || (J.form && J.form.v >= 1 && J.cables.every(c => Array.isArray(c.xr)))));
-  return {xlsx, build, counts, splitMarks, parseRoute, nLines, toLocal, fmtLen, round2, hasForm};
+  return {xlsx, build, counts, splitMarks, parseRoute, nLines, toLocal, fmtLen, round2, hasForm, zip, mergeOps, summaryBuild, summaryXlsx};
 })();
 if (typeof module !== 'undefined' && module.exports) module.exports = IKJX;
 /*IKJX-END*/
+
+/* ================================================================ 2.0: work orders (tasks) and operations of the cables
+   A cable has a card of operations (1 route ready … 8 handed over); in 2.0 the phone keeps 2 «Laying» (drum, cut / laid
+   metres, joints, temperature, photo), 5 «Cable tags» (received / hung) and the tick «Materials» of the task; 6 «Route
+   check» and 8 «Handed over» are the marks that exist since 1.x; 1, 3, 4, 7 come in 2.1. A task (.ikjt.json, from the
+   computer) = cables + operations + due date + drum + materials; the phone keeps several tasks. Every mark carries
+   the task it was made for (or null = outside a task). */
+const OPS = ['ready', 'lay', 'pen', 'term', 'tags', 'route', 'meas', 'done'];
+const OP_LABEL = {ready: 'Route ready', lay: 'Laying', pen: 'Penetrations', term: 'Terminations', tags: 'Cable tags', route: 'Route check', meas: 'Measurements', done: 'Handed over'};
+const OP_LATER = new Set(['ready', 'pen', 'term', 'meas']);
+const OP_FIELDS = ['date', 'drum', 'drumLen', 'cutM', 'laidM', 'joints', 'temp', 'heat', 'note', 'received', 'hung'];
+const opsOf = rc => (rc.ops || (rc.ops = {}));
+const opRec = (rc, op) => (rc && rc.ops && rc.ops[op]) || null;
+const opSt = (rc, op) => { const o = opRec(rc, op); return o ? (o.st || null) : null; };
+const todayStr = () => { const d = new Date(), p = n => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`; };
+const localDay = iso => { const t = new Date(iso), p = n => String(n).padStart(2, '0'); return Number.isNaN(t.getTime()) ? '' : `${t.getFullYear()}-${p(t.getMonth() + 1)}-${p(t.getDate())}`; };
+const stampC = () => { const d = new Date(), p = n => String(n).padStart(2, '0'); return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`; };
+const safeMark = m => String(m).replace(/\//g, '-').replace(/[^A-Za-z0-9._()-]/g, '_');
+const fmtDate = s => { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(s || '')); return m ? `${m[3]}.${m[2]}.${m[1]}` : String(s || ''); };
+const numIn = v => { const n = lenNum(v); return n === null ? (String(v ?? '').trim() === '' ? '' : String(v)) : n; };
+/* ---- tasks */
+function validateTask(o) {
+  if (!o || o.format !== 'ikj-task' || !o.id || !o.journal || !o.journal.id || !Array.isArray(o.items)) return T('This is not an IKJ task file.');
+  for (const it of o.items) if (!it || !it.mark) return T('The task file is damaged (an item without the cable mark).');
+  return null;
+}
+async function addTask(t, opts = {}) {
+  const err = validateTask(t); if (err) throw new Error(err);
+  t.items.forEach(it => { if (!Array.isArray(it.ops) || !it.ops.length) it.ops = ['lay', 'tags']; });
+  t.loadedAt = nowIso();
+  S.tasks[t.id] = t; await Store.set('task:' + t.id, t);
+  const j = S.journals[t.journal.id];
+  if (!j) toast(T('Task {id}: journal {j} is not on this phone — load its file.', {id: t.id, j: shortId(t.journal.id)}));
+  else if (t.journal.hash && j.hash !== t.journal.hash) toast(T('Task {id}: the journal on this phone is another version (the design changed). Check the cables of the task.', {id: t.id}));
+  else if (!opts.silent) toast(T('Task loaded: {id} ({n})', {id: t.id, n: plural(t.items.length, 'cable')}));
+  return t.id;
+}
+const taskIds = () => Object.keys(S.tasks).sort((a, b) => natCmp(S.tasks[b].due || '', S.tasks[a].due || '') || natCmp(a, b));
+const taskItemOf = (t, mark) => (t ? (t.items || []).find(x => x.mark === mark) : null);
+function taskItemDone(t, it) {
+  const r = S.results[t.journal.id], rc = r && r.cables[it.mark]; if (!rc) return [];
+  return it.ops.filter(op => (op === 'done' ? !!rc.closed : opSt(rc, op) === 'done'));
+}
+function taskProgress(t) {
+  const p = {items: t.items.length, ops: 0, done: 0, lenPlan: 0, lenDone: 0, missing: 0, cablesDone: 0};
+  const jid = t.journal.id, j = S.journals[jid];
+  for (const it of t.items) {
+    const c = j && S.idx[jid] ? S.idx[jid].byMark.get(it.mark) : null; if (!c) p.missing++;
+    const d = taskItemDone(t, it); p.ops += it.ops.length; p.done += d.length; if (d.length === it.ops.length) p.cablesDone++;
+    const dl = c ? lenNum(c.len) : null; if (dl !== null) { p.lenPlan += dl; if (d.includes('lay')) p.lenDone += dl; }
+  }
+  return p;
+}
+const taskComplete = t => { const p = taskProgress(t); return p.ops > 0 && p.done === p.ops; };
+const taskToday = t => !taskComplete(t) && (t.due || '') <= todayStr();     /* due today, overdue or without a date — and not finished */
+const taskOverdue = t => !taskComplete(t) && !!t.due && t.due < todayStr();
+function openTaskFor(jid, mark, op) {
+  for (const id of taskIds()) {
+    const t = S.tasks[id]; if (t.journal.id !== jid) continue;
+    const it = taskItemOf(t, mark); if (it && it.ops.includes(op) && !taskItemDone(t, it).includes(op)) return t;
+  }
+  return null;
+}
+const openOpsCount = jid => { let n = 0; for (const id of taskIds()) { const t = S.tasks[id]; if ((jid && t.journal.id !== jid) || !taskToday(t)) continue; const p = taskProgress(t); n += p.ops - p.done; } return n; };
+function tasksButton(jid) {
+  if (!Object.keys(S.tasks).length && !isDesktop()) return '';
+  const n = openOpsCount(jid);
+  return `<button class="btn tasks" data-act="openTasks">📋 ${T('Tasks')}${n ? `<span class="chip blue">${T('{n} to do', {n})}</span>` : ''}</button>`;
+}
+/* ---- screens */
+const rTask = id => '#/task/' + enc(id);
+function taskCard(t) {
+  const p = taskProgress(t), j = S.journals[t.journal.id], fin = taskComplete(t);
+  const chip = fin ? `<span class="chip closed">${T('Done')}</span>` : (taskOverdue(t) ? `<span class="chip red">${T('Overdue')}</span>` : (p.done ? `<span class="chip prog">${T('In progress')}</span>` : ''));
+  return `<button class="card ${fin ? 'closed' : ''}" data-act="openTask" data-id="${esc(t.id)}">
+    <div class="item-top"><span class="jid">📋 ${esc(fmtDate(t.due) || T('no date'))}</span>${chip}</div>
+    <div class="small"><b>${esc(t.assignee || '')}</b>${t.assignee ? ' · ' : ''}<span class="mono">${esc(shortId(t.journal.id))}</span>${j ? '' : ` · <span class="red">${T('journal not loaded')}</span>`}</div>
+    <div class="small muted">${plural(p.items, 'cable')} · ${T('{a}/{b} operations done', {a: p.done, b: p.ops})} · ${T('laid {a} of {b} m', {a: fmtLen(p.lenDone), b: fmtLen(p.lenPlan)})}</div>
+    ${bar(p.done, p.ops)}
+    ${t.note ? `<div class="small">${esc(t.note)}</div>` : ''}<div class="tiny muted">${esc(t.id)}</div>
+  </button>`;
+}
+function viewTasks() {
+  setHeader({title: T('Tasks'), sub: T('Work orders for the cables'), back: '#/'});
+  const tab = S.ui.taskTab || 'today', all = taskIds(), ids = all.filter(id => tab === 'all' || taskToday(S.tasks[id]));
+  let h = `<div class="tabs"><button data-act="ttab" data-tab="today" class="${tab === 'today' ? 'on' : ''}">${T('Today')}</button><button data-act="ttab" data-tab="all" class="${tab === 'all' ? 'on' : ''}">${T('All')}</button></div>`;
+  if (!all.length) h += `<div class="card"><p style="margin-top:0"><b>${T('No tasks on this phone yet.')}</b></p><p class="small">${T('Your supervisor sends a task file (name ends with <b>.ikjt.json</b>): cables, operations, due date, drum and materials. Save it from Telegram to Downloads and tap <b>Load</b> below.')}</p></div>`;
+  else if (!ids.length) h += `<div class="card small muted">${T('Nothing for today — all tasks are done.')}</div>`;
+  for (const id of ids) h += taskCard(S.tasks[id]);
+  if (isDesktop()) h += `<button class="btn primary" data-act="newTask">${T('Create a task…')}</button>`;
+  h += `<button class="btn" data-act="loadJ">${T('Load task files')}</button>`;
+  view.innerHTML = h;
+}
+function viewTask(id) {
+  const t = S.tasks[id]; if (!t) { nav('#/task'); return; }
+  const jid = t.journal.id, j = S.journals[jid], p = taskProgress(t), fin = taskComplete(t);
+  setHeader({title: T('Task {d}', {d: fmtDate(t.due) || ''}), sub: `${t.assignee || ''}${t.assignee ? ' · ' : ''}${shortId(jid)}`, back: '#/task', send: j ? jid : undefined});
+  let h = `<div class="card small ${fin ? 'closed' : ''}">
+    <div class="stval ${fin ? 'okc' : ''}">${fin ? '✓ ' + T('All done') : T('Not done: <b>{n}</b> of {m} operations', {n: p.ops - p.done, m: p.ops})}</div>${bar(p.done, p.ops)}
+    <div class="muted">${plural(p.items, 'cable')} · ${T('laid {a} of {b} m', {a: fmtLen(p.lenDone), b: fmtLen(p.lenPlan)})}${t.issuedBy ? ` · ${T('issued by')} ${esc(t.issuedBy)}` : ''}${t.issuedAt ? ` ${fmtTime(t.issuedAt)}` : ''}</div>
+    ${t.note ? `<div style="margin-top:6px"><b>${T('Note')}:</b> ${esc(t.note)}</div>` : ''}<div class="tiny muted mono">${esc(t.id)}</div></div>`;
+  if (!j) h += `<div class="warnbox">${T('Journal <b>{j}</b> is not on this phone. Load its file (.ikj.json) — then the cables of the task appear.', {j: esc(jid)})}</div>`;
+  else {
+    if (t.journal.hash && t.journal.hash !== j.hash) h += `<div class="warnbox small">${T('The task was made for another version of the journal (the design changed). Check the cables.')}</div>`;
+    const rows = t.items.map(it => ({it, c: S.idx[jid].byMark.get(it.mark), done: taskItemDone(t, it)}));
+    const fin1 = x => (x.c ? x.done.length === x.it.ops.length : false);
+    const open = rows.filter(x => !fin1(x)), closed = rows.filter(fin1);
+    if (open.length) h += `<div class="sec-h">${T('To do')} · ${open.length}</div>` + open.map(x => taskRow(t, x)).join('');
+    if (closed.length) h += `<div class="sec-h">${T('Done')} · ${closed.length}</div>` + closed.map(x => taskRow(t, x)).join('');
+  }
+  h += `<button class="btn danger-outline" data-act="delTask" data-id="${esc(t.id)}" style="margin-top:20px">${T('Remove this task from the phone')}</button>`;
+  view.innerHTML = h;
+}
+function taskRow(t, {it, c, done}) {
+  const jid = t.journal.id;
+  if (!c) return `<div class="card small"><span class="mark">${esc(it.mark)}</span> <span class="red">${T('not in the journal on this phone')}</span></div>`;
+  const rc = S.results[jid].cables[it.mark], all = done.length === it.ops.length, mat = opRec(rc, 'mat');
+  const opBtn = op => {
+    const d = done.includes(op), st = opSt(rc, op), later = OP_LATER.has(op);
+    return `<button class="btn ${d ? 'ok' : (st === 'wip' ? 'wip' : '')}" data-act="op" data-j="${esc(jid)}" data-m="${esc(it.mark)}" data-op="${esc(op)}" data-task="${esc(t.id)}" ${later ? 'disabled' : ''}>${d ? '✓ ' : ''}${T(OP_LABEL[op] || op)}${d ? '' : (later ? ` · ${T('in 2.1')}` : (st === 'wip' ? ` · ${T('in work')}` : '…'))}</button>`;
+  };
+  const mats = (it.materials || []).map(m => `${esc(m.name || '')}${m.qty === undefined || m.qty === null || m.qty === '' ? '' : ' ' + esc(m.qty)}${m.unit ? ' ' + esc(m.unit) : ''}`).join(', ');
+  return `<div class="card trow ${all ? 'closed' : ''}">
+    <div class="item-top"><button class="cbtn" data-act="openC" data-j="${esc(jid)}" data-m="${esc(it.mark)}"><span class="cno">${esc(c.no)}</span><span class="mark">${esc(it.mark)}</span></button>${all ? `<span class="chip closed">${T('Done')}</span>` : (rc.closed ? `<span class="chip closed">${T('✓ Handed over')}</span>` : '')}</div>
+    <div class="small muted">${esc(tx(c, 'type'))} ${esc(c.size || '')} · ${esc(c.len)} ${T('m')}${it.drum ? ` · ${T('drum')} <b class="mono">${esc(it.drum)}</b>${it.drumLen ? ` (${esc(it.drumLen)} ${T('m')})` : ''}` : ''}</div>
+    <div class="small ft"><span class="muted">${T('From')}</span> ${esc(tx(c, 'from'))} <span class="muted">${T('To')}</span> ${esc(tx(c, 'to'))}</div>
+    ${mats || mat ? `<div class="small" style="margin-top:4px"><span class="muted">${T('Materials')}:</span> ${mats || '—'} <button class="link" data-act="mat" data-j="${esc(jid)}" data-m="${esc(it.mark)}" data-task="${esc(t.id)}">${mat && mat.ok ? '☑ ' + T('available') : '☐ ' + T('available?')}</button></div>` : ''}
+    ${it.note ? `<div class="small note">📝 ${esc(it.note)}</div>` : ''}
+    <div class="grid2" style="margin-top:8px">${it.ops.map(opBtn).join('')}</div>
+  </div>`;
+}
+/* one line under the strip: what is marked on laying / tags */
+function opLine(jid, c, rc) {
+  const lay = opRec(rc, 'lay'), tg = opRec(rc, 'tags'), t = openTaskFor(jid, c.mark, 'lay') || openTaskFor(jid, c.mark, 'tags'), parts = [];
+  if (lay && lay.st) parts.push(`<b>${T('Laying')}</b>: ${lay.st === 'done' ? '✓ ' : ''}${esc(fmtDate(lay.date))}${lay.drum ? ` · ${T('drum')} ${esc(lay.drum)}` : ''}${lenNum(lay.laidM) !== null ? ` · ${esc(fmtLen(lenNum(lay.laidM)))} ${T('m')}` : ''}`);
+  if (tg && (tg.received || tg.hung)) parts.push(`<b>${T('Cable tags')}</b>: ${tg.received ? T('received') : ''}${tg.received && tg.hung ? ', ' : ''}${tg.hung ? T('hung') + ' ✓' : ''}`);
+  if (t) parts.push(`📋 ${T('task')} ${esc(fmtDate(t.due))}${t.assignee ? ' · ' + esc(t.assignee) : ''}`);
+  return parts.length ? `<div class="small" style="margin:4px 2px 0">${parts.join('<br>')}</div>` : '';
+}
+/* the strip of operations in the cable card */
+function opStrip(jid, c, rc) {
+  const s = cableStats(rc);
+  const state = op => {
+    if (op === 'route') return s.total ? (s.checked === s.total ? 'done' : (s.checked ? 'wip' : '')) : (s.add ? 'done' : '');
+    if (op === 'done') return rc.closed ? 'done' : '';
+    if (OP_LATER.has(op)) return 'later';
+    return opSt(rc, op) || '';
+  };
+  return `<div class="ops">${OPS.map((op, i) => `<button class="opchip ${state(op)}" data-act="opc" data-op="${op}" title="${T(OP_LABEL[op])}"><span class="n">${i + 1}</span><span class="l">${T(OP_LABEL[op])}</span></button>`).join('')}</div>`;
+}
+/* ---- the sheet of an operation */
+function readOpForm(op) {
+  const v = {}, g = id => { const el = $('#' + id); return el ? el.value : undefined; };
+  if (op === 'lay') { v.date = g('opDate'); v.drum = (g('opDrum') || '').trim(); v.drumLen = numIn(g('opDrumLen')); v.cutM = numIn(g('opCut')); v.laidM = numIn(g('opLaid')); v.joints = numIn(g('opJoints')); v.temp = numIn(g('opTemp')); v.heat = (g('opHeat') || '').trim(); v.note = (g('opNote') || '').trim(); }
+  else if (op === 'tags') { v.date = g('opDate'); v.received = !!($('#opRecv') && $('#opRecv').checked); v.hung = !!($('#opHung') && $('#opHung').checked); v.note = (g('opNote') || '').trim(); }
+  return v;
+}
+async function renderOpPhotos(ids) {
+  const box = $('#opPhotos'); if (!box) return; let h = '';
+  for (const pid of ids) { const p = await Store.getPhoto(pid); if (!p) continue; const u = URL.createObjectURL(p.blob); photoURLs.push(u); h += `<img src="${u}" alt="photo" data-sact="opPhotoOpen" data-p="${esc(pid)}">`; }
+  if ($('#opPhotos') === box) box.innerHTML = h || `<span class="small muted">${T('No photos')}</span>`;
+}
+async function openOpSheet(jid, mark, op, taskId, draft) {
+  if (isClosed(jid, mark)) { lockedToast(); return; }
+  if (!S.settings.inspector) { const name = await promptSheet(T('Your name'), '', T('Name and surname'), T('Continue')); if (!name) return; S.settings.inspector = name; await saveSettings(); }
+  const c = S.idx[jid].byMark.get(mark), rc = S.results[jid].cables[mark]; ensureSegs(c, rc);
+  const t = taskId && S.tasks[taskId] ? S.tasks[taskId] : openTaskFor(jid, mark, op); taskId = t ? t.id : null;
+  const it = taskItemOf(t, mark), prev = opRec(rc, op) || {}, o = Object.assign({}, prev, draft || {});
+  const photos = prev.photos || [];
+  const inp = (id, label, val, extra = '', w2 = false) => `<div class="${w2 ? 'w2' : ''}"><label for="${id}">${label}</label><input class="inp sm" id="${id}" value="${esc(val ?? '')}" ${extra}></div>`;
+  const title = `<div class="sh-title"><div class="small muted">${esc(c.no)} · ${esc(mark)}${t ? ` · ${T('task')} ${esc(fmtDate(t.due))}` : ` · ${T('outside a task')}`}</div><div class="big">${T(OP_LABEL[op])}</div></div>`;
+  let body;
+  if (op === 'lay') {
+    body = `<div class="fgrid">
+      ${inp('opDate', T('Date'), o.date || todayStr(), 'type="date"')}${inp('opDrum', T('Drum No.'), o.drum ?? (it && it.drum) ?? '', 'autocomplete="off"')}
+      ${inp('opDrumLen', T('Length on the drum, m'), o.drumLen ?? (it && it.drumLen) ?? '', 'inputmode="decimal"')}${inp('opCut', T('Cut off, m'), o.cutM ?? '', 'inputmode="decimal"')}
+      ${inp('opLaid', T('Laid, m'), o.laidM ?? (lenNum(c.len) ?? ''), 'inputmode="decimal"')}${inp('opJoints', T('Joints, pcs'), o.joints ?? 0, 'inputmode="numeric"')}
+      ${inp('opTemp', T('Air temperature, °C'), o.temp ?? '', 'inputmode="decimal"')}${inp('opHeat', T('Cable heating'), o.heat ?? T('no'))}
+      ${inp('opNote', T('Note'), o.note || '', '', true)}</div>
+      <div class="lbl">${T('Photos')} <span class="muted">— ${T('the cable on the tray with its tag and the tray number (required)')}</span></div><div class="photos" id="opPhotos"></div>`;
+  } else {
+    const allYes = rc.segs.length > 0 && rc.segs.every(x => x.tags === 'yes');
+    body = `<label class="chk inl"><input type="checkbox" id="opRecv" ${o.received ? 'checked' : ''}> ${T('Tags received')}</label>
+      <label class="chk inl"><input type="checkbox" id="opHung" ${(o.hung ?? allYes) ? 'checked' : ''}> ${T('Tags hung on the cable')}${allYes && !prev.hung ? ` <span class="small muted">(${T('tags are marked «present» on every segment')})</span>` : ''}</label>
+      <div class="fgrid">${inp('opDate', T('Date'), o.date || todayStr(), 'type="date"')}${inp('opNote', T('Note'), o.note || '')}</div>
+      <div class="lbl">${T('Photos')}</div><div class="photos" id="opPhotos"></div>`;
+  }
+  const html = `${title}${body}
+    <button class="btn" data-sact="opPhoto">📷 ${T('Add photo')}</button>
+    <div class="grid2" style="margin:4px 0 10px"><button class="btn primary" data-sact="opDone">✓ ${T('Done')}</button><button class="btn wip" data-sact="opWip">${T('In work')}</button></div>
+    ${prev.st || photos.length ? `<button class="btn danger-outline" data-sact="opClear">${T('Clear this operation')}</button>` : ''}
+    <button class="btn ghost" data-sact="close">${T('Cancel')}</button>`;
+  openSheet(html, async (act, ds) => {
+    if (act === 'opPhoto') { photoTarget = {jid, mark, op, task: taskId, draft: readOpForm(op)}; $('#filePhoto').click(); return; }
+    if (act === 'opPhotoOpen') { const d = readOpForm(op); closeSheet(); setTimeout(() => openPhoto(jid, mark, ds.p, () => openOpSheet(jid, mark, op, taskId, d)), 0); return; }
+    if (act === 'opClear') { closeSheet(); const ok = await confirmSheet(T('Clear the operation «{o}» of cable <b>{m}</b> (its marks and photos)?', {o: T(OP_LABEL[op]), m: esc(mark)}), T('Clear'), T('Cancel'), true); if (ok) await clearOp(jid, mark, op); render(); return; }
+    if (act !== 'opDone' && act !== 'opWip') return;
+    const v = readOpForm(op), st = act === 'opDone' ? 'done' : 'wip';
+    if (op === 'lay' && st === 'done') {
+      if (lenNum(v.laidM) === null) { toast(T('Enter the laid length in metres.')); $('#opLaid').focus(); return; }
+      if (!photos.length) { toast(T('Add a photo: the cable on the tray with its tag and the tray number.')); return; }
+    }
+    if (op === 'tags' && st === 'done' && !v.hung) { toast(T('«Done» = the tags are hung on the cable. Tick it, or save «In work».')); return; }
+    saveOp(jid, mark, op, st, v, taskId); closeSheet(); render();
+  });
+  renderOpPhotos(photos);
+}
+function saveOp(jid, mark, op, st, vals, taskId) {
+  const snap = snapshotCable(jid, mark);
+  const c = S.idx[jid].byMark.get(mark), rc = S.results[jid].cables[mark]; ensureSegs(c, rc);
+  const prev = opRec(rc, op) || {};
+  const rec = Object.assign({}, prev, vals, {st, by: S.settings.inspector || prev.by || '', t: nowIso(), task: taskId || null, photos: prev.photos || []});
+  opsOf(rc)[op] = rec;
+  if (op === 'lay' && st === 'done') {
+    const lm = lenNum(rec.laidM);
+    if (lm !== null && rc.segs.length === 1 && (rc.segs[0].fact === null || rc.segs[0].fact === undefined)) { rc.segs[0].fact = lm; syncLen(rc); }
+  }
+  if (op === 'tags' && rec.hung) rc.segs.forEach(x => { x.tags = 'yes'; x.tagsN = null; });
+  commit(jid, mark, st === 'done' ? T('{o}: done ✓', {o: T(OP_LABEL[op])}) : T('{o}: in work', {o: T(OP_LABEL[op])}), snap);
+}
+async function clearOp(jid, mark, op) {
+  const snap = snapshotCable(jid, mark); const rc = S.results[jid].cables[mark], o = opRec(rc, op);
+  if (!o) return;
+  for (const pid of (o.photos || [])) await Store.delPhoto(pid);
+  delete rc.ops[op];
+  commit(jid, mark, T('{o}: cleared', {o: T(OP_LABEL[op])}), snap);
+}
+function toggleMat(jid, mark, taskId) {
+  const snap = snapshotCable(jid, mark); const rc = S.results[jid].cables[mark], prev = opRec(rc, 'mat') || {};
+  opsOf(rc).mat = Object.assign({}, prev, {ok: !prev.ok, t: nowIso(), task: taskId || prev.task || null, by: S.settings.inspector || ''});
+  commit(jid, mark, rc.ops.mat.ok ? T('Materials: available ✓') : T('Materials: not available'), snap);
+}
+/* ops of a cable for the results file: photos as file names (the archive goes separately) */
+async function exportOps(rc) {
+  if (!rc.ops) return null; const out = {};
+  for (const op of ['lay', 'tags', 'mat']) {
+    const o = rc.ops[op]; if (!o) continue;
+    const x = {}; for (const k of ['st', 'date', 'by', 'drum', 'drumLen', 'cutM', 'laidM', 'joints', 'temp', 'heat', 'note', 'received', 'hung', 'ok', 't', 'task']) if (o[k] !== undefined) x[k] = o[k];
+    if (o.photos) { x.photos = []; for (const pid of o.photos) { const p = await Store.getPhoto(pid); if (p) x.photos.push({name: p.name, op, takenAt: p.takenAt}); } }
+    out[op] = x;
+  }
+  return Object.keys(out).length ? out : null;
+}
+async function opPhotoList(jid) {
+  const j = S.journals[jid], r = S.results[jid], out = [];
+  for (const c of j.cables) { const rc = r.cables[c.mark]; if (!rc || !rc.ops) continue; for (const op of ['lay', 'tags']) for (const pid of ((rc.ops[op] || {}).photos || [])) { const p = await Store.getPhoto(pid); if (p) out.push(p); } }
+  return out;
+}
+async function buildPhotoZip(jid) {
+  const files = [];
+  for (const p of await opPhotoList(jid)) files.push([p.name, new Uint8Array(await p.blob.arrayBuffer())]);
+  return files.length ? {blob: await IKJX.zip(files, 'application/zip'), n: files.length} : null;
+}
+/* photo of an operation: downscaled to 1600 px and captioned (mark · operation · date) */
+async function stampPhoto(file, lines, max = 1600, q = 0.8) {
+  let src;
+  try { src = await createImageBitmap(file); }
+  catch (e) { src = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = URL.createObjectURL(file); }); }
+  const w0 = src.width, h0 = src.height, sc = Math.min(1, max / Math.max(w0, h0));
+  const cv = document.createElement('canvas'); cv.width = Math.round(w0 * sc); cv.height = Math.round(h0 * sc);
+  const g = cv.getContext('2d'); g.drawImage(src, 0, 0, cv.width, cv.height);
+  const fs = Math.max(16, Math.round(cv.width / 36)), pad = Math.round(fs * 0.5), bh = pad * 2 + fs * 1.25 * lines.length;
+  g.fillStyle = 'rgba(0,0,0,0.55)'; g.fillRect(0, cv.height - bh, cv.width, bh);
+  g.fillStyle = '#fff'; g.font = `bold ${fs}px Arial, sans-serif`; g.textBaseline = 'top';
+  lines.forEach((l, i) => g.fillText(l, pad, cv.height - bh + pad + i * fs * 1.25, cv.width - 2 * pad));
+  return await new Promise(res => cv.toBlob(b => res(b || file), 'image/jpeg', q));
+}
+/* a short text for the message in Telegram: what was done today in this journal */
+function daySummary(jid) {
+  const j = S.journals[jid], r = S.results[jid], d = todayStr(); let laid = 0, m = 0, hung = 0, chk = 0;
+  for (const c of j.cables) {
+    const rc = r.cables[c.mark]; if (!rc) continue; const o = rc.ops || {};
+    if (o.lay && o.lay.st === 'done' && o.lay.date === d) { laid++; m += lenNum(o.lay.laidM) || 0; }
+    if (o.tags && o.tags.hung && o.tags.date === d) hung++;
+    for (const e of rc.entries) if (e.t && localDay(e.t) === d) { chk++; break; }
+  }
+  const s = journalStats(jid);
+  return T('{j} · {d}: laid {n} cables ({m} m), tags on {k}, trays checked on {c}; handed over {a}/{b}', {j: shortId(j.id), d: fmtDate(d), n: laid, m: fmtLen(m), k: hung, c: chk, a: s.done, b: s.cables});
+}
+/* ---- the computer: «Сводка выполнения» from the walk files and tasks */
+async function saveSummary(jid) {
+  const j = S.journals[jid]; if (!j) return;
+  const reps = S.ui.resFiles.filter(rf => (rf.o.journal || {}).id === jid);
+  busy(true);
+  try {
+    const {blob, rows} = await IKJX.summaryXlsx(j, reps, Object.values(S.tasks));
+    const name = `${xlsStem(j.id)}_Сводка_${stamp()}.xlsx`;
+    const r = await shareOrSave(new File([blob], name, {type: blob.type}), isMobile() ? 'share' : 'save');
+    toast(r === 'shared' ? T('Sent ✓') : (r === 'cancelled' ? T('Not sent') : T('Saved to Downloads: {n}', {n: name})) + (rows ? '' : ' · ' + T('no operations in the files yet')));
+  } catch (e) { console.error(e); toast(T('Could not build the file: ') + xlsErr(e)); }
+  finally { busy(false); }
+}
+function taskFileCard(t) {
+  const j = S.journals[t.journal.id], p = taskProgress(t);
+  return `<div class="card rescard"><div class="rname">📋 ${esc(t.id)}</div>
+    <div class="small"><b class="mono">${esc(t.journal.id)}</b>${j ? '' : ` · <span class="red">${T('journal not loaded')}</span>`}</div>
+    <div class="small muted">${esc(fmtDate(t.due))} · ${esc(t.assignee || '—')} · ${plural(p.items, 'cable')}</div>
+    <button class="btn ghost" data-act="delTask" data-id="${esc(t.id)}" style="margin:4px 0 0;min-height:40px">${T('Remove from the list')}</button></div>`;
+}
+/* ---- the computer: «Create a task» */
+function newTaskState(jid) {
+  if (!S.ui.newTask || S.ui.newTask.jid !== jid) S.ui.newTask = {jid, sel: {}, due: todayStr(), assignee: '', by: S.settings.inspector || '', note: '', q: '', lay: true, tags: true};
+  return S.ui.newTask;
+}
+function viewTaskNew() {
+  const ids = journalIds();
+  setHeader({title: T('Create a task'), sub: T('for the phone of the responsible person'), back: '#/task'});
+  if (!ids.length) { view.innerHTML = `<div class="card small muted">${T('Load a journal first (.ikj.json) — the task is made from its cables.')}</div>`; return; }
+  const st = newTaskState(S.ui.newTask && S.journals[S.ui.newTask.jid] ? S.ui.newTask.jid : ids[0]), j = S.journals[st.jid], qs = squash(st.q);
+  const list = j.cables.filter(c => !qs || squash(c.no).includes(qs) || squash(c.mark).includes(qs) || squash(c.from + ' ' + c.to).includes(qs));
+  const nSel = Object.keys(st.sel).length;
+  view.innerHTML = `<div class="card">
+    <div class="fgrid">
+      <div class="w2"><label>${T('Journal')}</label><select class="inp sm" id="ntJ">${ids.map(id => `<option value="${esc(id)}" ${id === st.jid ? 'selected' : ''}>${esc(id)}</option>`).join('')}</select></div>
+      <div><label>${T('Due date')}</label><input class="inp sm" id="ntDue" type="date" value="${esc(st.due)}"></div>
+      <div><label>${T('Responsible (phone)')}</label><input class="inp sm" id="ntA" value="${esc(st.assignee)}"></div>
+      <div><label>${T('Issued by')}</label><input class="inp sm" id="ntBy" value="${esc(st.by)}"></div>
+      <div><label>${T('Operations')}</label><label class="chk inl" style="margin:0"><input type="checkbox" id="ntLay" ${st.lay ? 'checked' : ''}> ${T('Laying')}</label><label class="chk inl" style="margin:0"><input type="checkbox" id="ntTags" ${st.tags ? 'checked' : ''}> ${T('Cable tags')}</label></div>
+      <div class="w2"><label>${T('Note for the task')}</label><input class="inp sm" id="ntNote" value="${esc(st.note)}"></div>
+    </div></div>
+    <div class="card"><div class="lbl">${T('Cables')} · ${T('selected {n}', {n: nSel})}</div>
+    <input class="search mono" id="ntQ" value="${esc(st.q)}" placeholder="${T('Cable No. or mark, e.g. 4.0012')}" autocomplete="off">
+    <div class="ntrow small muted"><span></span><span>${T('cable')}</span><span>${T('Drum No.')} · ${T('length on it, m')}</span><span>${T('Materials (comma-separated)')}</span></div>
+    ${list.map(c => { const x = st.sel[c.mark]; return `<div class="ntrow ${x ? '' : 'off'}" data-m="${esc(c.mark)}"><input type="checkbox" data-nt="sel" data-m="${esc(c.mark)}" ${x ? 'checked' : ''}>
+      <span><span class="cno">${esc(c.no)}</span><span class="mono"><b>${esc(c.mark)}</b></span><br><span class="tiny muted">${esc(tx(c, 'type'))} ${esc(c.size || '')} · ${esc(c.len)} ${T('m')}</span></span>
+      <span style="display:flex;gap:4px"><input class="inp sm" data-nt="drum" data-m="${esc(c.mark)}" value="${esc(x ? x.drum : '')}" placeholder="№"><input class="inp sm" data-nt="drumLen" data-m="${esc(c.mark)}" value="${esc(x ? x.drumLen : '')}" placeholder="${T('m')}" style="max-width:80px"></span>
+      <input class="inp sm" data-nt="mats" data-m="${esc(c.mark)}" value="${esc(x ? x.mats : '')}" placeholder="${T('tags 4 pcs, …')}"></div>`; }).join('')}
+    </div>
+    <button class="btn primary big" data-act="ntSave" ${nSel ? '' : 'disabled'}>${T('Download the task file')} (${nSel})</button>`;
+  const syncNT = () => { st.due = $('#ntDue').value; st.assignee = $('#ntA').value; st.by = $('#ntBy').value; st.note = $('#ntNote').value; st.lay = $('#ntLay').checked; st.tags = $('#ntTags').checked; };
+  ['ntDue', 'ntA', 'ntBy', 'ntNote', 'ntLay', 'ntTags'].forEach(id => { $('#' + id).oninput = syncNT; $('#' + id).onchange = syncNT; });
+  $('#ntJ').onchange = e => { newTaskState(e.target.value); render(); };
+  $('#ntQ').oninput = e => { syncNT(); st.q = e.target.value; render(); };
+}
+function newTaskInput(el) {
+  const st = S.ui.newTask; if (!st) return; const m = el.dataset.m, f = el.dataset.nt;
+  if (f === 'sel') { if (el.checked) st.sel[m] = st.sel[m] || {drum: '', drumLen: '', mats: ''}; else delete st.sel[m]; el.closest('.ntrow').classList.toggle('off', !el.checked); const b = $('[data-act=ntSave]'); if (b) { const n = Object.keys(st.sel).length; b.disabled = !n; b.textContent = `${T('Download the task file')} (${n})`; } return; }
+  if (!st.sel[m]) st.sel[m] = {drum: '', drumLen: '', mats: ''};
+  st.sel[m][f] = el.value;
+}
+function buildTaskFile() {
+  const st = S.ui.newTask, j = S.journals[st.jid];
+  st.due = $('#ntDue').value; st.assignee = $('#ntA').value.trim(); st.by = $('#ntBy').value.trim(); st.note = $('#ntNote').value.trim(); st.lay = $('#ntLay').checked; st.tags = $('#ntTags').checked;
+  if (st.by && !S.settings.inspector) { S.settings.inspector = st.by; saveSettings(); }
+  const ops = [st.lay ? 'lay' : null, st.tags ? 'tags' : null].filter(Boolean); if (!ops.length) ops.push('lay');
+  const items = j.cables.filter(c => st.sel[c.mark]).map(c => {
+    const x = st.sel[c.mark], it = {mark: c.mark, no: c.no, ops: ops.slice()};
+    if (x.drum.trim()) it.drum = x.drum.trim(); const dl = lenNum(x.drumLen); if (dl !== null) it.drumLen = dl;
+    const mats = x.mats.split(',').map(s => s.trim()).filter(Boolean).map(s => { const mm = /^(.*?)\s+(\d+(?:[.,]\d+)?)\s*(\S*)$/.exec(s); return mm ? {name: mm[1], qty: lenNum(mm[2]), unit: mm[3] || ''} : {name: s}; });
+    if (mats.length) it.materials = mats; return it;
+  });
+  const d = new Date(), p = n => String(n).padStart(2, '0');
+  return {format: 'ikj-task', v: 1, id: `T-${todayStr()}-${p(d.getHours())}${p(d.getMinutes())}`, journal: {id: j.id, hash: j.hash}, assignee: st.assignee, issuedBy: st.by, issuedAt: nowIso(), due: st.due || todayStr(), note: st.note, items};
+}
 
 /* ---------------------------------------------------------------- ИКЖ в Excel: from this phone, or from walk files (computer) */
 const isMobile = () => /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
@@ -1622,29 +2211,35 @@ function resCard(rf, i) {
     <div class="rname">📄 ${esc(rf.name)}</div>
     <div class="small"><b class="mono">${esc(jid)}</b></div>
     <div class="small muted">${T('Inspector: ')}${esc(o.inspector || '—')} · ${fmtTime(o.exportedAt)}${o.app ? ' · ' + esc(o.app) : ''}</div>
-    <div class="small">${plural(cabs.length, 'cable')} · ${T('handed over {n}', {n: closed})} · ${T('in work {n}', {n: cabs.length - closed})}</div>
+    <div class="small">${plural(cabs.length, 'cable')} · ${T('handed over {n}', {n: closed})} · ${T('in work {n}', {n: cabs.length - closed})}${o.summary && o.summary.ops ? ` · ${T('laid {n}', {n: o.summary.ops.laid})} (${fmtLen(o.summary.ops.laidM || 0)} ${T('m')}) · ${T('tags on {n}', {n: o.summary.ops.tagsHung})}` : ''}${o.photosArchive ? `<br><span class="muted">${T('Photos: ')}${esc(o.photosArchive)}</span>` : ''}</div>
     ${warn ? `<div class="warnbox small" style="margin:8px 0 0">${warn}</div>` : ''}
     ${cnt ? xlsButtons(cnt, 'resX', i) : ''}
     <button class="btn ghost" data-act="resDel" data-i="${i}" style="margin:4px 0 0;min-height:40px">${T('Remove from the list')}</button>
   </div>`;
 }
 function viewResFiles() {
-  setHeader({title: T('Walk files'), sub: T('IKJ to Excel from the files of electricians'), back: '#/'});
+  setHeader({title: T('Walk files'), sub: T('IKJ to Excel and the summary from the files of electricians'), back: '#/'});
   let h = '';
   if (!S.ui.resFiles.length) h += `<div class="card small muted">${T('No walk files opened. Open the files IKJ_….txt that electricians sent: the button below, or drag them into this window.')}</div>`;
+  const jids = [...new Set(S.ui.resFiles.map(rf => (rf.o.journal || {}).id).filter(id => S.journals[id]))];
+  if (jids.length) h += `<div class="card"><div class="lbl">📊 ${T('Work summary (Excel)')}</div><div class="small muted" style="margin:0 2px 8px">${T('Sheets «Сводка» (plan of the tasks / fact), «Операции», «Невыполненное», «Журнал прокладки» (F-31A, draft) — from all opened walk files of the journal and the loaded tasks. Several files of one journal are merged: the later mark of a cable wins.')}</div>
+    ${jids.map(id => `<button class="btn xls" data-act="sumX" data-j="${esc(id)}" style="margin:0 0 8px">📊 ${T('Summary')} · <span class="mono">${esc(xlsStem(id))}</span></button>`).join('')}</div>`;
   S.ui.resFiles.forEach((rf, i) => { h += resCard(rf, i); });
+  const tids = taskIds();
+  if (tids.length) h += `<h3>${T('Tasks')} · ${tids.length}</h3>` + tids.map(id => taskFileCard(S.tasks[id])).join('');
   h += `<button class="btn primary big" data-act="loadJ">${T('Open files…')}</button>`;
+  h += `<button class="btn" data-act="newTask">${T('Create a task…')}</button>`;
   view.innerHTML = h;
 }
 /* journals and walk files: «Load» button and drag & drop */
 async function loadFiles(list) {
   const files = [...(list || [])]; if (!files.length) return;
-  const objs = [], res = [], ids = [], errs = [];
+  const objs = [], res = [], tsk = [], ids = [], errs = [];
   for (const f of files) {
     let o;
     try { o = JSON.parse(await readFileText(f)); }
     catch (e) { errs.push((files.length === 1 ? '' : f.name + ': ') + T('Cannot read this file — is it the .ikj.json journal?')); continue; }
-    if (o && o.format === 'ikj-field-results') res.push({name: f.name, o}); else objs.push({f, o});
+    if (o && o.format === 'ikj-field-results') res.push({name: f.name, o}); else if (o && o.format === 'ikj-task') tsk.push({f, o}); else objs.push({f, o});
   }
   const one = objs.length === 1 && files.length === 1;
   for (const {f, o} of objs) {
@@ -1652,9 +2247,14 @@ async function loadFiles(list) {
     catch (e) { errs.push((one ? '' : f.name + ': ') + e.message); }
   }
   for (const r of res) addResFile(r.name, r.o);
-  if (errs.length) toast(one ? errs[0] : T('Loaded {a} of {b}. {e}', {a: ids.length + res.length, b: files.length, e: errs[0]}));
+  const tids = [];
+  for (const {f, o} of tsk) { try { tids.push(await addTask(o, {silent: tsk.length > 1 || !!res.length || !!ids.length})); } catch (e) { errs.push((files.length === 1 ? '' : f.name + ': ') + e.message); } }
+  if (errs.length) toast(one ? errs[0] : T('Loaded {a} of {b}. {e}', {a: ids.length + res.length + tids.length, b: files.length, e: errs[0]}));
   else if (!one && ids.length) toast(ids.length > 3 ? T('Loaded ✓ {n} journals', {n: ids.length}) : T('Loaded ✓ {list}', {list: ids.map(shortId).join(', ')}));
+  else if (tids.length > 1 && !ids.length) toast(T('Loaded ✓ {n} tasks', {n: tids.length}));
   if (res.length) nav('#/r');
+  else if (tids.length === 1 && !ids.length && !isDesktop()) nav(rTask(tids[0]));
+  else if (tids.length && !ids.length) nav(isDesktop() ? '#/r' : '#/task');
   else if (one && ids.length) nav(rJ(ids[0])); else if (ids.length) nav('#/'); else render();
 }
 let dragN = 0;
@@ -2032,6 +2632,7 @@ function parseRoute() {
   if (p[0] === 'help') return {v: 'help'};
   if (p[0] === 'b' && p[1]) return {v: 'folder', b: p[1] === '-' ? '' : p[1]};
   if (p[0] === 'r') return {v: 'res'};
+  if (p[0] === 'task') return p[1] === 'new' ? {v: 'tasknew'} : (p[1] ? {v: 'task', id: p.slice(1).join('/')} : {v: 'tasks'});
   return {v: 'home'};
 }
 const rJ = jid => '#/j/' + enc(jid);
@@ -2053,6 +2654,9 @@ function render() {
     else if (r.v === 'help') viewHelp();
     else if (r.v === 'folder') viewFolder(r.b);
     else if (r.v === 'res') viewResFiles();
+    else if (r.v === 'tasks') viewTasks();
+    else if (r.v === 'task') viewTask(r.id);
+    else if (r.v === 'tasknew') viewTaskNew();
     else { S.ui.lastJid = null; viewHome(); }
   } catch (e) { console.error(e); view.innerHTML = `<div class="errbox">${T('Something went wrong: ')}${esc(e.message)}</div><button class="btn" onclick="location.hash='#/'">${T('Home')}</button>`; }
   if (isNew) window.scrollTo(0, S.ui.scroll[key] || 0);
@@ -2068,7 +2672,7 @@ function journalCard(id) {
     <div class="small muted">${plural(j.cables.length, 'cable')}${secs ? ' · ' + esc(secs) : ''}${tx(j, 'title') ? ' · ' + esc(tx(j, 'title')) : ''}</div>
     ${bar(s.checked, s.total)}
     <div class="small">${T('{a}/{b} trays checked · {c}/{d} cables handed over', {a: s.checked, b: s.total, c: s.done, d: s.cables})}${s.changes ? ` · <span class="blue">${T('<b>{n}</b> changes', {n: s.changes})}</span>` : ''}</div>
-    <div class="small muted">${T('Length: {d} m by design · confirmed {c}/{n} cables', {d: fmtLen(s.lenDesign), c: s.lenConf, n: s.cables})}</div>
+    <div class="small muted">${T('Length: {d} m by design · confirmed {c}/{n} cables', {d: fmtLen(s.lenDesign), c: s.lenConf, n: s.cables})}${s.ops.laid || s.ops.layWip ? ` · ${T('laid {n}', {n: s.ops.laid})}${s.ops.layWip ? ` (+${s.ops.layWip} ${T('in work')})` : ''}` : ''}</div>
     ${r.unsent ? `<div class="unsent">${T('Not sent yet: {n}', {n: plural(r.unsent, 'edit')})}</div>` : (r.lastSent ? `<div class="tiny muted" style="margin-top:6px">${T('Last sent {t}', {t: fmtTime(r.lastSent)})}</div>` : '')}
   </button>`;
 }
@@ -2087,7 +2691,7 @@ function viewFolder(b) {
   const list = buildings().get(b) || [];
   if (!list.length) { S.ui.lastJid = null; viewHome(); return; }
   setHeader({title: b || T('Other'), sub: plural(list.length, 'journal'), back: '#/'});
-  view.innerHTML = list.map(journalCard).join('');
+  view.innerHTML = list.map(journalCard).join('') + tasksButton(null);
 }
 function viewHome() {
   setHeader({title: 'IKJ Field', sub: T('Cable route check — as-built journal')});
@@ -2100,7 +2704,8 @@ function viewHome() {
      ${T('2. In Telegram tap <b>⋮</b> on the file → <b>Save to Downloads</b>.')}<br>
      ${T('3. Tap <b>Load journal files</b> below and pick them in Downloads (you can select several at once).')}</p></div>`;
   else h += `<input class="search mono" type="search" id="gq" value="${esc(S.ui.gq)}" placeholder="${T('Find cable No., mark or tray')}" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false"><div id="glist"></div>`;
-  if (S.ui.resFiles.length) h += `<button class="card rescard" data-act="openR"><b>📄 ${T('Walk files: {n}', {n: S.ui.resFiles.length})}</b><div class="small muted">${T('IKJ to Excel from the files of electricians')}</div></button>`;
+  if (S.ui.resFiles.length) h += `<button class="card rescard" data-act="openR"><b>📄 ${T('Walk files: {n}', {n: S.ui.resFiles.length})}</b><div class="small muted">${T('IKJ to Excel and the summary from the files of electricians')}</div></button>`;
+  if (ids.length || Object.keys(S.tasks).length) h += tasksButton(null);
   if (useFolders()) { for (const [b, list] of buildings()) h += folderCard(b, list); }
   else {
     let lastB = null;
@@ -2155,7 +2760,7 @@ function viewJournal(jid) {
   view.innerHTML = `
     <div class="small muted" style="margin:0 2px 2px">${T('{a}/{b} trays checked · {c}/{d} cables handed over', {a: s.checked, b: s.total, c: s.done, d: s.cables})}${s.changes ? ` · <span class="blue">${T('{n} changes', {n: s.changes})}</span>` : ''}</div>${bar(s.checked, s.total)}
     <div class="small muted" style="margin:2px 2px 0">${T('Length by design <b>{d} m</b> · confirmed <b>{c}/{n}</b> cables', {d: fmtLen(s.lenDesign), c: s.lenConf, n: s.cables})}${s.lenConf ? T(' · actual <b>{f} m</b>', {f: fmtLen(s.lenFact)}) : ''}</div>
-    <button class="btn xls" data-act="xls">📊 ${T('IKJ to Excel')}</button>
+    <button class="btn xls" data-act="xls">📊 ${T('IKJ to Excel')}</button>${tasksButton(jid)}
     <div class="tabs" style="margin-top:10px"><button data-act="tab" data-tab="cable" class="${tab === 'cable' ? 'on' : ''}">${T('By cable')}</button><button data-act="tab" data-tab="tray" class="${tab === 'tray' ? 'on' : ''}">${T('By tray')}</button></div>
     <input class="search mono" type="search" id="jq" value="${esc(q)}" placeholder="${tab === 'cable' ? T('Cable No. or mark, e.g. 4.0012') : T('Find tray, e.g. 109')}" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false">
     <div id="jlist"></div>
@@ -2258,6 +2863,7 @@ function viewCable(jid, mark) {
       <div style="margin-top:4px"><span class="muted">${T('From')}</span> ${esc(tx(c, 'from'))}${c.fromRoom ? ` <span class="muted">(${esc(c.fromRoom)})</span>` : ''}</div>
       <div style="margin-top:2px"><span class="muted">${T('To')}</span> ${esc(tx(c, 'to'))}${c.toRoom ? ` <span class="muted">(${esc(c.toRoom)})</span>` : ''}</div>
       ${c.protection ? `<div style="margin-top:2px"><span class="muted">${T('Protection')}</span> ${esc(trProt(c.protection))}</div>` : ''}
+      ${opStrip(jid, c, rc)}${opLine(jid, c, rc)}
       ${sd ? totalLenBox(c, rc) : lenBox(c, rc, {i: 0, len: c.len}, true)}
       ${s.total ? bar(s.checked, s.total) + `<div class="muted">${T('{a}/{b} trays checked', {a: s.checked, b: s.total})}${s.changes ? ` · <span class="blue">${plural(s.changes, 'change')}</span>` : ''}</div>` : ''}
     </div>
@@ -2437,8 +3043,15 @@ function viewHelp() {
   <p><b>5. Colours</b> are the same as in the journal: black = as designed, <span class="red"><s>red crossed</s></span> = design tray not used, <span class="blue">blue</span> = actual tray.</p>
   <p><b>6. Mistake?</b> Tap <b>Undo</b> in the message at the bottom, or tap the tray code → <b>Clear mark</b>.</p>
   <p><b>7. Send.</b> Tap <b>Send</b> (top right) → Telegram/WhatsApp → your supervisor. Each journal is a separate file. No signal? Telegram sends it automatically when the signal is back. Each file contains <b>all</b> your work so far — always send the newest one.</p>
+  <p><b>Tasks and operations (2.0).</b> Your supervisor sends a <b>task file</b> (ends with <b>.ikjt.json</b>): which cables to lay, by when, from which drum, with which materials. Load it like a journal → <b>📋 Tasks</b> on the first screen: <b>Today</b> (due today and overdue) / <b>All</b>. In a task every cable has buttons <b>Laying…</b> and <b>Cable tags…</b> and a tick <b>Materials available</b>; done cables go down the list, the counter of what is left is on top.</p>
+  <ul>
+    <li><b>Laying</b>: date, drum No. and length on it, cut off and laid metres (laid = design length by default), joints, air temperature, heating, a note — and a <b>photo</b> (required: the cable on the tray with its tag and the tray number). <b>✓ Done</b> or <b>In work</b>. The laid length becomes the actual length of the cable if it was not confirmed yet.</li>
+    <li><b>Cable tags</b>: <b>received</b> / <b>hung on the cable</b> (+ photo). «Hung» also marks the tags «present» on every segment of the cable.</li>
+    <li>In the cable card the strip <b>1–8</b> shows the operations: 2 Laying and 5 Cable tags are marked here (also outside a task), 6 Route check and 8 Handed over are the usual marks, 1 / 3 / 4 / 7 come in version 2.1. A handed-over cable is locked, as before.</li>
+    <li><b>Send</b> makes two files: the results file and the archive <b>…_фото.zip</b> with the photos of the operations (each photo is captioned with the cable, operation and date). The message text is the summary of the day.</li>
+  </ul>
   <p><b>Folders.</b> With many journals the first screen shows folders by building (11URB, 11URF…). Tap a folder to see its journals. The search on the first screen looks through all journals.</p>
-  <p><b>On a computer (Windows).</b> Open the site in Edge or Chrome → <b>Install IKJ Field</b> (the icon in the address bar, or menu ⋯ → Apps). Load the journals, then open — or drag into the window — the walk files IKJ_….txt that electricians sent: for every file <b>Handed-over / In work / All</b> → Excel.</p>
+  <p><b>On a computer (Windows).</b> Open the site in Edge or Chrome → <b>Install IKJ Field</b> (the icon in the address bar, or menu ⋯ → Apps). Load the journals, then open — or drag into the window — the walk files IKJ_….txt that electricians sent: for every file <b>Handed-over / In work / All</b> → Excel. With 2.0: <b>📊 Summary</b> → Excel «Сводка выполнения» (plan of the tasks / fact, operations, what is left, the cable laying log F-31A as a draft) from all opened walk files and tasks; <b>📋 Tasks → Create a task…</b> → pick the journal, the cables, the due date, drum and materials → the task file for the phone.</p>
   <p><b>Important:</b> the app works without internet. Your marks are kept only on this phone until you send them — do not uninstall the app or clear Chrome data. Send at least once a day.</p>
   </div>`;
 }
@@ -2466,8 +3079,15 @@ const HELP_RU = `<div class="card help">
   <p><b>5. Цвета</b> как в журнале: чёрный — по проекту, <span class="red"><s>красный зачёркнутый</s></span> — проектная полка не использована, <span class="blue">синий</span> — фактическая полка.</p>
   <p><b>6. Ошибка?</b> Нажмите <b>Отменить</b> в сообщении внизу или код полки → <b>Снять отметку</b>.</p>
   <p><b>7. Отправка.</b> Нажмите <b>Отправить</b> (вверху справа) → Telegram → руководителю. Каждый журнал — отдельный файл. Нет связи — Telegram отправит, когда связь появится. В каждом файле <b>вся</b> работа на момент отправки — отправляйте самый свежий.</p>
+  <p><b>Задания и операции (2.0).</b> Руководитель присылает <b>файл задания</b> (окончание <b>.ikjt.json</b>): какие кабели проложить, к какому сроку, с какого барабана, с какими материалами. Загрузите его как журнал → на главном экране <b>📋 Задания</b>: <b>Сегодня</b> (срок сегодня и просроченные) / <b>Все</b>. В задании у каждого кабеля кнопки <b>Укладка…</b> и <b>Бирки…</b> и галочка <b>Материалы есть</b>; выполненные кабели уходят вниз, сверху — сколько осталось.</p>
+  <ul>
+    <li><b>Укладка</b>: дата, № барабана и длина на нём, отрезано и уложено метров (уложено = длина по РД по умолчанию), муфты, температура воздуха, подогрев, примечание — и <b>фото</b> (обязательно: кабель на полке с биркой и номером полки). <b>✓ Выполнено</b> или <b>В работе</b>. Уложенная длина становится длиной по факту, если она ещё не была подтверждена.</li>
+    <li><b>Бирки</b>: <b>получены</b> / <b>нацеплены</b> (+ фото). «Нацеплены» ставит бирки «есть» на всех отрезках кабеля.</li>
+    <li>В карточке кабеля полоса <b>1–8</b> — операции: 2 Укладка и 5 Бирки отмечаются здесь (и вне задания), 6 Проверка трассы и 8 Сдан — прежние отметки, 1 / 3 / 4 / 7 появятся в версии 2.1. Сданный кабель закрыт для изменений, как и раньше.</li>
+    <li><b>Отправить</b> делает два файла: файл результатов и архив <b>…_фото.zip</b> с фото операций (на каждом снимке подпись: кабель, операция, дата). Текст сообщения — сводка за день.</li>
+  </ul>
   <p><b>Папки.</b> Когда журналов много, на главном экране они собраны в папки по зданиям (11URB, 11URF…). Нажмите на папку — откроются её журналы. Поиск на главном экране ищет по всем журналам.</p>
-  <p><b>На компьютере (Windows).</b> Откройте сайт в Edge или Chrome → <b>Установить IKJ Field</b> (значок в адресной строке или меню ⋯ → Приложения). Загрузите журналы, затем откройте — или перетащите в окно — файлы обхода IKJ_….txt, которые прислали электрики: у каждого файла <b>Сданные / В работе / Все</b> → Excel.</p>
+  <p><b>На компьютере (Windows).</b> Откройте сайт в Edge или Chrome → <b>Установить IKJ Field</b> (значок в адресной строке или меню ⋯ → Приложения). Загрузите журналы, затем откройте — или перетащите в окно — файлы обхода IKJ_….txt, которые прислали электрики: у каждого файла <b>Сданные / В работе / Все</b> → Excel. С 2.0: <b>📊 Сводка</b> → Excel «Сводка выполнения» (план заданий / факт, операции, невыполненное, журнал прокладки F-31A черновиком) по всем открытым файлам обхода и заданиям; <b>📋 Задания → Создать задание…</b> → журнал, кабели, срок, барабан, материалы → файл задания для телефона.</p>
   <p><b>Важно:</b> приложение работает без интернета. Отметки хранятся только в этом телефоне, пока вы их не отправите — не удаляйте приложение и не очищайте данные Chrome. Отправляйте хотя бы раз в день.</p>
   <p class="small muted">Язык: ⚙ → Язык / Language.</p>
   </div>`;
@@ -2766,6 +3386,7 @@ async function openSend(jid) {
   const j = S.journals[jid], r = S.results[jid], s = journalStats(jid);
   const html = `<div class="sh-title"><div class="big">${T('Send results')}</div><div class="small muted mono">${esc(j.id)}</div></div>
     <div class="card small">${T('Trays checked: ')}<b>${s.checked}/${s.total}</b><br>${T('Cables handed over: ')}<b>${s.done}/${s.cables}</b><br>${T('Changes: ')}<b>${s.changes}</b><br>${T('Photos: ')}<b>${s.photos}</b><br>
+      ${s.ops.laid || s.ops.layWip || s.ops.tagsHung || s.ops.photos ? `${T('Laid: ')}<b>${s.ops.laid}</b> (${fmtLen(s.ops.laidM)} ${T('m')})${s.ops.layWip ? `, ${T('in work')} ${s.ops.layWip}` : ''} · ${T('tags on')} <b>${s.ops.tagsHung}</b><br>${T('Photos of operations: ')}<b>${s.ops.photos}</b> ${T('(a separate archive)')}<br>` : ''}
       ${T('Inspector: ')}<b>${esc(S.settings.inspector)}</b> <button class="link" data-sact="rename">${T('change')}</button>
       ${r.lastSent ? `<br><span class="muted">${T('Last sent ')}${fmtTime(r.lastSent)}</span>` : ''}</div>
     <p class="small muted" style="margin:0 2px 12px">${T('The file contains <b>all</b> your work on this journal so far. Send it to your supervisor. No signal? Telegram will send it when the signal is back.')}</p>
@@ -2777,16 +3398,17 @@ async function openSend(jid) {
     if (act === 'rename') { const n = await promptSheet(T('Your name'), S.settings.inspector, T('Name and surname'), T('Save')); if (n) { S.settings.inspector = n; await saveSettings(); } openSend(jid); return; }
     if (act !== 'share' && act !== 'save') return;
     const inc = $('#incPh') ? $('#incPh').checked : false;
-    busy(true); let text;
-    try { text = await buildExport(jid, inc); } catch (e) { busy(false); toast(T('Could not build the file: ') + e.message); return; }
+    busy(true); let text, zip = null; const base = `IKJ_${j.id}_${stamp()}`;
+    try { zip = await buildPhotoZip(jid); text = await buildExport(jid, inc, zip ? base + '_фото.zip' : null); }
+    catch (e) { busy(false); toast(T('Could not build the file: ') + e.message); return; }
     busy(false);
-    const name = `IKJ_${j.id}_${stamp()}.txt`;
-    const file = new File([text], name, {type: 'text/plain'});
-    const res = await shareOrSave(file, act);
+    const name = base + '.txt', files = [new File([text], name, {type: 'text/plain'})];
+    if (zip) files.push(new File([zip.blob], base + '_фото.zip', {type: 'application/zip'}));
+    const res = await shareFiles(files, act, daySummary(jid));
     if (res === 'cancelled') { toast(T('Not sent')); return; }
     r.lastSent = nowIso(); r.unsent = 0; await saveResult(jid);
     closeSheet(); render();
-    toast(res === 'shared' ? T('Sent ✓') : T('Saved to Downloads: {n}', {n: name}));
+    toast((res === 'shared' ? T('Sent ✓') : T('Saved to Downloads: {n}', {n: name + (zip ? ' + ' + base + '_фото.zip' : '')})) + ' · ' + daySummary(jid));
   });
 }
 async function doBackup() {
@@ -2829,7 +3451,20 @@ async function downscale(file, max = 1600, q = 0.72) {
 }
 $('#filePhoto').addEventListener('change', async ev => {
   const f = ev.target.files && ev.target.files[0]; ev.target.value = ''; if (!f || !photoTarget) return;
-  const {jid, mark} = photoTarget; if (isClosed(jid, mark)) { lockedToast(); return; } busy(true);
+  const {jid, mark, op} = photoTarget; if (isClosed(jid, mark)) { lockedToast(); return; } busy(true);
+  if (op) {
+    try {
+      const rc = S.results[jid].cables[mark], now = new Date(), p2 = n => String(n).padStart(2, '0');
+      const blob = await stampPhoto(f, [mark, T(OP_LABEL[op]), `${fmtDate(todayStr())} ${p2(now.getHours())}:${p2(now.getMinutes())}`]);
+      const p = {id: uid(), jid, mark, name: `${safeMark(mark)}_${op}_${stampC()}.jpg`, takenAt: nowIso(), blob, op};
+      await Store.putPhoto(p);
+      const rec = opsOf(rc)[op] || (opsOf(rc)[op] = {st: null, t: nowIso(), task: photoTarget.task || null, by: S.settings.inspector || ''});
+      rec.photos = [...(rec.photos || []), p.id]; rec.t = nowIso();
+      busy(false); commit(jid, mark, T('Photo added')); const pt = photoTarget; photoTarget = null;
+      openOpSheet(jid, mark, op, pt.task, pt.draft);
+    } catch (e) { busy(false); toast(T('Photo failed: ') + e.message); }
+    return;
+  }
   try {
     const blob = await downscale(f); const rc = S.results[jid].cables[mark];
     const n = (rc.photos || []).length + 1, safe = mark.replace(/[^A-Za-z0-9-]/g, '_');
@@ -2838,16 +3473,18 @@ $('#filePhoto').addEventListener('change', async ev => {
     busy(false); commit(jid, mark, T('Photo added')); render();
   } catch (e) { busy(false); toast(T('Photo failed: ') + e.message); }
 });
-async function openPhoto(jid, mark, pid) {
+async function openPhoto(jid, mark, pid, back) {
   const p = await Store.getPhoto(pid); if (!p) return; const u = URL.createObjectURL(p.blob);
   const handler = async act => {
     if (act === 'delp') {
       if (isClosed(jid, mark)) { lockedToast(); return; }
-      const rc = S.results[jid].cables[mark]; rc.photos = rc.photos.filter(x => x !== pid); await Store.delPhoto(pid);
+      const rc = S.results[jid].cables[mark]; rc.photos = (rc.photos || []).filter(x => x !== pid);
+      for (const op in (rc.ops || {})) if (rc.ops[op] && rc.ops[op].photos) rc.ops[op].photos = rc.ops[op].photos.filter(x => x !== pid);
+      await Store.delPhoto(pid);
       commit(jid, mark, T('Photo deleted')); closeSheet(); render();
     }
   };
-  handler.onClose = () => URL.revokeObjectURL(u);
+  handler.onClose = () => { URL.revokeObjectURL(u); if (back) setTimeout(back, 0); };
   openSheet(`<img src="${u}" alt="photo" style="width:100%;border-radius:12px;margin-bottom:10px"><div class="tiny muted" style="margin:0 2px 10px">${esc(p.name)} · ${fmtTime(p.takenAt)}</div>
     ${isClosed(jid, mark) ? '' : `<button class="btn danger-outline" data-sact="delp">${T('Delete photo')}</button>`}<button class="btn ghost" data-sact="close">${T('Close')}</button>`, handler);
 }
@@ -2877,7 +3514,7 @@ async function reopenCable(jid, mark) {
   commit(jid, mark, T('Cable returned to work')); render();
 }
 /* actions that change a cable — refused for a handed-over cable (the card / tray row explains why) */
-const EDIT_ACTS = new Set(['tick', 'entry', 'addStart', 'addEnd', 'copyRoute', 'addPhoto', 'lenOk', 'lenOther', 'tagYes', 'tagNo', 'tagAdd', 'addSeg', 'tYes', 'tNo', 'tOther']);
+const EDIT_ACTS = new Set(['tick', 'entry', 'addStart', 'addEnd', 'copyRoute', 'addPhoto', 'lenOk', 'lenOther', 'tagYes', 'tagNo', 'tagAdd', 'addSeg', 'tYes', 'tNo', 'tOther', 'op', 'mat']);
 view.addEventListener('click', async ev => {
   const el = ev.target.closest('[data-act]'); if (!el || el.disabled) return;
   const a = el.dataset.act, r = parseRoute(), jid = el.dataset.j || r.jid;
@@ -2936,11 +3573,37 @@ view.addEventListener('click', async ev => {
     case 'tOther': openEntrySheet(jid, el.dataset.m, el.dataset.k); break;
     case 'tAdd': trayAddCable(el.dataset.code); break;
     case 'lang': setLang(el.dataset.l); break;
+    /* 2.0: tasks and operations */
+    case 'openTasks': nav('#/task'); break;
+    case 'ttab': S.ui.taskTab = el.dataset.tab; render(); break;
+    case 'openTask': nav(rTask(el.dataset.id)); break;
+    case 'newTask': nav('#/task/new'); break;
+    case 'ntSave': { const t = buildTaskFile(); if (!t.items.length) break; await addTask(t, {silent: true});
+      downloadBlob(new Blob([JSON.stringify(t, null, 1)], {type: 'application/json'}), `IKJ_Задание_${t.due}_${(t.assignee || 'задание').replace(/[\\/:*?"<>|]+/g, '_')}.ikjt.json`);
+      S.ui.newTask = null; toast(T('Task file saved to Downloads — send it to the phone of {a}.', {a: t.assignee || '…'})); nav('#/task'); break; }
+    case 'delTask': {
+      const t = S.tasks[el.dataset.id]; if (!t) break;
+      const ok = await confirmSheet(T('Remove task <b>{id}</b> from this phone? The marks of the cables stay.', {id: esc(t.id)}), T('Remove'), T('Cancel'), true); if (!ok) break;
+      delete S.tasks[t.id]; await Store.del('task:' + t.id); if (parseRoute().v === 'task') nav('#/task'); else render(); break;
+    }
+    case 'sumX': saveSummary(el.dataset.j); break;
+    case 'op': openOpSheet(jid, el.dataset.m, el.dataset.op, el.dataset.task || null); break;
+    case 'mat': toggleMat(jid, el.dataset.m, el.dataset.task || null); render(); break;
+    case 'opc': {
+      const op = el.dataset.op, m = r.mark;
+      if (op === 'lay' || op === 'tags') { if (isClosed(jid, m)) { lockedToast(); break; } openOpSheet(jid, m, op, null); }
+      else if (op === 'done') { if (isClosed(jid, m)) toast(T('The cable is handed over ✓')); else closeCable(jid, m); }
+      else if (op === 'route') toast(T('Route check: tick the trays below.'));
+      else toast(T('Operation {n} «{o}» comes in version 2.1.', {n: OPS.indexOf(op) + 1, o: T(OP_LABEL[op])}));
+      break;
+    }
     case 'backup': doBackup(); break;
     case 'restore': $('#fileBackup').click(); break;
   }
 });
 $('#fileJournal').addEventListener('change', async ev => { const files = [...(ev.target.files || [])]; ev.target.value = ''; await loadFiles(files); });
+view.addEventListener('input', ev => { const el = ev.target.closest('[data-nt]'); if (el) newTaskInput(el); });
+view.addEventListener('change', ev => { const el = ev.target.closest('[data-nt=sel]'); if (el) newTaskInput(el); });
 $('#fileBackup').addEventListener('change', async ev => { const f = ev.target.files && ev.target.files[0]; ev.target.value = ''; if (f) doRestore(f); });
 
 /* ---------------------------------------------------------------- install / service worker */
@@ -2966,6 +3629,7 @@ function registerSW() {
       if (k === 'settings' && v) S.settings = Object.assign(S.settings, v);
       else if (k.startsWith('journal:') && v && v.id) S.journals[v.id] = v;
       else if (k.startsWith('result:') && v && v.journalId) S.results[v.journalId] = v;
+      else if (k.startsWith('task:') && v && v.id && v.journal) S.tasks[v.id] = v;
     }
   } catch (e) { console.error(e); }
   if (!S.settings.lang) S.settings.lang = /^ru\b/i.test(navigator.language || '') ? 'ru' : 'en';
