@@ -216,6 +216,12 @@ body.drop main{outline:3px dashed var(--primary);outline-offset:-6px;border-radi
 /* 1.7.1: add a tray before / after the selected one */
 .grid2.addba{margin:0 0 10px}
 .grid2.addba .btn{min-height:56px;font-size:15px;line-height:1.25;padding:6px 8px}
+.xmain .btn{margin:0;min-height:62px;font-size:15px;line-height:1.25;padding:6px 8px}
+.xprow{display:grid;grid-template-columns:30px 1fr;gap:8px;align-items:start;padding:8px 2px;border-bottom:1px solid var(--line);cursor:pointer}
+.xprow input{width:22px;height:22px;margin:2px 0 0}
+.xprow.on{background:var(--ok-bg)}
+.xpbar{position:sticky;bottom:0;padding:8px 0 calc(8px + env(safe-area-inset-bottom));background:var(--bg,#f4f6f8)}
+.xpbar .btn{margin:0}
 </style>
 </head>
 <body>
@@ -235,7 +241,7 @@ body.drop main{outline:3px dashed var(--primary);outline-offset:-6px;border-radi
 <input type="file" id="filePhoto" accept="image/*" class="hidden">
 <script>
 'use strict';
-const APP_VERSION = '2.0.2';
+const APP_VERSION = '2.0.3';
 const EMBEDDED_JOURNAL = null; /*EMBED*/
 const ST = {U:'unchecked', OK:'ok', CHG:'changed', NO:'absent', ADD:'added'};
 /* tray code: building (12.12URF10.109/3), site trestle (00USY24.195.02/3) or 07UBG structure (07UBG080P024.01/46);
@@ -342,7 +348,7 @@ const RU = { "Offline": "Нет сети",
   "Cable returned to work": "Кабель возвращён в работу",
   "Segment {n}: ": "Отрезок {n}: ", "Tags: present": "Бирки: есть", "Tags: none": "Бирки: нет", "Tags: add {n} pcs": "Бирки: довесить {n} шт.", "Tags: not marked": "Бирки: не отмечены", "Range split into {n}": "Диапазон раскрыт: {n}", "Add a tray to segment {n}": "Добавить полку в отрезок {n}", "＋ Add a tray to segment {n}": "＋ Добавить полку в отрезок {n}", "Cable tags": "Бирки", "not marked": "не отмечены", "Present": "Есть", "None": "Нет", "Add {n} pcs": "Довесить {n} шт.", "Add…": "Довесить…", "no trays in design": "в РД без полок", "segments {n}": "отрезки {n}", "{n} segments: confirm the length and the cable tags of each one below.": "Отрезков: {n}. Подтвердите длину и бирки каждого отрезка ниже.", "range · all {n} sections": "диапазон · все секции, {n} шт.", "from range": "из диапазона", "design: the whole range": "по РД: весь диапазон", "the mark applies to the range; split it in the cable card": "отметка относится ко всему диапазону; раскрыть по полкам можно в карточке кабеля", "Range: the cable runs along all {n} sections. ✓ confirms the whole range; «Trays one by one» lets you mark each section.": "Диапазон: кабель идёт по всем секциям ({n} шт.). ✓ подтверждает весь диапазон; «Полки по одной» — отметить каждую секцию отдельно.", "Trays one by one ({n})…": "Полки по одной ({n} шт.)…", "segment {n}": "отрезок {n}", "Cable tags to add": "Довесить бирки", "How many tags are missing on this part of the cable?": "Сколько бирок не хватает на этом отрезке кабеля?", "or type a number": "или введите число", "<b>length not confirmed</b> on segments {n}": "<b>длина не подтверждена</b> на отрезках {n}", "<b>cable tags not marked</b> on segments {n}": "<b>бирки не отмечены</b> на отрезках {n}", "<b>cable tags not marked</b>": "<b>бирки не отмечены</b>" };
 Object.assign(RU, {
-  "IKJ to Excel": "ИКЖ в Excel", "Handed-over cables": "Сданные", "Cables in work": "В работе", "All cables": "Все", "cab.": "каб.",
+  "IKJ to Excel": "ИКЖ в Excel", "The journal file has repeated cable marks: {m}. Ask for a corrected file.": "В файле журнала повторяются марки кабелей: {m}. Попросите исправленный файл.", "Full IKJ": "Полный ИКЖ", "whole journal": "весь журнал", "Partial IKJ": "Частичный ИКЖ", "choose cables": "выбрать кабели", "By status:": "По статусу:", "Partial IKJ…": "Частичный ИКЖ…", "Selection for the acts": "Выборка под акты", "Act: ": "Акт: ", "Section ": "Раздел ", "Tick shown": "Отметить показанные", "Untick shown": "Снять показанные", "Untick all": "Снять все", "selected {n} of {m} · {l} m": "выбрано {n} из {m} · {l} м", "Make IKJ part{k} — {n}": "Сформировать ИКЖ part{k} — {n}", "handed over": "сдан", "Tick the cables for this IKJ. Only they go into the file: rows one after another, ИТОГО over them, sheet «Обход» — the same cables. The ticks are kept on this device. File: {f}": "Отметьте кабели для этого ИКЖ. В файл попадут только они: строки подряд, ИТОГО — по ним, на листе «Обход» — те же кабели. Отметки запоминаются на этом устройстве. Файл: {f}", "Full IKJ — all cables of the journal. Partial IKJ — you tick the cables on the next screen; the file gets the index «part» and a number. Sheet «Обход» — what is left on every cable. The file is saved to Downloads: open it in Excel, WPS or Google Sheets.": "Полный ИКЖ — все кабели журнала. Частичный ИКЖ — кабели отмечаете на следующем экране, файл получит индекс part и номер. На листе «Обход» — что осталось по каждому кабелю. Файл сохраняется в «Загрузки»: откройте его в Excel, WPS или Google Таблицах.", "Handed-over cables": "Сданные", "Cables in work": "В работе", "All cables": "Все", "cab.": "каб.",
   "Sheet «ИКЖ» — the journal form with the actual route (black, red, blue) and lengths; sheet «Обход» — what is left on every cable. The file is saved to Downloads: open it in Excel, WPS or Google Sheets.":
     "Лист «ИКЖ» — форма журнала с трассой по факту (чёрный, красный, синий) и длинами; лист «Обход» — что осталось сделать по каждому кабелю. Файл сохраняется в «Загрузки»: откройте его в Excel, WPS или Google Таблицах.",
   "This journal was loaded from an older file — it has no IKJ form yet. Ask your supervisor for the new journal file and load it: your marks are kept.":
@@ -693,8 +699,51 @@ function validateJournal(o) {
   for (const c of o.cables) if (c.segs && !(Array.isArray(c.segs) && c.segs.length > 1 && c.segs.reduce((n, x) => n + (+x.trays || 0), 0) === c.route.length)) delete c.segs;
   return null;
 }
+/* 2.0.3: a journal file made in a Claude chat from the PDF of the design has no hash (and no IKJ form yet). The phone
+   prepares it exactly as the converter tools/ikj_from_journal.py does — marks trimmed, route items normalised
+   («A – B» → «A - B», no trailing «/»), parallel cables with one mark get «mark (No.)», hash = sha1 of [[mark, route]]
+   like journal_hash() — so the file returned by the converter (with the IKJ form) later updates the journal silently. */
+const normItemJ = t => { t = String(isNoneJ(t) ? '' : t).replace(/\s+/g, ' ').trim().replace(/^[,;]+|[,;]+$/g, '').trim();
+  if (/\d\s*[-–—]\s*\d{2}[A-Z]/.test(t)) t = t.replace(/\s*[-–—]\s*/g, ' - ');
+  return t.endsWith('/') ? t.slice(0, -1) : t; };
+const isNoneJ = v => v === null || v === undefined || v === false || v === 0 || v === '';
+function sha1hex(str) {
+  const by = new TextEncoder().encode(str), l = by.length, n = ((l + 8) >> 6) + 1, w = new Uint32Array(n * 16), x = new Uint32Array(80);
+  for (let i = 0; i < l; i++) w[i >> 2] |= by[i] << (24 - (i & 3) * 8);
+  w[l >> 2] |= 0x80 << (24 - (l & 3) * 8); w[n * 16 - 1] = l * 8;
+  let h0 = 0x67452301, h1 = 0xEFCDAB89, h2 = 0x98BADCFE, h3 = 0x10325476, h4 = 0xC3D2E1F0;
+  for (let o = 0; o < w.length; o += 16) {
+    for (let t = 0; t < 16; t++) x[t] = w[o + t];
+    for (let t = 16; t < 80; t++) { const v = x[t - 3] ^ x[t - 8] ^ x[t - 14] ^ x[t - 16]; x[t] = (v << 1) | (v >>> 31); }
+    let a = h0, b = h1, c = h2, d = h3, e = h4;
+    for (let t = 0; t < 80; t++) {
+      const f = t < 20 ? ((b & c) | (~b & d)) + 0x5A827999 : t < 40 ? (b ^ c ^ d) + 0x6ED9EBA1 : t < 60 ? ((b & c) | (b & d) | (c & d)) + 0x8F1BBCDC : (b ^ c ^ d) + 0xCA62C1D6;
+      const tmp = (((a << 5) | (a >>> 27)) + f + e + x[t]) >>> 0;
+      e = d; d = c; c = ((b << 30) | (b >>> 2)) >>> 0; b = a; a = tmp;
+    }
+    h0 = (h0 + a) >>> 0; h1 = (h1 + b) >>> 0; h2 = (h2 + c) >>> 0; h3 = (h3 + d) >>> 0; h4 = (h4 + e) >>> 0;
+  }
+  return [h0, h1, h2, h3, h4].map(v => v.toString(16).padStart(8, '0')).join('');
+}
+/* the same text as Python json.dumps([[mark, route], …], ensure_ascii=False) */
+const pyJsonMR = cables => '[' + cables.map(c => '[' + JSON.stringify(c.mark) + ', [' + c.route.map(x => JSON.stringify(x)).join(', ') + ']]').join(', ') + ']';
+const journalHashJ = cables => sha1hex(pyJsonMR(cables)).slice(0, 12);
+function prepChatJournal(j) {
+  if (j.hash) return false;
+  for (const c of j.cables) { c.mark = String(c.mark).trim(); c.route = c.route.map(normItemJ).filter(Boolean); }
+  const by = new Map(); for (const c of j.cables) { if (!by.has(c.mark)) by.set(c.mark, []); by.get(c.mark).push(c); }
+  for (const [m, cs] of by) if (cs.length > 1) {
+    const nos = cs.map(c => String(isNoneJ(c.no) ? '' : c.no).trim());
+    if (nos.every(Boolean) && new Set(nos).size === nos.length) cs.forEach((c, i) => { c.markRd = m; c.mark = `${m} (${nos[i]})`; });
+  }
+  j.hash = journalHashJ(j.cables);
+  return true;
+}
 async function addJournal(j, opts = {}) {
   const err = validateJournal(j); if (err) throw new Error(err);
+  prepChatJournal(j);
+  { const seen = new Set(), dup = []; for (const c of j.cables) { if (seen.has(c.mark)) dup.push(c.mark); seen.add(c.mark); }
+    if (dup.length) throw new Error(T('The journal file has repeated cable marks: {m}. Ask for a corrected file.', {m: [...new Set(dup)].slice(0, 5).join(', ')})); }
   const exist = S.journals[j.id];
   if (exist && exist.hash === j.hash) {
     if (JSON.stringify(exist) === JSON.stringify(j)) { if (!opts.silent) toast(T('This journal is already on the phone.')); return j.id; }
@@ -774,7 +823,8 @@ async function shareFiles(files, mode, text) {
    signatures, styles, column widths, print settings) and `xr` for every cable (its row of the template).
    IKJX.build(journal, results, group) makes the same workbook as the office converter
    (tools/ikj_tool.py apply / apply-split): sheet «ИКЖ» with the marked route and sheet «Обход».
-   group: 'all' | 'сдан' | 'в_работе'.  Everything is done on the device, no internet.
+   group: 'all' | 'сдан' | 'в_работе' | {marks: [...]} (2.0.3: partial ИКЖ — the cables ticked by the user, file index «part»).
+   Everything is done on the device, no internet.
    1.8: a journal may also carry `formSeg` (lay 'seg') and `xb` for every cable — the form «по участкам» like the cable
    journal of the RD: every segment of a cable is a block of rows («From» / «To» with X, Y, Z, design length, actual
    length, routing). Then the ИКЖ is made in that form (buildSeg), the same as the converter for such a template.
@@ -1208,6 +1258,7 @@ const IKJX = (() => {
     });
     let only = null;
     if (group === 'сдан' || group === 'в_работе') only = splitMarks(res, rows.map(x => x.key))[group];
+    else if (group && typeof group === 'object' && Array.isArray(group.marks)) only = new Set(group.marks.map(normMark));   /* 2.0.3: частичный ИКЖ */
     const keep = only ? rows.filter(x => only.has(normMark(x.key))) : rows;
     if (!keep.length) throw new Error('empty');
     const rep = only ? report.filter(it => only.has(normMark(it.mark))) : report;
@@ -1352,6 +1403,7 @@ const IKJX = (() => {
     /* which cables go into this file */
     let only = null;
     if (group === 'сдан' || group === 'в_работе') only = splitMarks(res, rows.map(x => x.key))[group];
+    else if (group && typeof group === 'object' && Array.isArray(group.marks)) only = new Set(group.marks.map(normMark));   /* 2.0.3: частичный ИКЖ */
     const keep = only ? rows.filter(x => only.has(normMark(x.key))) : rows;
     if (!keep.length) throw new Error('empty');
     const rep = only ? report.filter(it => only.has(normMark(it.mark))) : report;
@@ -1793,7 +1845,7 @@ const IKJX = (() => {
   }
   const hasForm = J => !!(J && ((J.formSeg && J.formSeg.lay === 'seg' && J.cables.every(c => Array.isArray(c.xb)))
                                  || (J.form && J.form.v >= 1 && J.cables.every(c => Array.isArray(c.xr)))));
-  return {xlsx, build, counts, splitMarks, parseRoute, nLines, toLocal, fmtLen, round2, hasForm, zip, mergeOps, summaryBuild, summaryXlsx};
+  return {xlsx, build, counts, splitMarks, normMark, parseRoute, nLines, toLocal, fmtLen, round2, hasForm, zip, mergeOps, summaryBuild, summaryXlsx};
 })();
 if (typeof module !== 'undefined' && module.exports) module.exports = IKJX;
 
@@ -2162,9 +2214,9 @@ const xlsErr = e => (e && e.message === 'no-form' ? T('the journal file is old')
 function xlsButtons(cnt, act, i) {
   return `<div class="grid3">${XGROUPS.map(([g, l]) => `<button class="btn ${g === 'сдан' ? 'primary' : ''}" data-${act === 'xg' ? 'sact' : 'act'}="${act}" data-g="${g}"${i === undefined ? '' : ` data-i="${i}"`} ${cnt[g] ? '' : 'disabled'}>${T(l)}<br><b>${cnt[g]}</b> ${T('cab.')}</button>`).join('')}</div>`;
 }
-async function saveXls(j, res, g, srcName) {
+async function saveXls(j, res, g, srcName, label) {
   const {blob} = await IKJX.xlsx(j, res, g, srcName);
-  const name = `${xlsStem(j.id)}_ИКЖ_${g === 'all' ? 'все' : g}_${stamp()}.xlsx`;
+  const name = `${xlsStem(j.id)}_ИКЖ_${label || (g === 'all' ? 'все' : g)}_${stamp()}.xlsx`;
   const file = new File([blob], name, {type: blob.type});
   const r = await shareOrSave(file, isMobile() ? 'share' : 'save');
   toast(r === 'shared' ? T('Sent ✓') : (r === 'cancelled' ? T('Not sent') : T('Saved to Downloads: {n}', {n: name})));
@@ -2183,15 +2235,132 @@ async function openXls(jid) {
   }
   const s = journalStats(jid), cnt = {'сдан': s.done, 'в_работе': s.cables - s.done, all: s.cables};
   openSheet(`<div class="sh-title"><div class="big">${T('IKJ to Excel')}</div><div class="small muted mono">${esc(j.id)}</div></div>
-    ${xlsButtons(cnt, 'xg')}
-    <p class="small muted" style="margin:8px 2px 12px">${T('Sheet «ИКЖ» — the journal form with the actual route (black, red, blue) and lengths; sheet «Обход» — what is left on every cable. The file is saved to Downloads: open it in Excel, WPS or Google Sheets.')}</p>
+    <div class="grid2 xmain">
+      <button class="btn primary" data-sact="xg" data-g="all">${T('Full IKJ')}<br><b>${cnt.all}</b> ${T('cab.')} · ${T('whole journal')}</button>
+      <button class="btn" data-sact="xpart">${T('Partial IKJ')}<br>${T('choose cables')}</button>
+    </div>
+    <div class="small muted" style="margin:12px 2px 6px">${T('By status:')}</div>
+    <div class="grid2 xmain">${[['сдан', 'Handed-over cables'], ['в_работе', 'Cables in work']].map(([g, l]) => `<button class="btn" data-sact="xg" data-g="${g}" ${cnt[g] ? '' : 'disabled'}>${T(l)}<br><b>${cnt[g]}</b> ${T('cab.')}</button>`).join('')}</div>
+    <p class="small muted" style="margin:10px 2px 12px">${T('Full IKJ — all cables of the journal. Partial IKJ — you tick the cables on the next screen; the file gets the index «part» and a number. Sheet «Обход» — what is left on every cable. The file is saved to Downloads: open it in Excel, WPS or Google Sheets.')}</p>
     <button class="btn ghost" data-sact="close">${T('Cancel')}</button>`, async (act, ds) => {
+    if (act === 'xpart') { nav(rX(jid, null)); return; }
     if (act !== 'xg') return;
     busy(true);
     try { const res = JSON.parse(await buildExport(jid, false)); await saveXls(j, res, ds.g, 'выгрузка из приложения'); closeSheet(); }
     catch (e) { console.error(e); toast(T('Could not build the file: ') + xlsErr(e)); }
     finally { busy(false); }
   });
+}
+/* ---- 2.0.3: partial ИКЖ — the user ticks the cables («threads») for the ИКЖ; the file gets the index «part» and a number.
+   src = null: marks of this phone; src = i: walk file S.ui.resFiles[i] (computer). Ticks of the phone are kept per journal
+   (S.settings.xpSel), the number — S.settings.xpN (next part on this device). */
+const rX = (jid, src) => `#/x/${enc(jid)}` + (src === null || src === undefined ? '' : `/r/${src}`);
+const xpNextN = jid => ((S.settings.xpN || {})[jid] || 0) + 1;
+function xpState(jid, src) {
+  const key = jid + '|' + (src === null ? 'phone' : src);
+  const saved = () => { const have = new Set(S.journals[jid].cables.map(c => c.mark));
+    return new Set((src === null ? ((S.settings.xpSel || {})[jid] || []) : []).filter(m => have.has(m))); };
+  if (!S.ui.xp || S.ui.xp.key !== key) S.ui.xp = {key, jid, src, sel: saved(), q: '', f: 'all', touched: false};
+  else if (!S.ui.xp.touched) S.ui.xp.sel = saved();      /* the screen may open before the settings are read at start-up */
+  return S.ui.xp;
+}
+function xpClosed(jid, src) {            /* mark -> handed over? (phone marks or the walk file) */
+  const j = S.journals[jid], m = new Map();
+  if (src === null) { const r = S.results[jid]; for (const c of j.cables) m.set(c.mark, !!(r && r.cables[c.mark] && r.cables[c.mark].closed)); }
+  else {
+    const rf = S.ui.resFiles[src], by = new Map();
+    for (const c of ((rf && rf.o.cables) || [])) by.set(IKJX.normMark(c.mark), isClosedRes(c));
+    for (const c of j.cables) m.set(c.mark, !!by.get(IKJX.normMark(c.mark)));
+  }
+  return m;
+}
+function xpFilters(j, closed) {
+  const n = f => j.cables.filter(f).length;
+  const out = [['all', T('All cables'), j.cables.length], ['сдан', T('Handed-over cables'), n(c => closed.get(c.mark))],
+               ['в_работе', T('Cables in work'), n(c => !closed.get(c.mark))]];
+  if (j.cables.some(c => c.sel)) out.push(['sel', T('Selection for the acts'), n(c => c.sel)]);
+  for (const a of [...new Set(j.cables.map(c => c.act).filter(Boolean))].sort()) out.push(['act:' + a, T('Act: ') + a, n(c => c.act === a)]);
+  const secs = [...new Set(j.cables.map(c => c.section).filter(Boolean))];
+  if (secs.length > 1) for (const sc of secs) out.push(['sec:' + sc, T('Section ') + sc, n(c => c.section === sc)]);
+  return out;
+}
+function xpMatch(c, st, closed) {
+  const f = st.f;
+  if (f === 'сдан' && !closed.get(c.mark)) return false;
+  if (f === 'в_работе' && closed.get(c.mark)) return false;
+  if (f === 'sel' && !c.sel) return false;
+  if (f.startsWith('act:') && c.act !== f.slice(4)) return false;
+  if (f.startsWith('sec:') && c.section !== f.slice(4)) return false;
+  const qs = squash(st.q);
+  return !qs || squash(c.no).includes(qs) || squash(c.mark).includes(qs) || squash(`${c.from || ''} ${c.to || ''} ${c.act || ''}`).includes(qs);
+}
+function xpRows(j, st, closed) {
+  const list = j.cables.filter(c => xpMatch(c, st, closed));
+  if (!list.length) return `<div class="small muted">${T('No cable matches.')}</div>`;
+  const secs = j.sections || [], many = new Set(j.cables.map(c => c.section)).size > 1;
+  let cur = null;
+  return list.map(c => { const on = st.sel.has(c.mark);
+    let head = '';
+    if (many && c.section !== cur) { cur = c.section; const sc = secs.find(x => x.id === cur) || {}; head = `<div class="sec-h">${esc(cur || '')}${tx(sc, 'title') ? ' · ' + esc(tx(sc, 'title')) : ''}${sc.sheets ? ` <span class="muted">(${T('sheets')} ${esc(sc.sheets)})</span>` : ''}</div>`; }
+    return head + `<label class="xprow ${on ? 'on' : ''}"><input type="checkbox" data-xp="1" data-m="${esc(c.mark)}" ${on ? 'checked' : ''}>
+    <span><span class="cno">${esc(c.no)}</span><span class="mono"><b>${esc(c.mark)}</b></span>${closed.get(c.mark) ? ` <span class="chip closed">${T('handed over')}</span>` : ''}${c.act ? ` <span class="chip blue">${esc(c.act)}</span>` : ''}<br>
+    <span class="tiny muted">${esc(tx(c, 'type'))} ${esc(c.size || '')} · ${esc(c.len)} ${T('m')} · ${esc(tx(c, 'from'))} → ${esc(tx(c, 'to'))}</span></span></label>`; }).join('');
+}
+function viewXPart(jid, src) {
+  const j = S.journals[jid], st = xpState(jid, src), closed = xpClosed(jid, src);
+  setHeader({title: T('Partial IKJ'), sub: jid, back: src === null ? rJ(jid) : '#/r'});
+  const fl = xpFilters(j, closed);
+  if (!fl.some(x => x[0] === st.f)) st.f = 'all';
+  view.innerHTML = `<div class="card">
+    <div class="small muted" style="margin:0 2px 10px">${T('Tick the cables for this IKJ. Only they go into the file: rows one after another, ИТОГО over them, sheet «Обход» — the same cables. The ticks are kept on this device. File: {f}', {f: `<b class="mono" id="xpFile">${esc(xlsStem(jid))}_ИКЖ_part${xpNextN(jid)}_…xlsx</b>`})}</div>
+    <select class="inp sm" id="xpF">${fl.map(([k, l, n]) => `<option value="${esc(k)}" ${k === st.f ? 'selected' : ''}>${esc(l)} (${n})</option>`).join('')}</select>
+    <input class="search mono" id="xpQ" value="${esc(st.q)}" placeholder="${T('Cable No. or mark, e.g. 4.0012')}" autocomplete="off">
+    <div class="grid3"><button class="btn" data-act="xpAdd">${T('Tick shown')}</button><button class="btn" data-act="xpDel">${T('Untick shown')}</button><button class="btn" data-act="xpClr">${T('Untick all')}</button></div>
+  </div>
+  <div class="card"><div class="lbl" id="xpSum"></div><div id="xpList">${xpRows(j, st, closed)}</div></div>
+  <div class="xpbar"><button class="btn primary big" data-act="xpGo" id="xpGo"></button></div>`;
+  xpUpd();
+  $('#xpQ').oninput = e => { st.q = e.target.value; $('#xpList').innerHTML = xpRows(j, st, closed); };
+  $('#xpF').onchange = e => { st.f = e.target.value; $('#xpList').innerHTML = xpRows(j, st, closed); };
+}
+function xpUpd() {
+  const st = S.ui.xp; if (!st || !S.journals[st.jid]) return;
+  const j = S.journals[st.jid], cs = j.cables.filter(c => st.sel.has(c.mark)), L = cs.reduce((a, c) => a + (lenNum(c.len) || 0), 0);
+  const sm = $('#xpSum'); if (sm) sm.textContent = T('selected {n} of {m} · {l} m', {n: cs.length, m: j.cables.length, l: fmtLen(L)});
+  const b = $('#xpGo'); if (b) { b.disabled = !cs.length; b.textContent = T('Make IKJ part{k} — {n}', {k: xpNextN(st.jid), n: plural(cs.length, 'cable')}); }
+  const f = $('#xpFile'); if (f) f.textContent = `${xlsStem(st.jid)}_ИКЖ_part${xpNextN(st.jid)}_…xlsx`;
+}
+function xpKeep() { const st = S.ui.xp; if (!st || st.src !== null) return; S.settings.xpSel = {...(S.settings.xpSel || {}), [st.jid]: [...st.sel]}; saveSettings(); }
+function xpToggle(el) {
+  const st = S.ui.xp; if (!st) return; const m = el.dataset.m;
+  if (el.checked) st.sel.add(m); else st.sel.delete(m);
+  st.touched = true; el.closest('.xprow').classList.toggle('on', el.checked); xpUpd(); xpKeep();
+}
+function xpBulk(mode) {
+  const st = S.ui.xp; if (!st) return; const j = S.journals[st.jid], closed = xpClosed(st.jid, st.src);
+  st.touched = true;
+  if (mode === 'clr') st.sel.clear();
+  else for (const c of j.cables) if (xpMatch(c, st, closed)) { if (mode === 'add') st.sel.add(c.mark); else st.sel.delete(c.mark); }
+  $('#xpList').innerHTML = xpRows(j, st, closed); xpUpd(); xpKeep();
+}
+async function xpBuild() {
+  const st = S.ui.xp; if (!st) return; const j = S.journals[st.jid];
+  const marks = j.cables.filter(c => st.sel.has(c.mark)).map(c => c.mark); if (!marks.length) return;
+  if (!IKJX.hasForm(j)) { toast(T('Could not build the file: ') + T('the journal file is old')); return; }
+  if (st.src === null && !S.settings.inspector) {
+    const name = await promptSheet(T('Your name'), '', T('Name and surname'), T('Continue')); if (!name) return;
+    S.settings.inspector = name; await saveSettings();
+  }
+  const k = xpNextN(st.jid);
+  busy(true);
+  try {
+    let res, srcName;
+    if (st.src === null) { res = JSON.parse(await buildExport(st.jid, false)); srcName = 'выгрузка из приложения'; }
+    else { const rf = S.ui.resFiles[st.src]; if (!rf) throw new Error('walk file'); res = rf.o; srcName = rf.name; }
+    await saveXls(j, res, {marks}, srcName, 'part' + k);
+    S.settings.xpN = {...(S.settings.xpN || {}), [st.jid]: k}; await saveSettings(); xpUpd();
+  } catch (e) { console.error(e); toast(T('Could not build the file: ') + xlsErr(e)); }
+  finally { busy(false); }
 }
 /* walk files IKJ_….txt (from «Send») opened in the app — on the office computer: ИКЖ in Excel from them */
 const isClosedRes = c => (c.closed === undefined || c.closed === null ? String(c.note || '').trim().toLowerCase() === 'сдан' : !!c.closed);
@@ -2215,7 +2384,7 @@ function resCard(rf, i) {
     <div class="small muted">${T('Inspector: ')}${esc(o.inspector || '—')} · ${fmtTime(o.exportedAt)}${o.app ? ' · ' + esc(o.app) : ''}</div>
     <div class="small">${plural(cabs.length, 'cable')} · ${T('handed over {n}', {n: closed})} · ${T('in work {n}', {n: cabs.length - closed})}${o.summary && o.summary.ops ? ` · ${T('laid {n}', {n: o.summary.ops.laid})} (${fmtLen(o.summary.ops.laidM || 0)} ${T('m')}) · ${T('tags on {n}', {n: o.summary.ops.tagsHung})}` : ''}${o.photosArchive ? `<br><span class="muted">${T('Photos: ')}${esc(o.photosArchive)}</span>` : ''}</div>
     ${warn ? `<div class="warnbox small" style="margin:8px 0 0">${warn}</div>` : ''}
-    ${cnt ? xlsButtons(cnt, 'resX', i) : ''}
+    ${cnt ? xlsButtons(cnt, 'resX', i) + `<button class="btn" data-act="resPart" data-i="${i}" style="margin:6px 0 0;min-height:44px">${T('Partial IKJ…')}</button>` : ''}
     <button class="btn ghost" data-act="resDel" data-i="${i}" style="margin:4px 0 0;min-height:40px">${T('Remove from the list')}</button>
   </div>`;
 }
@@ -2634,6 +2803,7 @@ function parseRoute() {
   if (p[0] === 'help') return {v: 'help'};
   if (p[0] === 'b' && p[1]) return {v: 'folder', b: p[1] === '-' ? '' : p[1]};
   if (p[0] === 'r') return {v: 'res'};
+  if (p[0] === 'x' && p[1]) return {v: 'xpart', jid: p[1], src: p[2] === 'r' && p[3] !== undefined && /^\d+$/.test(p[3]) ? +p[3] : null};
   if (p[0] === 'task') return p[1] === 'new' ? {v: 'tasknew'} : (p[1] ? {v: 'task', id: p.slice(1).join('/')} : {v: 'tasks'});
   return {v: 'home'};
 }
@@ -2656,6 +2826,7 @@ function render() {
     else if (r.v === 'help') viewHelp();
     else if (r.v === 'folder') viewFolder(r.b);
     else if (r.v === 'res') viewResFiles();
+    else if (r.v === 'xpart' && S.journals[r.jid] && (r.src === null || S.ui.resFiles[r.src])) viewXPart(r.jid, r.src);
     else if (r.v === 'tasks') viewTasks();
     else if (r.v === 'task') viewTask(r.id);
     else if (r.v === 'tasknew') viewTaskNew();
@@ -3040,7 +3211,7 @@ function viewHelp() {
   <p><b>Segments.</b> Some cables are printed in the design in several parts with their own lengths (inside the building — along the site — in another building). Each part has a numbered header in the cable card: confirm <b>its</b> length and tags, then tick the trays under it. The total length is calculated automatically. A part without trays in the design has a <b>＋ Add a tray to segment</b> button.</p>
   <p><b>Range of trays</b> <span class="mono">00USY24.176.01/10 – 00USY24.176.05/10</span> means the cable runs along all sections 01…05 of the trestle. Tap <b class="okc">✓</b> if it does. Tap the code → <b>Trays one by one</b> to split the range and mark every section separately.</p>
   <p><b>Cable status.</b> Every cable is <b>In work</b> until it is handed over. At the bottom of the cable card: <b>Cable handed over…</b> → the app asks to confirm (and warns if trays, length or tags are not marked yet). A handed-over cable is highlighted green and cannot be changed in this journal. Handed over by mistake? <b>Return to work…</b> at the bottom of the card.</p>
-  <p><b>IKJ to Excel.</b> In a journal tap <b>📊 IKJ to Excel</b> → <b>Handed-over cables</b>, <b>Cables in work</b> or <b>All cables</b>. The phone makes the as-built cable journal in Excel — the same form as in the office: the actual route in black / red / blue, actual lengths, totals; the second sheet «Обход» lists what is left on every cable. The file is saved to Downloads: open it in Excel, WPS or Google Sheets, or send it from there. Works without internet. The app says the journal file is old? Ask your supervisor for the new journal file and load it — your marks are kept.</p>
+  <p><b>IKJ to Excel.</b> In a journal tap <b>📊 IKJ to Excel</b> → <b>Full IKJ</b> (all cables of the journal) or <b>Partial IKJ</b>: on the next screen tick the cables (search, filter by status, act or section, «Tick shown») and tap <b>Make IKJ part…</b> — the file gets the index <b>part</b> and a number (part1, part2 … on this phone), only the ticked cables are in it, the ticks are kept. The row <b>By status</b> still has <b>Handed-over cables</b> and <b>Cables in work</b>. The phone makes the as-built cable journal in Excel — the same form as in the office: the actual route in black / red / blue, actual lengths, totals; the second sheet «Обход» lists what is left on every cable. The file is saved to Downloads: open it in Excel, WPS or Google Sheets, or send it from there. Works without internet. The app says the journal file is old? Ask your supervisor for the new journal file and load it — your marks are kept.</p>
   <p><b>4. Check by tray.</b> Standing at one tray? Open <b>By tray</b> (or search the tray code on the first screen) — you see the cables of <b>all</b> loaded journals on this tray and mark them at once.</p>
   <p><b>5. Colours</b> are the same as in the journal: black = as designed, <span class="red"><s>red crossed</s></span> = design tray not used, <span class="blue">blue</span> = actual tray.</p>
   <p><b>6. Mistake?</b> Tap <b>Undo</b> in the message at the bottom, or tap the tray code → <b>Clear mark</b>.</p>
@@ -3076,7 +3247,7 @@ const HELP_RU = `<div class="card help">
   <p><b>Диапазон полок</b> <span class="mono">00USY24.176.01/10 – 00USY24.176.05/10</span> означает, что кабель идёт по всем секциям эстакады 01…05. Нажмите <b class="okc">✓</b>, если это так. Код → <b>Полки по одной</b> — раскрыть диапазон и отметить каждую секцию отдельно.</p>
   <p><b>Длина.</b> Вверху карточки кабеля: <b>✓ … м как по РД</b>, если длина совпадает, или <b>Другая длина…</b> — ввести измеренную. Подтвердите её до того, как сдать кабель.</p>
   <p><b>Статус кабеля.</b> Каждый кабель — <b>В работе</b>, пока он не сдан. Внизу карточки кабеля: <b>Кабель сдан…</b> → приложение переспросит (и предупредит, если ещё не отмечены полки, длина или бирки). Сданный кабель подсвечен зелёным, изменить его в этом журнале нельзя. Сдали по ошибке — <b>Вернуть в работу…</b> внизу карточки.</p>
-  <p><b>ИКЖ в Excel.</b> В журнале нажмите <b>📊 ИКЖ в Excel</b> → <b>Сданные</b>, <b>В работе</b> или <b>Все</b>. Телефон сам сделает исполнительный кабельный журнал в Excel — та же форма, что в офисе: трасса по факту чёрным / красным / синим, длины по факту, ИТОГО; на втором листе «Обход» — что осталось сделать по каждому кабелю. Файл сохраняется в «Загрузки»: откройте его в Excel, WPS или Google Таблицах или отправьте оттуда. Работает без интернета. Приложение пишет, что файл журнала старый? Попросите у руководителя новый файл журнала и загрузите его — отметки сохранятся.</p>
+  <p><b>ИКЖ в Excel.</b> В журнале нажмите <b>📊 ИКЖ в Excel</b> → <b>Полный ИКЖ</b> (все кабели журнала) или <b>Частичный ИКЖ</b>: на следующем экране отметьте кабели (поиск, фильтр по статусу, акту или разделу, «Отметить показанные») и нажмите <b>Сформировать ИКЖ part…</b> — файл получит индекс <b>part</b> и номер (part1, part2 … на этом телефоне), в нём только отмеченные кабели, отметки запоминаются. В строке <b>По статусу</b> остались <b>Сданные</b> и <b>В работе</b>. Телефон сам сделает исполнительный кабельный журнал в Excel — та же форма, что в офисе: трасса по факту чёрным / красным / синим, длины по факту, ИТОГО; на втором листе «Обход» — что осталось сделать по каждому кабелю. Файл сохраняется в «Загрузки»: откройте его в Excel, WPS или Google Таблицах или отправьте оттуда. Работает без интернета. Приложение пишет, что файл журнала старый? Попросите у руководителя новый файл журнала и загрузите его — отметки сохранятся.</p>
   <p><b>4. Проверка у полки.</b> Стоите у одной полки? Откройте <b>По полкам</b> (или наберите код полки на главном экране) — видны кабели <b>всех</b> загруженных журналов на этой полке, их можно отметить разом.</p>
   <p><b>5. Цвета</b> как в журнале: чёрный — по проекту, <span class="red"><s>красный зачёркнутый</s></span> — проектная полка не использована, <span class="blue">синий</span> — фактическая полка.</p>
   <p><b>6. Ошибка?</b> Нажмите <b>Отменить</b> в сообщении внизу или код полки → <b>Снять отметку</b>.</p>
@@ -3535,6 +3706,11 @@ view.addEventListener('click', async ev => {
       break;
     }
     case 'resDel': S.ui.resFiles.splice(+el.dataset.i, 1); render(); break;
+    case 'resPart': { const rf = S.ui.resFiles[+el.dataset.i]; if (rf && rf.o.journal && S.journals[rf.o.journal.id]) nav(rX(rf.o.journal.id, +el.dataset.i)); break; }
+    case 'xpAdd': xpBulk('add'); break;
+    case 'xpDel': xpBulk('del'); break;
+    case 'xpClr': xpBulk('clr'); break;
+    case 'xpGo': await xpBuild(); break;
     case 'loadJ': $('#fileJournal').click(); break;
     case 'help': nav('#/help'); break;
     case 'install': if (S.installEvt) { S.installEvt.prompt(); try { await S.installEvt.userChoice; } catch (e) {} S.installEvt = null; render(); } break;
@@ -3606,6 +3782,7 @@ view.addEventListener('click', async ev => {
 $('#fileJournal').addEventListener('change', async ev => { const files = [...(ev.target.files || [])]; ev.target.value = ''; await loadFiles(files); });
 view.addEventListener('input', ev => { const el = ev.target.closest('[data-nt]'); if (el) newTaskInput(el); });
 view.addEventListener('change', ev => { const el = ev.target.closest('[data-nt=sel]'); if (el) newTaskInput(el); });
+view.addEventListener('change', ev => { const el = ev.target.closest('[data-xp]'); if (el) xpToggle(el); });
 $('#fileBackup').addEventListener('change', async ev => { const f = ev.target.files && ev.target.files[0]; ev.target.value = ''; if (f) doRestore(f); });
 
 /* ---------------------------------------------------------------- install / service worker */
