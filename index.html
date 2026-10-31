@@ -235,7 +235,7 @@ body.drop main{outline:3px dashed var(--primary);outline-offset:-6px;border-radi
 <input type="file" id="filePhoto" accept="image/*" class="hidden">
 <script>
 'use strict';
-const APP_VERSION = '2.0.1';
+const APP_VERSION = '2.0.2';
 const EMBEDDED_JOURNAL = null; /*EMBED*/
 const ST = {U:'unchecked', OK:'ok', CHG:'changed', NO:'absent', ADD:'added'};
 /* tray code: building (12.12URF10.109/3), site trestle (00USY24.195.02/3) or 07UBG structure (07UBG080P024.01/46);
@@ -1268,9 +1268,10 @@ const IKJX = (() => {
     const res = JSON.parse(JSON.stringify(res0));
     if (res.format !== 'ikj-field-results') throw new Error('Это не файл результатов обхода IKJ Field.');
     const jinfo = res.journal || {};
+    const RC = (F.cm && F.cm.route) || 12;   /* 2.0.2: графа размеченной трассы (M, если в шаблоне есть «Трасса по РД») */
     const rows = J.cables.map((c, i) => {
       const cells = new Map(); for (const [col, v, s] of c.xr[1]) cells.set(col, {v, s});
-      const lv = cells.get(12), pr = parseRoute(lv && typeof lv.v === 'string' ? lv.v : null);
+      const lv = cells.get(RC), pr = parseRoute(lv && typeof lv.v === 'string' ? lv.v : null);
       const av = cells.get(1), jv = cells.get(10);
       return {key: c.mark, trow: isNone(c.row) ? F.first + i : c.row, h: c.xr[0], cells, doc: pyStrip(String(av && !isNone(av.v) ? av.v : '')),
               len: jv ? (isNone(jv.v) ? null : jv.v) : null, route: pr.codes, lPrefix: pr.prefix, lSuffix: pr.suffix, segs: pr.segs};
@@ -1284,7 +1285,7 @@ const IKJX = (() => {
     const used = new Set();
     const styles = F.styles;
     const colW = c => { const d = (F.cols || []).find(x => x[0] <= c && c <= x[1]); return d && d[2] ? d[2] : 13; };
-    const widthL = colW(12) || 9.0;
+    const widthL = colW(RC) || 9.0;
     const report = [];
     rows.forEach((x, i) => {
       const r = F.first + i;
@@ -1307,8 +1308,8 @@ const IKJX = (() => {
         }
         [rich, plain] = richSegmented(x.segs, entries, rcSegs);
       } else [rich, plain] = richRoute(entries, x.lPrefix || '', x.lSuffix || '');
-      const L = x.cells.get(12) || {v: null, s: null};
-      x.cells.set(12, {v: rich, s: L.s});
+      const L = x.cells.get(RC) || {v: null, s: null};
+      x.cells.set(RC, {v: rich, s: L.s});
       const K = x.cells.get(11) || {v: null, s: null};
       const kfont = (K.s !== null && styles[K.s] && styles[K.s].font) || {};
       const kf = differs => Object.assign({}, K.s !== null ? styles[K.s] : {}, {font: {n: kfont.n || 'Arial', s: kfont.s || 8, c: differs ? BLUE : BLACK}});
@@ -1386,7 +1387,7 @@ const IKJX = (() => {
       });
       for (const [o1, c1, o2, c2] of F.mt || []) sh.merges.push([t0 + o1, c1, t0 + o2, c2]);
     }
-    if (only) { const lastRow = Math.max(...sh.rows.keys()); sh.area = `A1:L${lastRow}`; }
+    if (only) { const lastRow = Math.max(...sh.rows.keys()); const col = String(F.area || '').split(':').pop().replace(/[\d$]/g, '') || 'L'; sh.area = `A1:${col}${lastRow}`; }
     for (const it of rep) it.row = newpos.get(it.row) ?? it.row;
     computeCache(sh);
 
@@ -1795,6 +1796,7 @@ const IKJX = (() => {
   return {xlsx, build, counts, splitMarks, parseRoute, nLines, toLocal, fmtLen, round2, hasForm, zip, mergeOps, summaryBuild, summaryXlsx};
 })();
 if (typeof module !== 'undefined' && module.exports) module.exports = IKJX;
+
 /*IKJX-END*/
 
 /* ================================================================ 2.0: work orders (tasks) and operations of the cables
