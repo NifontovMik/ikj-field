@@ -36,8 +36,11 @@ header.top .title.tap .t1::after{content:" \25BE";font-size:14px;opacity:.85}
 .t2{font-size:13px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hbtn{background:transparent;border:0;color:#fff;min-width:46px;min-height:46px;border-radius:10px;font-size:24px;line-height:1;padding:0 8px}
 .hbtn:active{background:rgba(255,255,255,.18)}
+#hAct{display:flex;align-items:center;gap:4px}
+.hlang{background:rgba(255,255,255,.14);color:#fff;border:0;border-radius:10px;min-height:40px;padding:0 10px;font-weight:700;font-size:15px;white-space:nowrap}
+.hlang:active{background:rgba(255,255,255,.3)}
 .hsend{background:#fff;color:var(--hdr);border:0;border-radius:10px;min-height:42px;padding:0 12px;font-weight:700;font-size:15px;position:relative}
-@media (max-width:360px){.hsend{padding:0 9px;font-size:14px}.hbtn{min-width:40px;padding:0 4px}.rr .code{font-size:16px;letter-spacing:0}.rr .num{flex-basis:24px}}
+@media (max-width:360px){.hlang{padding:0 7px;font-size:14px}.hsend{padding:0 9px;font-size:14px}.hbtn{min-width:40px;padding:0 4px}.rr .code{font-size:16px;letter-spacing:0}.rr .num{flex-basis:24px}}
 .badge{position:absolute;top:-6px;right:-6px;background:#e5484d;color:#fff;border-radius:999px;font-size:12px;min-width:20px;height:20px;line-height:20px;padding:0 5px;text-align:center}
 .offl{font-size:12px;background:#ffd166;color:#3a2a00;border-radius:999px;padding:3px 8px;font-weight:700;white-space:nowrap}
 
@@ -243,7 +246,7 @@ body.drop main{outline:3px dashed var(--primary);outline-offset:-6px;border-radi
 <input type="file" id="filePhoto" accept="image/*" class="hidden">
 <script>
 'use strict';
-const APP_VERSION = '2.0.4';
+const APP_VERSION = '2.0.5';
 const EMBEDDED_JOURNAL = null; /*EMBED*/
 const ST = {U:'unchecked', OK:'ok', CHG:'changed', NO:'absent', ADD:'added'};
 /* tray code: building (12.12URF10.109/3), site trestle (00USY24.195.02/3) or 07UBG structure (07UBG080P024.01/46);
@@ -3055,8 +3058,10 @@ function setHeader({title, sub, back, send, onTitle}) {
   if (send) {
     const n = send === '*' ? totalUnsent() : ((S.results[send] || {}).unsent || 0);
     a = `<button class="hsend" id="hSend">${T('Send')}${n ? `<span class="badge">${n > 99 ? '99+' : n}</span>` : ''}</button>`;
-  } else if (!back) a = `<button class="hbtn" id="hSet" aria-label="Settings">&#9881;</button>`;
+  } else if (!back) a = `<button class="hlang" id="hLang" aria-label="Language" title="${LANG === 'ru' ? 'English' : 'Русский'}">🌐 ${LANG === 'ru' ? 'EN' : 'RU'}</button>`
+    + `<button class="hbtn" id="hSet" aria-label="Settings">&#9881;</button>`;   /* 2.0.5: язык — сразу в шапке */
   $('#hAct').innerHTML = a;
+  if ($('#hLang')) $('#hLang').onclick = () => setLang(LANG === 'ru' ? 'en' : 'ru');
   if (send) $('#hSend').onclick = () => (send === '*' ? openSendHub() : openSend(send));
   if ($('#hSet')) $('#hSet').onclick = () => nav('#/settings');
   const tt = $('#hTitle'); tt.classList.toggle('tap', !!onTitle); tt.onclick = onTitle || null;
@@ -3501,6 +3506,7 @@ function viewHelp() {
   <p><b>Folders.</b> With many journals the first screen shows folders by building (11URB, 11URF…). Tap a folder to see its journals. The search on the first screen looks through all journals.</p>
   <p><b>On a computer (Windows).</b> Open the site in Edge or Chrome → <b>Install IKJ Field</b> (the icon in the address bar, or menu ⋯ → Apps). Load the journals, then open — or drag into the window — the walk files IKJ_….txt that electricians sent: for every file <b>Handed-over / In work / All</b> → Excel. With 2.0: <b>📊 Summary</b> → Excel «Сводка выполнения» (plan of the tasks / fact, operations, what is left, the cable laying log F-31A as a draft) from all opened walk files and tasks; <b>📋 Tasks → Create a task…</b> → pick the journal, the cables, the due date, drum and materials → the task file for the phone.</p>
   <p><b>Important:</b> the app works without internet. Your marks are kept only on this phone until you send them — do not uninstall the app or clear Chrome data. Send at least once a day.</p>
+  <p class="small muted">Language: the <b>🌐 RU</b> button at the top of the main screen (or ⚙ → Language).</p>
   </div>`;
 }
 
@@ -3537,7 +3543,7 @@ const HELP_RU = `<div class="card help">
   <p><b>Папки.</b> Когда журналов много, на главном экране они собраны в папки по зданиям (11URB, 11URF…). Нажмите на папку — откроются её журналы. Поиск на главном экране ищет по всем журналам.</p>
   <p><b>На компьютере (Windows).</b> Откройте сайт в Edge или Chrome → <b>Установить IKJ Field</b> (значок в адресной строке или меню ⋯ → Приложения). Загрузите журналы, затем откройте — или перетащите в окно — файлы обхода IKJ_….txt, которые прислали электрики: у каждого файла <b>Сданные / В работе / Все</b> → Excel. С 2.0: <b>📊 Сводка</b> → Excel «Сводка выполнения» (план заданий / факт, операции, невыполненное, журнал прокладки F-31A черновиком) по всем открытым файлам обхода и заданиям; <b>📋 Задания → Создать задание…</b> → журнал, кабели, срок, барабан, материалы → файл задания для телефона.</p>
   <p><b>Важно:</b> приложение работает без интернета. Отметки хранятся только в этом телефоне, пока вы их не отправите — не удаляйте приложение и не очищайте данные Chrome. Отправляйте хотя бы раз в день.</p>
-  <p class="small muted">Язык: ⚙ → Язык / Language.</p>
+  <p class="small muted">Язык: кнопка <b>🌐 EN</b> вверху главного экрана (или ⚙ → Язык / Language).</p>
   </div>`;
 
 /* ---------------------------------------------------------------- switchers */
